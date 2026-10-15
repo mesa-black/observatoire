@@ -1,0 +1,162 @@
+# What runs on every push, modeled on the blog's CI: check, build the image,
+# point k3s-stack at it. CI never talks to the cluster.
+name: CI
+
+on:
+  push:
+  pull_request:
+  # Dependencies are checked daily too: no advisory today is not no advisory
+  # in a month, and a relevé month can pass without a commit.
+  schedule:
+    - cron: '23 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Tests and static analysis
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-24.04
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v5
+      -
+        name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_sqlite, sodium
+          coverage: none
+      -
+        name: Install the dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+      -
+        # Includes the parity test: the PHP port of build.sh must give relevé
+        # 1's data exactly as the prototype's jq did.
+        name: PHPUnit
+        run: vendor/bin/phpunit
+      -
+        name: PHPStan
+        run: |
+          php bin/console cache:warmup --env=dev
+          vendor/bin/phpstan analyse --no-progress --memory-limit=512M
+
+  dependencies:
+    name: Dependencies
+    runs-on: ubuntu-24.04
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v5
+      -
+        name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+      -
+        # --locked: what is checked is what the image installs.
+        name: Advisories
+        run: |
+          composer validate --strict --no-check-publish
+          composer audit --locked --no-interaction
+
+  # ---------------------------------------------------------------- delivery
+  image:
+    name: Image
+    needs: [tests, dependencies]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v5
+      -
+        # The heavy stage (composer, cache warmup) runs on the runner's own
+        # platform; only the base stage's small RUN (setcap) runs per
+        # architecture, hence emulation for arm64.
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      -
+        name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+      -
+        name: Log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        # Tagged with the full commit SHA, never `latest`: the deployment
+        # repository names exactly which build runs, and going back is a revert.
+        name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: frankenphp_prod
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ghcr.io/mesa-black/observatoire:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.description=Observatoire post-quantique, Symfony on FrankenPHP
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # GitOps, exactly as the blog: one line changed in k3s-stack, Argo CD does
+  # the rest. Rollback = git revert of that commit.
+  deploy:
+    name: Deploy (commit to k3s-stack)
+    needs: image
+    runs-on: ubuntu-24.04
+    concurrency:
+      group: deploy-observatoire
+      cancel-in-progress: false
+    steps:
+      -
+        # A deploy key with write access to k3s-stack and nothing else: its own
+        # key ("observatoire CI"), not the blog's, so that either can be
+        # revoked alone. Same secret name as in the blog's repository.
+        name: Checkout the deployment repository
+        uses: actions/checkout@v5
+        with:
+          repository: mesa-black/k3s-stack
+          ssh-key: ${{ secrets.K3S_STACK_DEPLOY_KEY }}
+          path: k3s-stack
+      -
+        name: Point the Observatoire at this build
+        working-directory: k3s-stack
+        run: |
+          yq -i '(.images[] | select(.name == "ghcr.io/mesa-black/observatoire")).newTag = "${{ github.sha }}"' \
+            spoke/apps/observatoire/kustomization.yaml
+          git diff --stat
+      -
+        name: Commit and push
+        working-directory: k3s-stack
+        env:
+          SUBJECT: ${{ github.event.head_commit.message }}
+        run: |
+          git diff --quiet && { echo "already deployed"; exit 0; }
+          subject=${SUBJECT%%$'\n'*}
+          git config user.name 'observatoire CI'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -q -a -F - <<MSG
+          observatoire: deploy ${GITHUB_SHA::7}
+
+          ${subject}
+
+          https://github.com/${{ github.repository }}/commit/${{ github.sha }}
+          MSG
+          for attempt in 1 2 3 4 5; do
+            git pull -q --rebase && git push -q && exit 0
+            sleep $((attempt * 3))
+          done
+          exit 1

@@ -1,0 +1,7 @@
+{% extends 'layout.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+    <h1>{{ title }}</h1>
+    <p>{{ text }}</p>
+    <p><a href="{{ path('home') }}">Revenir au relevé</a></p>
+{% endblock %}

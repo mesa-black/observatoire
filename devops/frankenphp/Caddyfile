@@ -1,0 +1,82 @@
+# FrankenPHP inside the image: Symfony in worker mode on :8080, plain HTTP. TLS
+# belongs to the ingress in front (Traefik); the headers belong to the site, so
+# they live here and travel with the image, as the blog's do.
+{
+	# No configuration API: the configuration is this file, baked in.
+	admin off
+	persist_config off
+	auto_https off
+	# On SIGTERM, wait at most this long for open connections (the default
+	# waits forever while the proxy keeps connections alive).
+	grace_period 10s
+
+	frankenphp {
+		worker {
+			file ./public/index.php
+			# symfony/runtime 7.4 runs the worker loop itself when it sees
+			# FRANKENPHP_WORKER: no extra runtime package.
+			{$FRANKENPHP_WORKER_CONFIG}
+		}
+	}
+}
+
+{$SERVER_NAME::8080} {
+	root * /app/public
+	encode zstd gzip
+
+	# The blog's policy, two lines stricter: a script is allowed (its own, from
+	# this origin), so the DOM sinks it could reach are locked with Trusted
+	# Types; and forms may post, to this origin only (newsletter, admin).
+	# The page's data is a <script type="application/json">: not executed, so
+	# no 'unsafe-inline' and no nonce.
+	header {
+		Content-Security-Policy "default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; require-trusted-types-for 'script'"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		Permissions-Policy "accelerometer=(), camera=(), display-capture=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), browsing-topics=()"
+		Cross-Origin-Opener-Policy "same-origin"
+		Cross-Origin-Resource-Policy "same-origin"
+		# Ignored over plain HTTP, honoured once the ingress serves it over TLS.
+		# No includeSubDomains: mesa.black's own header already carries it.
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+		-X-Powered-By
+	}
+
+	# The relevé pages only, by the owner's decision (2026-10-16): relevé 2
+	# plays a track hotlinked from archive.org, which redirects to a mirror.
+	# One directive added, for audio/video only; everything else stays as above.
+	# The one third-party request of the site, listed in SETUP.md as open.
+	@releve path / /releve/*
+	header @releve >Content-Security-Policy "default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; media-src https://archive.org https://*.archive.org; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; require-trusted-types-for 'script'"
+
+	# app.js and style.css are linked with ?v=<hash of their content>
+	# (App\Twig\AssetExtension): a new version is a new URL, so the old one can
+	# be kept forever.
+	@versioned {
+		path *.css *.js
+		query v=*
+	}
+	header @versioned Cache-Control "public, max-age=31536000, immutable"
+	@fonts path *.woff2
+	header @fonts Cache-Control "public, max-age=86400"
+
+	# Everything that is not a file goes to Symfony.
+	@phpRoute not file {path}
+	rewrite @phpRoute index.php
+
+	@frontController path index.php
+	php @frontController
+
+	file_server {
+		hide *.php
+	}
+
+	handle_errors {
+		header -Server
+	}
+
+	# No access log: nothing here needs visitors' IP addresses, and a log that
+	# is not written cannot leak (the rate limiter keeps them in memory, for
+	# an hour at most).
+}

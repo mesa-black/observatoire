@@ -1,0 +1,26 @@
+/* The admin's pages: plain and legible, nothing more. */
+:root { --fond: #fbf9f4; --encre: #1f2326; --doux: #5b6064; --filet: #e0d9cc; --lien: #2e4a55; --vif: #a5582a; }
+@media (prefers-color-scheme: dark) {
+    :root { --fond: #1e201f; --encre: #ece8df; --doux: #a7a59e; --filet: #2e302e; --lien: #9cbcc8; --vif: #dc915c; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fond); color: var(--encre); font: 16px/1.5 system-ui, sans-serif; }
+a { color: var(--lien); }
+.barre { display: flex; justify-content: space-between; gap: 1rem; padding: .8rem 1rem; border-bottom: 1px solid var(--filet); }
+main { max-width: 60rem; margin: 0 auto; padding: 1rem; }
+h1 { font-size: 1.6rem; }
+h2 { font-size: 1.2rem; margin-top: 2rem; }
+table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
+th, td { text-align: left; padding: .4rem .6rem; border-bottom: 1px solid var(--filet); vertical-align: top; }
+.pile { display: flex; flex-direction: column; gap: .8rem; max-width: 40rem; }
+.pile label { display: flex; flex-direction: column; gap: .3rem; }
+.pile label:has(input[type=radio]) { flex-direction: row; align-items: center; flex-wrap: wrap; }
+input, textarea, button, .bouton { font: inherit; }
+input[type=text], input[type=password], input[type=datetime-local], textarea { padding: .5rem; border: 1px solid var(--filet); background: transparent; color: inherit; }
+textarea { font-family: ui-monospace, Menlo, monospace; }
+button, .bouton { display: inline-block; padding: .5rem 1rem; border: 0; background: var(--lien); color: #fff; text-decoration: none; cursor: pointer; }
+.actions { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; }
+.cadre { margin-top: 1.5rem; padding: 1rem; border: 1px solid var(--filet); }
+.flash { padding: .6rem 1rem; border-left: 4px solid var(--lien); background: rgba(46, 74, 85, .08); }
+.erreur { padding: .6rem 1rem; border-left: 4px solid var(--vif); }
+.apercu { padding: 1rem 1.5rem; border: 1px solid var(--filet); font-family: Georgia, serif; }

@@ -1,0 +1,23 @@
+{# Included at the bottom of every relevé (bin/sync-prototype puts it there).
+   If this wording changes, bump App\Newsletter\Subscriptions::CONSENT_VERSION:
+   it is what each subscriber is recorded as having agreed to. #}
+<section class="wrap lettre" aria-labelledby="lettre-titre">
+    <div>
+        <p class="sur">Lettre d'information</p>
+        <h2 id="lettre-titre">Le prochain relevé, par courriel.</h2>
+        <p>Un message à chaque relevé, rien d'autre. L'adresse sert à cela seulement, n'est confiée à personne d'autre qu'au service d'envoi, et s'efface d'un clic depuis n'importe quel message.</p>
+    </div>
+    <form method="post" action="{{ path('newsletter_subscribe') }}" class="lettre-form">
+        <label for="lettre-email">Adresse électronique</label>
+        <div class="lettre-ligne">
+            <input type="email" id="lettre-email" name="email" required maxlength="254" autocomplete="email" inputmode="email" placeholder="vous@exemple.fr">
+            <button type="submit" class="bouton">S'inscrire</button>
+        </div>
+        {# Humans never see this field; robots fill every field they find. #}
+        <div class="lettre-piege" aria-hidden="true">
+            <label for="lettre-site">Ne pas remplir</label>
+            <input type="text" id="lettre-site" name="site" tabindex="-1" autocomplete="off">
+        </div>
+        <p class="lettre-note">Un message de confirmation vous sera envoyé : sans clic de votre part, rien n'est gardé. <a href="{{ path('privacy') }}">Ce qui est conservé, et pourquoi</a>.</p>
+    </form>
+</section>

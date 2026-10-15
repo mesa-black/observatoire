@@ -1,0 +1,44 @@
+#!/bin/sh
+# Copies one measurement from the prototype into releves/N/, the files exactly
+# as the probes wrote them. The relevé's own meta.json (title, publication
+# time) is written once, as a draft to edit; it is never overwritten.
+#
+#   sh bin/add-releve ../observatoire-pq 2 2026-10-16
+set -eu
+proto=$1; n=$2; date=$3
+case "$n" in ''|*[!0-9]*) echo "usage: $0 PROTO N YYYY-MM-DD" >&2; exit 1 ;; esac
+echo "$date" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' || { echo "usage: $0 PROTO N YYYY-MM-DD" >&2; exit 1; }
+here=$(cd "$(dirname "$0")/.." && pwd)
+dir=$here/releves/$n
+mkdir -p "$dir"
+
+for f in jsonl self.jsonl cost.jsonl self.cost.jsonl csp.jsonl self.csp.jsonl domains.json meta.json; do
+    src=$proto/results/$date.$f
+    if [ -f "$src" ]; then
+        cp "$src" "$dir/$date.$f"
+    else
+        case "$f" in
+            # Optional, as for build.sh: no meta, or cost still being measured.
+            meta.json|cost.jsonl|self.cost.jsonl) echo "  (no $date.$f)" ;;
+            # The list the relevé was measured against: the current one if no snapshot.
+            domains.json) cp "$proto/domains.json" "$dir/$date.domains.json"; echo "  $date.domains.json <- domains.json (no snapshot)" ;;
+            *) echo "✗ $src is missing" >&2; exit 1 ;;
+        esac
+    fi
+done
+
+if [ ! -f "$dir/meta.json" ]; then
+    # Far in the future on purpose: a relevé is published by a decision, not
+    # by being copied. Set the real time (Paris) before committing.
+    cat > "$dir/meta.json" <<JSON
+{
+    "number": $n,
+    "date": "$date",
+    "published": "2099-01-01 07:00",
+    "title": "Relevé n° $n",
+    "intro": "Chaque mois, ce que les portes d'entrée publiques des grandes organisations françaises laisseront lire le jour où un ordinateur quantique cassera l'échange de clés classique."
+}
+JSON
+    echo "  meta.json written: set \"published\" (Paris time) before committing"
+fi
+echo "✓ releves/$n <- $proto/results/$date.*"

@@ -1,0 +1,17 @@
+# The Observatoire post-quantique on the spoke. The Secret `observatoire` is
+# not listed: it is created by hand (create-secret.sh) and never committed.
+# The application's CI updates newTag below with yq, as for the blog.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - pvc.yaml
+  - configmap.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+  # Optional, off until the probe image exists (probe-cronjob.yaml says why).
+  # - probe-cronjob.yaml
+images:
+  - name: ghcr.io/mesa-black/observatoire
+    newTag: REPLACED-BY-CI

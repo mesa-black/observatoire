@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: observatoire
+  annotations:
+    mesa.black/description: "Observatoire post-quantique: the monthly relevés of French organisations' front doors, and their newsletter. Symfony on FrankenPHP, SQLite on a volume."
+    mesa.black/repository: "https://github.com/mesa-black/observatoire"
+    mesa.black/docs: "https://github.com/mesa-black/observatoire/blob/main/README.md"
+    mesa.black/deployment: "https://github.com/mesa-black/k3s-stack/tree/main/spoke/apps/observatoire"
+    mesa.black/url: "https://observatoire.mesa.black"

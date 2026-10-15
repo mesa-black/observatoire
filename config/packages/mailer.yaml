@@ -1,0 +1,9 @@
+framework:
+    mailer:
+        # brevo+api://xkeysib-…@default (an API key, not an SMTP key: see
+        # Show me the REX's config/packages/mailer.yaml for the trap).
+        dsn: '%env(MAILER_DSN)%'
+        envelope:
+            sender: '%env(MAILER_FROM)%'
+        headers:
+            From: '%env(MAILER_FROM)%'

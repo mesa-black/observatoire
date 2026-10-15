@@ -1,0 +1,26 @@
+framework:
+    secret: '%env(APP_SECRET)%'
+    http_method_override: false
+    handle_all_throwables: true
+    trusted_proxies: '%env(TRUSTED_PROXIES)%'
+    trusted_headers: ['x-forwarded-for', 'x-forwarded-proto', 'x-forwarded-host', 'x-forwarded-port']
+    # Absolute URLs (mails, consumer process) point here, whatever the request.
+    router:
+        default_uri: '%env(SITE_URL)%'
+    # Only the admin opens a session: the public pages set no cookie at all
+    # (the footer says so). Stored in var/cache: a pod restart logs the admin out.
+    session:
+        handler_id: null
+        save_path: '%kernel.cache_dir%/sessions'
+        cookie_secure: auto
+        cookie_samesite: strict
+        name: observatoire_admin
+    csrf_protection: true
+    php_errors:
+        log: true
+
+when@test:
+    framework:
+        test: true
+        session:
+            storage_factory_id: session.storage.factory.mock_file
