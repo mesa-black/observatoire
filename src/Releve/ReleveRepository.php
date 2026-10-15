@@ -65,6 +65,19 @@ final class ReleveRepository
         return $latest;
     }
 
+    /** The first relevé whose time has not come, if any: what the waiting page announces. */
+    public function nextScheduled(): ?Releve
+    {
+        $now = $this->clock->now();
+        foreach ($this->all() as $releve) {
+            if (!$releve->isPublishedAt($now)) {
+                return $releve;
+            }
+        }
+
+        return null;
+    }
+
     private function load(string $file): Releve
     {
         $meta = json_decode((string) file_get_contents($file), true, 16, \JSON_THROW_ON_ERROR);

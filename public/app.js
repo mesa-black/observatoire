@@ -55,8 +55,15 @@
         // the server takes, and the "hybrid" figure would be a classical one.
         if (e.pq === 'none') e.cost = null;
     }
+    // Each entry knows its group, the plaques' copies as much as the lists'.
+    for (const g of D.groups) for (const e of g.entries) e.g = g.key;
     const all = D.groups.flatMap(g => g.entries.map(e => ({ ...e, g: g.key })));
-    const measured = all.filter(e => e.reachable);
+    // Every figure on the page is about organisations. The AI providers of
+    // relevé 2 have their plaques and sheets, but are not counted among them:
+    // they are where the organisations send data, not organisations under
+    // review (and all but four are American, which would tilt every share).
+    const reachable = all.filter(e => e.reachable);
+    const measured = reachable.filter(e => e.g !== 'ia');
     const sealed = measured.filter(e => e.pq === 'full');
     const cdn = measured.filter(e => e.front && e.front !== 'other');
     const own = measured.filter(e => e.front === 'other');
@@ -78,7 +85,7 @@
         cursor: { label: 'Cursor', hosts: ['api2.cursor.sh'], what: 'le code source de ses développeurs' },
         perplexity: { label: 'Perplexity', hosts: ['www.perplexity.ai', 'api.perplexity.ai'] },
     };
-    const byHostAll = new Map(measured.map(e => [e.host, e]));
+    const byHostAll = new Map(reachable.map(e => [e.host, e]));
     // A provider is sealed only if every door of it we measured is.
     const providerSealed = k => PROVIDERS[k].hosts.every(x => byHostAll.get(x)?.pq === 'full');
     const lifeOf = e => LIFE[e.life] || LIFE[e.g];
@@ -97,6 +104,9 @@
                 ` ne l'est pas : ${PROVIDERS[k].what || 'ce qui y part'} chez ${usersOf(k).length} d'entre elles, dont `, names(usersOf(k), 4), `, s'échange en classique. `))) : '',
             `Combien de temps cela reste-t-il secret ? Faites avancer le Q-Day.`,
         );
+        sources($('chapo'), `les enregistrements DNS publics de chaque organisation (`, h('code', null, 'openai-domain-verification'), `, `,
+            h('code', null, 'anthropic-domain-verification'), `, `, h('code', null, 'cursor-domain-verification'), `…), lus le ${dateFr} sur ses serveurs DNS faisant autorité, et la porte de chaque fournisseur, mesurée le même jour. `,
+            `Pour vérifier : `, h('code', null, 'dig +short TXT qonto.com'), '.');
     } else {
         $('chapo').append(
             `Qui enregistre aujourd'hui le trafic chiffré vers un site pourra le lire le jour où un ordinateur quantique cassera l'échange de clés classique. Sur `,
@@ -325,7 +335,7 @@
                 // Its years, so the plaque says what the slider changes for it.
                 etat.textContent = (e.onDemand ? `◩ Sur demande · ${e.group} par défaut` : `◩ En partie · ${e.hits} connexions sur ${e.tries}`)
                     + (sensitive ? ` · sensible jusqu'en ${RECORDED + life.years}` : ` · plus sensible depuis ${RECORDED + life.years + 1}`);
-                if (sensitive) { exposed++; perGroup[group.key] = (perGroup[group.key] || 0) + 1; }
+                if (sensitive) { if (group.key !== 'ia') exposed++; perGroup[group.key] = (perGroup[group.key] || 0) + 1; }
                 scramble(flux, `${noise(e.host, 8)} ${kind}`);
             } else {
                 const now = sensitive ? 'ouvert' : 'perime';
@@ -338,7 +348,7 @@
                 etat.textContent = sensitive
                     ? `▲ Lisible en ${Y} · sensible jusqu'en ${until}, encore ${plural(until - Y + 1, 'an', 'ans')}`
                     : `△ Lisible en ${Y} · plus sensible depuis ${until + 1}`;
-                if (sensitive) { exposed++; perGroup[group.key] = (perGroup[group.key] || 0) + 1; }
+                if (sensitive) { if (group.key !== 'ia') exposed++; perGroup[group.key] = (perGroup[group.key] || 0) + 1; }
                 scramble(flux, label);
             }
         }
@@ -580,12 +590,25 @@
             const ok = e.ai.filter(providerSealed), ko = e.ai.filter(k => !providerSealed(k));
             const until = RECORDED + life.years;
             add(`Ouvert à l'IA : ${e.ai.map(k => PROVIDERS[k].label).join(', ')}.`,
-                `D'après ses enregistrements DNS publics, ${e.name} a vérifié son domaine auprès de ${plural(e.ai.length, 'ce fournisseur', 'ces fournisseurs')}, ce que demande l'ouverture d'un espace d'entreprise. `,
+                `D'après ses enregistrements DNS publics, ${e.name} a vérifié son domaine auprès de ${e.ai.length > 1 ? `ces ${e.ai.length} fournisseurs` : 'ce fournisseur'}, ce que demande l'ouverture d'un espace d'entreprise. `,
                 ok.length ? `Vers ${ok.map(k => PROVIDERS[k].label).join(' et ')}, le chemin est hybride : un échange enregistré aujourd'hui y reste illisible après le Q-Day. ` : '',
                 ko.map(k => Y <= until
                     ? `Vers ${PROVIDERS[k].label}, il est classique : ${PROVIDERS[k].what || 'ce qui y part'}, enregistré aujourd'hui, serait lisible en ${Y} et resterait sensible jusqu'en ${until}, soit ${plural(until - Y + 1, 'année', 'années')} d'exposition. `
                     : `Vers ${PROVIDERS[k].label}, il est classique, mais ce qui y part ne serait plus sensible en ${Y} selon notre hypothèse (jusqu'en ${until}). `),
                 `On ne voit ni ce qui est envoyé, ni en quelle quantité.`);
+        }
+        if ((e.hf || []).length) {
+            const tot = k => e.hf.reduce((n, o) => n + (o[k] || 0), 0);
+            add('En open source.', `Sur Hugging Face, ${plural(e.hf.length, 'compte vérifié', 'comptes vérifiés')} (${e.hf.map(o => o.name).join(', ')}) : `,
+                `${plural(tot('models'), 'modèle publié', 'modèles publiés')}, ${plural(tot('datasets'), 'jeu de données', 'jeux de données')}, ${plural(tot('spaces'), 'démonstration', 'démonstrations')}. `,
+                tot('models') + tot('datasets') ? `${e.name} ne fait pas que consommer de l'IA : elle en publie.` : `Un compte ouvert, rien de publié pour l'instant.`);
+        }
+        if (e.g === 'ia') {
+            const k = Object.keys(PROVIDERS).find(x => PROVIDERS[x].hosts.includes(e.host));
+            const users = k ? usersOf(k) : [];
+            if (users.length) add(`${plural(users.length, 'organisation de ce relevé', 'organisations de ce relevé')} y ont un espace.`,
+                `D'après leurs enregistrements DNS : `, names(users, 8), '. ',
+                e.pq === 'full' ? `Ce qu'elles y envoient passe par une porte scellée.` : `Ce qu'elles y envoient passe par une porte classique : lisible au Q-Day.`);
         }
         const p = cspOf(e);
         if (p && p.kind !== 'bloque') {
@@ -690,9 +713,34 @@
             link('host', 'srv');
         }
 
+        // Its ties to AI: providers it opened an account with (DNS), coloured by
+        // whether the way there is sealed, and what it publishes in the open.
+        if (e.g !== 'ia') {
+            (e.ai || []).forEach((k, i) => {
+                const door = PROVIDERS[k].hosts[0];
+                node(`ia${i}`, PROVIDERS[k].label, `fournisseur ${providerSealed(k) ? 'scelle' : 'ouvert'}`, 10, { href: `#${door}` });
+                link('org', `ia${i}`);
+            });
+            for (const [i, o] of (e.hf || []).entries()) {
+                const what = [o.models && `${o.models} modèles`, o.datasets && `${o.datasets} jeux`].filter(Boolean).join(', ') || 'compte vérifié';
+                node(`hf${i}`, `Hugging Face · ${what}`, 'logiciel', 7);
+                link('org', `hf${i}`);
+            }
+        } else {
+            // A provider's sheet: the organisations that opened an account with it.
+            const k = Object.keys(PROVIDERS).find(x => PROVIDERS[x].hosts.includes(e.host));
+            const users = k ? usersOf(k) : [];
+            if (users.length) {
+                node('clients', `${users.length} organisations clientes`, 'tiers', 12);
+                link('org', 'clients');
+                users.slice(0, most).forEach((o, i) => { node(`u${i}`, o.name, `voisin ${stateClass(o)}`, 6, { href: `#${o.host}` }); link('clients', `u${i}`); });
+                if (users.length > most) { node('urest', `+ ${users.length - most} autres`, 'reste', 4); link('clients', 'urest'); }
+            }
+        }
+
         // Neighbours: the organisations behind the same CDN, or else the same network.
         const hub = cdnName ? 'cdn' : op ? 'net' : null;
-        if (hub) {
+        if (hub && !(e.g === 'ia' && nodes.some(n => n.id === 'clients'))) {
             const same = others(e, o => cdnName ? o.front === e.front : operator(o)?.key === op.key);
             // A mix is what tells the story: alternate sealed and not, six at most
             // (four on a phone).
@@ -822,6 +870,7 @@
                             h('span', null, h('i', { class: 'pastille org' }), 'organisation'),
                             h('span', null, h('i', { class: 'pastille tiers' }), 'qui tient la porte, le réseau'),
                             h('span', null, h('i', { class: 'pastille ac' }), 'certificat, logiciel'),
+                            (e.ai || []).length && e.g !== 'ia' ? h('span', null, h('i', { class: 'pastille scelle' }), h('i', { class: 'pastille ouvert' }), 'fournisseurs d\'IA : chemin scellé ou classique') : null,
                             h('span', null, h('i', { class: 'pastille scelle' }), h('i', { class: 'pastille ouvert' }), 'mêmes voisins, cliquables'),
                         ),
                     ),
@@ -1103,6 +1152,8 @@
         const rest = measured.length - held;
         const restSealed = sealed.length - topSealed;
         const google = hubs.find(x => x.name === 'Google');
+        sources($('atlas-texte'),
+            `le réseau qui annonce l'adresse de chaque porte (Team Cymru, relevé du ${dateFr}), regroupé par entreprise ; pour les certificats, l'émetteur lu dans le certificat servi. Les ${reachable.length - measured.length} fournisseurs d'IA du relevé ne sont pas comptés.`);
         $('atlas-titre').append(`Cinq entreprises tiennent `, h('em', null, `${held} portes sur ${measured.length}`), '.');
         $('atlas-texte').append(
             top.map(x => `${x.name} ${x.list.length}`).join(', '), `. Derrière elles, ${pct(topSealed, held)} % des portes sont scellées ; chez tous les autres réunis, ${pct(restSealed, rest)} %. `,
@@ -1122,6 +1173,13 @@
         });
     }
 
+
+
+    // Where a block's figures come from, and how to check one without us.
+    function sources(after, ...body) {
+        after.after(h('p', { class: 'sources' }, h('b', null, 'Sources. '), ...body));
+    }
+    const asLink = asn => h('a', { href: `https://bgp.he.net/AS${asn}`, rel: 'noopener' }, `AS${asn}`);
 
     // ------------------------------------------------------------ jurisdiction
     // Whose law reaches the company that answers at the address. The parent
@@ -1228,6 +1286,15 @@
             `En France, la qualification SecNumCloud de l'ANSSI exige que le prestataire échappe aux lois extra-européennes ; vue de l'extérieur, rien ne dit si un site l'utilise. `,
             `On rattache chaque porte à la maison mère de l'entreprise qui répond à son adresse : c'est une lecture de la façade, pas un audit des contrats.`,
         );
+        const asnsOf = list => [...new Set(list.map(e => operator(e)?.asn).filter(Boolean))].sort((a, b) => a - b);
+        sources($('droit-note'),
+            `pour chacune des ${measured.length} organisations, l'adresse IP de sa porte, résolue le ${dateFr} ; le réseau qui annonce cette adresse sur Internet (annonce BGP) et le nom sous lequel il est enregistré, lus dans la base publique de Team Cymru ; la maison mère de ce réseau, rattachée par nous : `,
+            Object.entries(PARENT).filter(([c]) => measured.some(e => atlasBy.porte(e) === c)).map(([c, cc]) => `${c} (${COUNTRY[cc] || cc})`).join(', '),
+            ` ; les autres réseaux, au pays sous lequel ils sont enregistrés. `,
+            `Réseaux comptés aux États-Unis : `, asnsOf(us).flatMap((a, i) => [i ? ', ' : '', asLink(a)]), '. ',
+            `Chaque fiche donne l'adresse et le réseau de sa porte. Pour en vérifier une : `,
+            h('code', null, 'dig +short TXT <IP à l\'envers>.origin.asn.cymru.com'), '.',
+        );
     }
 
 
@@ -1281,6 +1348,8 @@
                 h('span', { class: 'noms' }, names(v.list, 4), '.'),
             ));
         }
+        sources($('csp-texte'), `l'en-tête Content-Security-Policy (ou la balise meta) de la page d'accueil de chaque organisation, chargée comme par un navigateur, redirections suivies, le ${dateFr} ; les scripts tiers présents dans son HTML. Pour vérifier : `,
+            h('code', null, 'curl -sIL https://<site>/ | grep -i content-security-policy'), '.');
         const eval_ = read.filter(([, p]) => p.flags && p.flags.unsafeEval).length;
         const tt = read.filter(([, p]) => p.flags && p.flags.trustedTypes).length;
         $('csp-note').append(
