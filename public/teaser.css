@@ -1,0 +1,16 @@
+/* The waiting page, on top of style.css's plaques and stamp. */
+.large { padding-block: 2.5rem 1rem; }
+.teaser { display: grid; grid-template-columns: minmax(0, 24rem) minmax(0, 1fr); gap: 2.5rem; align-items: center; margin: 2rem 0 2.5rem; }
+.teaser .enseigne { transform: rotate(-2deg); }
+.teaser-texte h1 { margin: 0 0 1rem; font: 400 clamp(2.6rem, 6vw, 4.4rem)/.98 var(--serif); }
+.teaser-texte h1 em { color: var(--vif); }
+.teaser-texte p { color: var(--doux); max-width: 34rem; }
+.teaser-quand { color: var(--encre) !important; font-size: 1.1rem; }
+.teaser-compte { margin-top: 1rem; }
+.teaser-compte .quoi { font-family: var(--mono); letter-spacing: .04em; }
+.teaser-mur { display: grid; grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); gap: .6rem; margin: 0 0 3rem; padding: 0; list-style: none; }
+.teaser-mur .plaque { display: flex; flex-direction: column; gap: .4rem; min-height: 5rem; padding: .8rem .9rem; border-radius: 10px; background: var(--p-perime); color: var(--ardoise); box-shadow: inset 0 0 0 3px var(--p-perime), inset 0 0 0 4.5px var(--ardoise); }
+.teaser-mur .flux { margin-top: auto; font: 500 .74rem/1.35 var(--mono); }
+.teaser-mur .etat { font: 600 .58rem/1.3 var(--sans); letter-spacing: .12em; text-transform: uppercase; }
+@media (max-width: 40rem) { .teaser { grid-template-columns: 1fr; gap: 1.5rem; } .teaser .enseigne { max-width: 20rem; } }
+@media (max-width: 40rem) { .teaser-mur .plaque:nth-child(n+9) { display: none; } }

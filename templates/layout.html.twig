@@ -8,9 +8,10 @@
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="{{ versioned('/style.css') }}">
 <link rel="stylesheet" href="{{ versioned('/site.css') }}">
+{% block head %}{% endblock %}
 </head>
 <body>
-<main class="wrap court">
+<main class="wrap {% block main_class %}court{% endblock %}">
     <p class="sur"><a href="{{ path('home') }}">Observatoire post-quantique</a></p>
     {% block body %}{% endblock %}
 </main>

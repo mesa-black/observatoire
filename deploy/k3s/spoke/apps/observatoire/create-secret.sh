@@ -33,11 +33,13 @@ case "$hash" in '$2y$'*|'$argon2'*) ;; *) echo "hashing failed" >&2; exit 1 ;; e
 totp=$(podman run --rm --entrypoint php "$image" bin/console app:admin:totp | sed -n 's/^ADMIN_TOTP_SECRET=//p')
 uri="otpauth://totp/Observatoire%20post-quantique:admin?secret=$totp&issuer=Observatoire%20post-quantique"
 
-read -rsp "Brevo API key (xkeysib-…): " key; echo
+read -rsp "Brevo API key (xkeysib-…, empty for none yet): " key; echo
+# No key yet: mail goes nowhere, and the app still runs (subscriptions wait).
+if [ -n "$key" ]; then dsn="brevo+api://$key@default"; else dsn="null://null"; fi
 
 k create secret generic observatoire --dry-run=client -o yaml --from-env-file=<(
   printf 'APP_SECRET=%s\n' "$app_secret"
-  printf 'MAILER_DSN=brevo+api://%s@default\n' "$key"
+  printf 'MAILER_DSN=%s\n' "$dsn"
   printf 'ADMIN_PASSWORD_HASH=%s\n' "$hash"
   printf 'ADMIN_TOTP_SECRET=%s\n' "$totp"
 ) | k apply -f -
