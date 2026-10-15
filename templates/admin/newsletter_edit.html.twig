@@ -1,0 +1,13 @@
+{% extends 'admin/layout.html.twig' %}
+{% block title %}{{ newsletter ? 'Modifier la lettre' : 'Nouvelle lettre' }}{% endblock %}
+{% block body %}
+<h1>{{ newsletter ? 'Modifier la lettre' : 'Nouvelle lettre' }}</h1>
+{% if error %}<p class="erreur">{{ error }}</p>{% endif %}
+<form method="post" class="pile">
+    <label>Objet <input type="text" name="subject" value="{{ subject }}" maxlength="200" required></label>
+    <label>Texte, en Markdown (le HTML est échappé ; le lien de désinscription est ajouté automatiquement)
+        <textarea name="body" rows="20" required>{{ body }}</textarea></label>
+    <input type="hidden" name="_token" value="{{ csrf_token('newsletter') }}">
+    <button type="submit">Enregistrer le brouillon</button>
+</form>
+{% endblock %}

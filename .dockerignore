@@ -1,0 +1,16 @@
+# Only what the image needs: the vendors are installed inside, the cache and
+# the database are the pod's, and nothing local or secret goes in.
+.git
+.github
+.env.local
+.env.*.local
+.env.local.php
+deploy
+var
+vendor
+tests
+*.md
+Makefile
+phpunit.dist.xml
+phpstan.dist.neon
+.phpunit.cache

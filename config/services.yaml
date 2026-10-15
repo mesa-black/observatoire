@@ -1,0 +1,39 @@
+parameters:
+    app.releves_dir: '%kernel.project_dir%/releves'
+    # Optional monthly probe (deploy/k3s/.../probe-cronjob.yaml) writes here.
+    app.probes_dir: '%kernel.project_dir%/var/data/probes'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        bind:
+            string $relevesDir: '%app.releves_dir%'
+            string $probesDir: '%app.probes_dir%'
+            string $adminEmail: '%env(ADMIN_EMAIL)%'
+            string $secret: '%env(APP_SECRET)%'
+            string $publicDir: '%kernel.project_dir%/public'
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    App\Security\AdminUserProvider:
+        arguments:
+            $passwordHash: '%env(ADMIN_PASSWORD_HASH)%'
+            $totpSecret: '%env(ADMIN_TOTP_SECRET)%'
+
+    App\Doctrine\SqliteMiddleware:
+        tags: [doctrine.middleware]
+
+when@test:
+    parameters:
+        app.releves_dir: '%kernel.project_dir%/tests/fixtures/releves'
+    services:
+        # Time stands still in tests, and they move it themselves.
+        Psr\Clock\ClockInterface:
+            class: Symfony\Component\Clock\MockClock
+            public: true
+            arguments: ['2026-10-16 12:00:00', 'UTC']

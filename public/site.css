@@ -1,0 +1,30 @@
+/* What the application adds to the prototype's style.css (synced, never
+   edited here): the newsletter form and the small pages around it. Same
+   tokens, so it follows the prototype's colours and dark mode. */
+
+.lettre {
+    display: grid; gap: 1.5rem 3rem; grid-template-columns: 1fr 1fr;
+    margin-top: 4.5rem; padding-top: 2.2rem; border-top: 1px solid var(--filet);
+}
+@media (max-width: 48rem) { .lettre { grid-template-columns: 1fr; } }
+.lettre h2 { margin: .5rem 0 .8rem; font: 400 1.9rem/1.1 var(--serif); }
+.lettre p { margin: 0 0 .8rem; color: var(--doux); }
+.lettre-form label { display: block; margin-bottom: .4rem; font-weight: 600; }
+.lettre-ligne { display: flex; gap: .6rem; flex-wrap: wrap; }
+.lettre-ligne input {
+    flex: 1 1 14rem; min-width: 0; padding: .65rem .8rem;
+    font: inherit; color: var(--encre); background: var(--papier);
+    border: 1px solid var(--filet); border-radius: 4px;
+}
+.lettre-ligne input:focus { outline: 2px solid var(--lien); outline-offset: 1px; }
+.lettre-ligne .bouton { border: 0; cursor: pointer; font: inherit; }
+.lettre-note { margin-top: .8rem; font-size: .88rem; }
+.lettre-note a, .pied a, .court a { color: var(--lien); }
+/* The honeypot: out of sight and out of reach, but still in the form. */
+.lettre-piege { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+.court { max-width: 42rem; padding-block: 3rem 1rem; }
+.court h1 { margin: .5rem 0 1rem; font: 400 2.4rem/1.1 var(--serif); }
+.court h2 { margin: 2rem 0 .5rem; font: 400 1.5rem/1.2 var(--serif); }
+.court form { margin: 1.5rem 0; }
+.court .bouton { border: 0; cursor: pointer; font: inherit; }

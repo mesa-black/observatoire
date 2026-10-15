@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>{% block title %}Administration{% endblock %} · Observatoire</title>
+<link rel="stylesheet" href="{{ versioned('/admin.css') }}">
+</head>
+<body>
+<header class="barre">
+    <a href="{{ path('admin_index') }}">Observatoire · administration</a>
+    {% if app.user %}<a href="{{ path('admin_logout') }}">Se déconnecter</a>{% endif %}
+</header>
+<main>
+    {% for message in app.flashes('ok') %}<p class="flash">{{ message }}</p>{% endfor %}
+    {% block body %}{% endblock %}
+</main>
+</body>
+</html>

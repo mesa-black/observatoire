@@ -1,0 +1,39 @@
+{% extends 'admin/layout.html.twig' %}
+{% block title %}{{ newsletter.subject }}{% endblock %}
+{% block body %}
+{% set token = csrf_token('newsletter-' ~ newsletter.id) %}
+<h1>{{ newsletter.subject }}</h1>
+<p>État : <b>{{ {draft: 'brouillon', scheduled: 'programmée', sending: 'en cours d\'envoi', sent: 'envoyée'}[newsletter.status] }}</b>
+{% if newsletter.scheduledAt %} · prévue le {{ newsletter.scheduledAt|date }}{% if newsletter.releveNumber %}, à la publication du relevé {{ newsletter.releveNumber }}{% endif %}{% endif %}
+{% if newsletter.sentAt %} · envoyée le {{ newsletter.sentAt|date }} à {{ newsletter.recipients }} adresse(s){% endif %}</p>
+
+<div class="actions">
+    {% if newsletter.editable %}<a href="{{ path('admin_newsletter_edit', {id: newsletter.id}) }}" class="bouton">Modifier</a>{% endif %}
+    <form method="post" action="{{ path('admin_newsletter_test', {id: newsletter.id}) }}">
+        <input type="hidden" name="_token" value="{{ token }}">
+        <button type="submit">Envoyer un test à {{ admin_email }}</button>
+    </form>
+    {% if newsletter.status == 'scheduled' %}
+    <form method="post" action="{{ path('admin_newsletter_unschedule', {id: newsletter.id}) }}">
+        <input type="hidden" name="_token" value="{{ token }}">
+        <button type="submit">Annuler la programmation</button>
+    </form>
+    {% endif %}
+</div>
+
+{% if newsletter.editable %}
+<form method="post" action="{{ path('admin_newsletter_schedule', {id: newsletter.id}) }}" class="pile cadre">
+    <h2>Envoyer à {{ confirmed }} abonné(s) confirmé(s)</h2>
+    <label><input type="radio" name="when" value="now" required> Maintenant (dans la minute)</label>
+    <label><input type="radio" name="when" value="at"> Le <input type="datetime-local" name="at"> (heure de Paris)</label>
+    {% for r in upcoming %}
+    <label><input type="radio" name="when" value="releve:{{ r.number }}"> À la publication du relevé {{ r.number }} ({{ r.publishedAt|date }})</label>
+    {% endfor %}
+    <input type="hidden" name="_token" value="{{ token }}">
+    <button type="submit">Programmer l'envoi</button>
+</form>
+{% endif %}
+
+<h2>Aperçu</h2>
+<article class="apercu">{{ html|raw }}</article>
+{% endblock %}

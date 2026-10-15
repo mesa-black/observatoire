@@ -1,0 +1,34 @@
+# The Observatoire post-quantique (observatoire.mesa.black), deployed from the
+# hub to mesa.black. To copy into k3s-stack/hub/apps/ once the Secret exists on
+# the spoke (spoke/apps/observatoire/create-secret.sh).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: observatoire
+  namespace: argocd
+  # No resources finalizer, as for vault: deleting this Application must never
+  # delete the subscribers' database. (The PVC also refuses deletion.)
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:mesa-black/k3s-stack.git
+    targetRevision: main
+    path: spoke/apps/observatoire
+  destination:
+    name: mesa-black
+    namespace: observatoire
+  syncPolicy:
+    automated:
+      # prune off for an application holding data, as for vault: a file
+      # removed by mistake must not remove a database.
+      prune: false
+      selfHeal: true
+  info:
+    - name: Site
+      value: https://observatoire.mesa.black
+    - name: Source
+      value: https://github.com/mesa-black/observatoire
+    - name: Notes
+      value: https://github.com/mesa-black/observatoire/blob/main/README.md
+    - name: Manifests
+      value: https://github.com/mesa-black/k3s-stack/tree/main/spoke/apps/observatoire

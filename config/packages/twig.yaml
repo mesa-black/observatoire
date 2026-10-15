@@ -1,0 +1,12 @@
+twig:
+    file_name_pattern: '*.twig'
+    # The publication calendar is Paris's: every date shown is Paris time.
+    date:
+        timezone: Europe/Paris
+        format: 'd/m/Y H:i'
+    globals:
+        admin_email: '%env(ADMIN_EMAIL)%'
+
+when@test:
+    twig:
+        strict_variables: true

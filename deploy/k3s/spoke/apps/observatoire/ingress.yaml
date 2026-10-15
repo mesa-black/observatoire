@@ -1,0 +1,45 @@
+# How the Observatoire is reached from the internet: Traefik terminates TLS
+# with a certificate from cert-manager, as for labs and vault. The security
+# headers are the application's own (devops/frankenphp/Caddyfile in its
+# repository): they travel with the image.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: observatoire
+  namespace: observatoire
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    # ECDSA P-256, as for the other sites (README 12.6).
+    cert-manager.io/private-key-algorithm: ECDSA
+    cert-manager.io/private-key-size: "256"
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.middlewares: observatoire-retry@kubernetescrd
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts: [observatoire.mesa.black]
+      secretName: observatoire-tls
+  rules:
+    - host: observatoire.mesa.black
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: observatoire
+                port:
+                  name: http
+---
+# While the pod is replaced (Recreate: a few seconds without one), a
+# connection can fail: retry rather than answer 502 at once. Only network
+# errors are retried, never a response the pod gave.
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: retry
+  namespace: observatoire
+spec:
+  retry:
+    attempts: 3
+    initialInterval: 500ms

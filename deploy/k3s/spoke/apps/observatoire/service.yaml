@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: observatoire
+  namespace: observatoire
+spec:
+  # No fixed clusterIP, unlike labs and vault: theirs was for host Caddy,
+  # which proxied by address and is gone since step 12. Traefik finds the
+  # Service by name.
+  selector:
+    app.kubernetes.io/name: observatoire
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

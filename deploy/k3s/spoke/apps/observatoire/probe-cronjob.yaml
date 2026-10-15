@@ -1,0 +1,115 @@
+# OPTIONAL — not in kustomization.yaml until enabled by hand.
+#
+# Once a month, measure the list of the latest relevé and leave the raw
+# results on the volume, under var/data/probes/<date>/, for review in the
+# admin. Never published automatically: a relevé is a decision, made by
+# copying these files into releves/N/ (make releve), reading them, and
+# committing.
+#
+# Prerequisite: the probe image (observatoire-pq/Containerfile: Alpine 3.22,
+# OpenSSL 3.5, probe.sh, cost.sh, csp.sh) built and pushed as
+# ghcr.io/mesa-black/observatoire-probe:<tag>. It is not today (SETUP.md).
+#
+# Caveats: the measure is taken from the server's network (OVH, Gravelines),
+# not from a workstation, and cost.sh takes ~20 min one host at a time, on a
+# 1-vCPU node that also serves the sites. The night is chosen for that.
+#
+# Fetch a run:  kubectl --context mesa-black -n observatoire cp -c web \
+#   $(kubectl --context mesa-black -n observatoire get pod -o name | head -1 | cut -d/ -f2):var/data/probes/<date> ./<date>
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: observatoire-probe
+  namespace: observatoire
+spec:
+  # The 15th, 03:30 Paris.
+  schedule: "30 3 15 * *"
+  timeZone: Europe/Paris
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 3600
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 7200
+      template:
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            fsGroup: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          initContainers:
+            # The list to measure: the latest relevé's, from the app image.
+            - name: list
+              image: ghcr.io/mesa-black/observatoire
+              command:
+                - sh
+                - -c
+                - |
+                  last=$(ls releves | sort -n | tail -1)
+                  cp releves/$last/*.domains.json /work/domains.json
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: [ALL]
+              volumeMounts:
+                - name: work
+                  mountPath: /work
+          containers:
+            # The same commands as observatoire-pq's README, written to the volume.
+            - name: probe
+              image: ghcr.io/mesa-black/observatoire-probe:CHANGE-ME
+              command:
+                - sh
+                - -c
+                - |
+                  set -eu
+                  d=$(date +%F)
+                  out=/data/probes/$d
+                  mkdir -p "$out"
+                  hosts() { jq -r '.groups[].entries[].host' /work/domains.json | sort -u; }
+                  cp /work/domains.json "$out/$d.domains.json"
+                  hosts | xargs -P 12 -n 1 sh /probe.sh > "$out/$d.jsonl"
+                  hosts | xargs -P 12 -n 1 sh /csp.sh > "$out/$d.csp.jsonl"
+                  sh /probe.sh mesa.black > "$out/$d.self.jsonl"
+                  sh /csp.sh mesa.black > "$out/$d.self.csp.jsonl"
+                  sh /cost.sh mesa.black > "$out/$d.self.cost.jsonl"
+                  hosts | xargs -P 1 -n 1 sh /cost.sh > "$out/$d.cost.jsonl"
+                  echo "done: $out"
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  memory: 128Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: [ALL]
+              volumeMounts:
+                # The live volume, next to the web pod: allowed, ReadWriteOnce
+                # is one node and there is one node (as vault-backup does).
+                - name: data
+                  mountPath: /data
+                - name: work
+                  mountPath: /work
+                - name: tmp
+                  mountPath: /tmp
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: observatoire-data
+            - name: work
+              emptyDir:
+                sizeLimit: 1Mi
+            - name: tmp
+              emptyDir:
+                sizeLimit: 16Mi

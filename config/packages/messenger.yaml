@@ -1,0 +1,26 @@
+framework:
+    messenger:
+        failure_transport: failed
+
+        transports:
+            # Doctrine transport on the same SQLite file: no extra service in a
+            # pod that has 1 vCPU to share. The consumer container reads it.
+            async:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                retry_strategy:
+                    max_retries: 3
+                    delay: 60000
+                    multiplier: 4
+            failed: 'doctrine://default?queue_name=failed&auto_setup=0'
+
+        routing:
+            # Only mail leaves the request: a visitor subscribing never waits on
+            # Brevo, and a newsletter is one queued message per recipient, each
+            # retried on its own.
+            'Symfony\Component\Mailer\Messenger\SendEmailMessage': async
+
+when@test:
+    framework:
+        messenger:
+            transports:
+                async: 'sync://'

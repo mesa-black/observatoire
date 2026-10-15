@@ -1,0 +1,59 @@
+{% extends 'admin/layout.html.twig' %}
+{% block body %}
+<h1>Tableau de bord</h1>
+
+<section>
+    <h2>Abonnés</h2>
+    <p><b>{{ counts.confirmed }}</b> confirmés · <b>{{ counts.pending }}</b> en attente de confirmation (effacés après sept jours).</p>
+</section>
+
+<section>
+    <h2>Relevés</h2>
+    <table>
+        <thead><tr><th>N°</th><th>Titre</th><th>Mesuré le</th><th>Publication (Paris)</th><th>État</th><th></th></tr></thead>
+        <tbody>
+        {% for r in releves %}
+            <tr>
+                <td>{{ r.number }}</td>
+                <td>{{ r.title }}</td>
+                <td>{{ r.date }}</td>
+                <td>{{ r.publishedAt|date }}</td>
+                <td>{{ r.isPublishedAt(now) ? 'publié' : 'à venir' }}</td>
+                <td>{% if r.isPublishedAt(now) %}<a href="{{ path('releve', {number: r.number}) }}">Voir</a>{% else %}<a href="{{ path('admin_releve_preview', {number: r.number}) }}">Aperçu</a>{% endif %}</td>
+            </tr>
+        {% else %}
+            <tr><td colspan="6">Aucun relevé.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+<section>
+    <h2>Lettres</h2>
+    <p><a href="{{ path('admin_newsletter_new') }}" class="bouton">Nouvelle lettre</a></p>
+    <table>
+        <thead><tr><th>Objet</th><th>État</th><th>Prévue (Paris)</th><th>Envoyée (Paris)</th><th>Destinataires</th></tr></thead>
+        <tbody>
+        {% for n in newsletters %}
+            <tr>
+                <td><a href="{{ path('admin_newsletter_show', {id: n.id}) }}">{{ n.subject }}</a></td>
+                <td>{{ {draft: 'brouillon', scheduled: 'programmée', sending: 'en cours', sent: 'envoyée'}[n.status] }}{% if n.releveNumber %} (relevé {{ n.releveNumber }}){% endif %}</td>
+                <td>{{ n.scheduledAt ? n.scheduledAt|date : '' }}</td>
+                <td>{{ n.sentAt ? n.sentAt|date : '' }}</td>
+                <td>{{ n.status == 'sent' ? n.recipients : '' }}</td>
+            </tr>
+        {% else %}
+            <tr><td colspan="5">Aucune lettre.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+
+{% if probes %}
+<section>
+    <h2>Mesures automatiques (facultatif)</h2>
+    <p>Résultats de la sonde mensuelle, sur le volume, en attente de relecture. Un relevé reste fait à la main : <code>make releve</code>, relecture, commit.</p>
+    <ul>{% for p in probes %}<li><code>var/data/probes/{{ p }}</code></li>{% endfor %}</ul>
+</section>
+{% endif %}
+{% endblock %}

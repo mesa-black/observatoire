@@ -1,0 +1,10 @@
+{% extends 'layout.html.twig' %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+    <h1>{{ title }}</h1>
+    <p>{{ text }}</p>
+    {# Posts to this same address: the link's token is the proof. #}
+    <form method="post">
+        <button type="submit" class="bouton">{{ button }}</button>
+    </form>
+{% endblock %}

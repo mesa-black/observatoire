@@ -1,0 +1,19 @@
+# The public settings. Secrets (APP_SECRET, MAILER_DSN, ADMIN_PASSWORD_HASH,
+# ADMIN_TOTP_SECRET) are in the Secret `observatoire`, created by hand
+# (create-secret.sh), never in Git.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: observatoire
+  namespace: observatoire
+data:
+  APP_ENV: "prod"
+  APP_DEBUG: "0"
+  # Absolute links in the mails are built from this.
+  SITE_URL: "https://observatoire.mesa.black"
+  # Must be a sender verified in Brevo, on a domain with SPF/DKIM/DMARC (SETUP.md).
+  MAILER_FROM: "Observatoire post-quantique <observatoire@mesa.black>"
+  # Receives the admin's test copies, shown in the privacy notice.
+  ADMIN_EMAIL: "jerome@nadaud.io"
+  # Traefik runs in the pod network: only its X-Forwarded-For is believed.
+  TRUSTED_PROXIES: "10.42.0.0/16"

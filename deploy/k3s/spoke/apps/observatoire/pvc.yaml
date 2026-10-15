@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: observatoire-data
+  namespace: observatoire
+  annotations:
+    # The subscribers' addresses: never deleted by Argo CD, neither when the
+    # file is removed (Prune) nor when the Application is deleted (Delete).
+    # local-path's reclaimPolicy is Delete: once the claim is gone, so is the
+    # directory on the node.
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
+spec:
+  # A directory on the node's disk; ReadWriteOnce is one node, which is also
+  # all SQLite wants.
+  storageClassName: local-path
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 1Gi

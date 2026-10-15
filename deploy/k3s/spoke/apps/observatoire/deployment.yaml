@@ -1,0 +1,136 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: observatoire
+  namespace: observatoire
+  annotations:
+    mesa.black/description: "FrankenPHP serving Symfony (web), and the same image consuming the mail queue and the scheduler (consumer). One SQLite file on a volume."
+    mesa.black/repository: "https://github.com/mesa-black/observatoire"
+    link.argocd.argoproj.io/external-link: "https://observatoire.mesa.black"
+spec:
+  replicas: 1
+  # Recreate, as for vault and unlike the blog: SQLite on a ReadWriteOnce
+  # volume means one pod. Two pods on the same database file, even for the
+  # few seconds of a rolling update, would be two web processes and two
+  # consumers sending the same queue. The price is a few seconds without a
+  # pod on each deploy, which Traefik's retry middleware mostly hides.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: observatoire
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: observatoire
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        # The volume's files belong to this group: both containers can write.
+        fsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        # Pages, the subscription form, the admin. Runs the migrations at
+        # start (docker-entrypoint), before FrankenPHP listens.
+        - name: web
+          image: ghcr.io/mesa-black/observatoire
+          envFrom:
+            - configMapRef:
+                name: observatoire
+            - secretRef:
+                name: observatoire
+          ports:
+            - name: http
+              containerPort: 8080
+          # Not "/": with no relevé published yet it is a 404 by design. This
+          # page goes through PHP and Twig, which is what has to work.
+          readinessProbe:
+            httpGet:
+              path: /confidentialite
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /confidentialite
+              port: http
+            periodSeconds: 30
+            failureThreshold: 3
+          lifecycle:
+            preStop:
+              sleep:
+                seconds: 5
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              memory: 192Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: data
+              mountPath: /app/var/data
+            - name: cache
+              mountPath: /app/var/cache
+            - name: tmp
+              mountPath: /tmp
+        # The mail queue and the scheduler (a letter's time has come; pending
+        # requests older than a week are deleted). A second container rather
+        # than a FrankenPHP worker: FrankenPHP's workers answer HTTP requests,
+        # this is a loop with no request; a container of its own is restarted
+        # on its own, logs on its own, and is bounded in memory on its own,
+        # while sharing the pod's volume — which SQLite requires.
+        - name: consumer
+          image: ghcr.io/mesa-black/observatoire
+          envFrom:
+            - configMapRef:
+                name: observatoire
+            - secretRef:
+                name: observatoire
+          # Waits for the web container's migrations, then consumes. It exits
+          # every hour (or past 96 MB) and the kubelet starts it again: a
+          # long-running PHP process is kept fresh that way.
+          command:
+            - sh
+            - -c
+            - |
+              until php bin/console doctrine:migrations:up-to-date --quiet; do sleep 2; done
+              exec php bin/console messenger:consume async scheduler_default --time-limit=3600 --memory-limit=96M
+          resources:
+            requests:
+              cpu: 5m
+              memory: 48Mi
+            limits:
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: data
+              mountPath: /app/var/data
+            - name: cache
+              mountPath: /app/var/cache
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        # observatoire.db: subscribers, letters, the queue.
+        - name: data
+          persistentVolumeClaim:
+            claimName: observatoire-data
+        # Twig's compiled templates, the rate limiter's windows, the admin's
+        # session: all rebuilt or forgotten at restart, by design.
+        - name: cache
+          emptyDir:
+            sizeLimit: 64Mi
+        - name: tmp
+          emptyDir:
+            sizeLimit: 16Mi

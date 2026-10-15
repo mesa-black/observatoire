@@ -1,0 +1,13 @@
+framework:
+    rate_limiter:
+        # A person subscribes once; a script tries again and again. Per address
+        # of origin, then per mailbox (so that nobody can flood a third party's
+        # inbox with confirmation requests from many addresses).
+        subscribe_ip:
+            policy: sliding_window
+            limit: 5
+            interval: '1 hour'
+        subscribe_email:
+            policy: fixed_window
+            limit: 3
+            interval: '1 day'
