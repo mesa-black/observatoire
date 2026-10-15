@@ -1,0 +1,8 @@
+{% extends 'layout.html.twig' %}
+{% block title %}Premier relevé le {{ when }}{% endblock %}
+{% block body %}
+    <h1>Enregistré <em>aujourd'hui</em>, lu demain.</h1>
+    <p>Chaque mois, l'observatoire relève ce que les portes d'entrée publiques des grandes organisations françaises laisseront lire le jour où un ordinateur quantique cassera l'échange de clés classique.</p>
+    <p><strong>Premier relevé le {{ when }}.</strong></p>
+    {{ include('newsletter/_form.html.twig') }}
+{% endblock %}
