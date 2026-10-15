@@ -28,7 +28,7 @@ final class ReleveController extends AbstractController
         // Before the first relevé, the address already answers: with the date
         // it opens, and the form to be told. Nothing of the relevé itself.
         $next = $this->releves->nextScheduled() ?? throw new NotFoundHttpException();
-        $response = $this->render('releve/bientot.html.twig', ['when' => self::frenchDate($next->publishedAt)]);
+        $response = $this->render('releve/bientot.html.twig', ['when' => self::frenchDate($next->publishedAt), 'short' => preg_replace('/ \d{4} à .*$/', '', self::frenchDate($next->publishedAt)), 'at' => $next->publishedAt->format(\DATE_ATOM), 'next' => $next]);
         $response->setPublic();
         $response->setMaxAge(60);
 

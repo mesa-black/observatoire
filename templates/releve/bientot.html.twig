@@ -1,8 +1,30 @@
 {% extends 'layout.html.twig' %}
 {% block title %}Premier relevé le {{ when }}{% endblock %}
+{% block head %}
+<meta name="description" content="Premier relevé le {{ when }} : ce que les portes d'entrée des grandes organisations françaises laisseront lire le jour où un ordinateur quantique cassera l'échange de clés classique.">
+<link rel="stylesheet" href="{{ versioned('/teaser.css') }}">
+<script src="{{ versioned('/teaser.js') }}" defer></script>
+{% endblock %}
+{% block main_class %}large{% endblock %}
 {% block body %}
-    <h1>Enregistré <em>aujourd'hui</em>, lu demain.</h1>
-    <p>Chaque mois, l'observatoire relève ce que les portes d'entrée publiques des grandes organisations françaises laisseront lire le jour où un ordinateur quantique cassera l'échange de clés classique.</p>
-    <p><strong>Premier relevé le {{ when }}.</strong></p>
-    {{ include('newsletter/_form.html.twig') }}
+<div class="teaser">
+    <div class="plaque enseigne" role="img" aria-label="Observatoire post-quantique, relevé n° 1">
+        <span class="haut">Observatoire</span>
+        <span class="nom">Post-quantique</span>
+        <span class="bas">Relevé n° {{ next.number }} · {{ short }}</span>
+    </div>
+    <div class="teaser-texte">
+        <h1>Enregistré <em>aujourd'hui</em>, lu demain.</h1>
+        <p>Les grandes organisations françaises, leurs portes d'entrée sur Internet relevées une à une : lesquelles un ordinateur quantique laissera lire, et combien de temps ce qu'elles protègent restera sensible.</p>
+        <p class="teaser-quand"><strong>Premier relevé le {{ when }}.</strong></p>
+        {# Filled by teaser.js; without it, the sentence above says it all. #}
+        <div class="tampon teaser-compte" id="compte" data-at="{{ at }}" hidden aria-live="off">
+            <div><span class="n" id="compte-n"></span><span class="quoi" id="compte-quoi"></span></div>
+        </div>
+    </div>
+</div>
+{# Plaques with no name and no verdict: the relevé is under embargo until its
+   time, and nothing here may tell who is sealed and who is not. #}
+<ul class="teaser-mur" id="mur" aria-hidden="true"></ul>
+{{ include('newsletter/_form.html.twig') }}
 {% endblock %}
