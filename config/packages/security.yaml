@@ -21,6 +21,18 @@ security:
             login_throttling:
                 max_attempts: 5
                 interval: '15 minutes'
+            # Once logged in, 30 days without logging in again. The cookie is
+            # signed with APP_SECRET and with the password hash: a new password
+            # signs everyone out. Only sent to /admin, over HTTPS.
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 2592000
+                always_remember_me: true
+                signature_properties: ['password']
+                path: /admin
+                secure: true
+                httponly: true
+                samesite: strict
             logout:
                 path: admin_logout
                 target: admin_login

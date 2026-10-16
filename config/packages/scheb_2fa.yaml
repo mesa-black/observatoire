@@ -8,3 +8,13 @@ scheb_two_factor:
         enabled: true
         issuer: 'Observatoire post-quantique'
         template: admin/2fa.html.twig
+    # The code is asked once per device, then the device is trusted 30 days
+    # (AdminUser::getTrustedTokenVersion invalidates them all on a new secret).
+    trusted_device:
+        enabled: true
+        lifetime: 2592000
+        extend_lifetime: false
+        cookie_name: observatoire_appareil
+        cookie_secure: true
+        cookie_same_site: strict
+        cookie_path: /admin

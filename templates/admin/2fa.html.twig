@@ -4,8 +4,11 @@
 <h1>Code de vérification</h1>
 {% if authenticationError %}<p class="erreur">Code incorrect.</p>{% endif %}
 <form method="post" action="{{ checkPathUrl ? checkPathUrl : path(checkPathRoute) }}" class="pile">
-    <label>Code à six chiffres de l'application d'authentification
+    <label>Code à six chiffres de votre application d'authentification (Mots de passe, 1Password…)
         <input type="text" name="{{ authCodeParameterName }}" inputmode="numeric" pattern="[0-9]{6}" autocomplete="one-time-code" required autofocus></label>
+    {% if isTrustedDeviceEnabled is defined and isTrustedDeviceEnabled %}
+    <label class="case"><input type="checkbox" name="{{ trustedParameterName }}" value="1" checked> Faire confiance à cet appareil pendant 30 jours</label>
+    {% endif %}
     {% if isCsrfProtectionEnabled %}<input type="hidden" name="{{ csrfParameterName }}" value="{{ csrf_token(csrfTokenId) }}">{% endif %}
     <button type="submit">Valider</button>
 </form>
