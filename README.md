@@ -136,21 +136,32 @@ web container's migrations, and exits every hour to be restarted fresh.
 
 ## Security headers
 
-Set by the Caddyfile inside the image, for every response, errors included:
+Every page PHP answers (errors included) gets its policy from
+`App\Security\ContentSecurityPolicy`, with a new nonce per response; the
+`<script>` tags carry it (`nonce="{{ csp_nonce() }}"`, inserted by
+`bin/sync-prototype` in the relevé template):
 
-    Content-Security-Policy: default-src 'none'; script-src 'self'; connect-src 'self';
-      style-src 'self'; font-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'self';
-      frame-ancestors 'none'; require-trusted-types-for 'script'
+    Content-Security-Policy: default-src 'none'; script-src 'nonce-…' 'strict-dynamic';
+      object-src 'none'; connect-src 'self'; style-src 'self'; font-src 'self';
+      img-src 'self' data:; base-uri 'none'; form-action 'self'; frame-ancestors 'none';
+      require-trusted-types-for 'script'
+
+Relevé pages and their previews (`/`, `/releve/*`, `/admin/releve/*`,
+`/apercu/*`) also get `media-src https://archive.org https://*.archive.org` for
+the soundtrack of relevé 2, by the owner's decision (the one third-party
+request of the site; open item in SETUP.md). They are `Cache-Control: private`:
+a shared cache must not hand the same nonce to everyone.
+
+Set by the Caddyfile inside the image, for every response:
+
+    Content-Security-Policy: (static files only: the same, with script-src 'self',
+      set only when PHP did not set one)
     Strict-Transport-Security: max-age=31536000
     X-Content-Type-Options: nosniff
     Referrer-Policy: no-referrer
     Permissions-Policy: (every powerful feature off, browsing-topics included)
     Cross-Origin-Opener-Policy / Cross-Origin-Resource-Policy: same-origin
     (no Server, no X-Powered-By)
-
-Relevé pages (`/`, `/releve/*`) only add `media-src https://archive.org
-https://*.archive.org` for the soundtrack of relevé 2, by the owner's decision
-(the one third-party request of the site; open item in SETUP.md).
 
 Public pages set no cookie. The admin has a session cookie (`SameSite=Strict`,
 `HttpOnly`, `Secure` behind TLS), CSRF tokens on every form, login throttling

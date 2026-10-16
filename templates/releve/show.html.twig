@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="{{ versioned('/style.css') }}">
 <link rel="stylesheet" href="{{ versioned('/site.css') }}">
 <script type="application/json" id="donnees">{{ donnees|raw }}</script>
-<script src="{{ versioned('/app.js') }}" defer></script>
+<script src="{{ versioned('/app.js') }}" nonce="{{ csp_nonce() }}" defer></script>
 {{ include('releve/_head.html.twig') }}
 </head>
 <body>

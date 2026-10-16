@@ -3,7 +3,7 @@
 {% block head %}
 <meta name="description" content="Premier relevé le {{ when }} : ce que les portes d'entrée des grandes organisations françaises laisseront lire le jour où un ordinateur quantique cassera l'échange de clés classique.">
 <link rel="stylesheet" href="{{ versioned('/teaser.css') }}">
-<script src="{{ versioned('/teaser.js') }}" defer></script>
+<script src="{{ versioned('/teaser.js') }}" nonce="{{ csp_nonce() }}" defer></script>
 {% endblock %}
 {% block main_class %}large{% endblock %}
 {% block body %}

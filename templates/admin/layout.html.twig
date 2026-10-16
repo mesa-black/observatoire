@@ -8,8 +8,8 @@
 <title>{% block title %}Administration{% endblock %} · Observatoire</title>
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="{{ versioned('/admin.css') }}">
-<script src="{{ versioned('/cle-acces.js') }}" defer></script>
-<script src="{{ versioned('/admin.js') }}" defer></script>
+<script src="{{ versioned('/cle-acces.js') }}" nonce="{{ csp_nonce() }}" defer></script>
+<script src="{{ versioned('/admin.js') }}" nonce="{{ csp_nonce() }}" defer></script>
 </head>
 <body>
 {% set route = app.request.attributes.get('_route') %}
