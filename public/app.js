@@ -190,6 +190,22 @@
         `Nous ne l'avons pas configuré : c'est le comportement par défaut du proxy qui sert ce site. Une façade scellée sans décision, comme beaucoup d'autres ci-dessous.`,
         s.page && /fonts.googleapis/.test(s.page.csp) ? ` Sa CSP n'autorise aucun script ; elle autorise en revanche les polices de Google Fonts, un tiers américain que nous devons encore retirer.` : '',
     );
+    // What is still wrong at home, from the same measurement: said as plainly
+    // as for the others.
+    const classicalGroups = (s.groups || []).filter(g => !/MLKEM/i.test(g));
+    const wrong = [
+        s.cert && !/ML-?DSA|SLH-?DSA/i.test(s.cert.sig || '') ? `notre certificat est signé en classique (${s.cert.curve ? `ECDSA ${s.cert.curve}` : s.cert.key}, ${s.cert.issuer}) : au Q-Day, quelqu'un pourra se faire passer pour nous. Aucune autorité reconnue par les navigateurs ne délivre encore de certificat post-quantique` : '',
+        classicalGroups.length ? `un navigateur qui ne connaît pas ML-KEM obtient de nous un échange classique (${classicalGroups.join(', ')}), sans que rien ne le refuse${(s.protocols || []).includes('tls1_2') ? ` ; TLS 1.2, encore accepté, ne peut pas faire mieux` : ''}` : '',
+        !s.hsts ? `pas de HSTS : un visiteur peut être ramené en HTTP` : !/preload/i.test(s.hsts) ? `notre HSTS n'est pas préchargé dans les navigateurs : la toute première visite peut encore être détournée en HTTP` : '',
+    ].filter(Boolean);
+    if (wrong.length) $('nous').append(' ', h('b', null, 'Ce qui ne va pas chez nous : '), wrong.join(' ; '), '.');
+    // Relevé 2 opens on its screens (who sends what to which AI, the
+    // machine's vision): we come first, right under the façade note.
+    if (M.focus === 'ia') {
+        const box = h('div', { class: 'wrap' });
+        $('scan').before(box);
+        box.append($('nous'));
+    }
 
     // Deterministic noise per host: the same door always shows the same ciphertext.
     const GLYPHS = '0123456789abcdef';
