@@ -1,39 +1,47 @@
 {% extends 'admin/layout.html.twig' %}
+{% import 'admin/_ui.html.twig' as ui %}
 {% block title %}{{ newsletter.subject }}{% endblock %}
-{% block body %}
-{% set token = csrf_token('newsletter-' ~ newsletter.id) %}
-<h1>{{ newsletter.subject }}</h1>
-<p>État : <b>{{ {draft: 'brouillon', scheduled: 'programmée', sending: 'en cours d\'envoi', sent: 'envoyée'}[newsletter.status] }}</b>
-{% if newsletter.scheduledAt %} · prévue le {{ newsletter.scheduledAt|date }}{% if newsletter.releveNumber %}, à la publication du relevé {{ newsletter.releveNumber }}{% endif %}{% endif %}
-{% if newsletter.sentAt %} · envoyée le {{ newsletter.sentAt|date }} à {{ newsletter.recipients }} adresse(s){% endif %}</p>
-
-<div class="actions">
-    {% if newsletter.editable %}<a href="{{ path('admin_newsletter_edit', {id: newsletter.id}) }}" class="bouton">Modifier</a>{% endif %}
+{% block fil %}<p class="fil"><a href="{{ path('admin_newsletter_index') }}">Lettres</a> › n° {{ newsletter.id }}</p>{% endblock %}
+{% block heading %}{{ newsletter.subject }} {{ ui.statut(newsletter.status) }}{% endblock %}
+{% block header_actions %}
+    {% set token = csrf_token('newsletter-' ~ newsletter.id) %}
+    {% if newsletter.editable %}<a href="{{ path('admin_newsletter_edit', {id: newsletter.id}) }}" class="bouton second">{{ ui.ico('crayon') }} Modifier</a>{% endif %}
     <form method="post" action="{{ path('admin_newsletter_test', {id: newsletter.id}) }}">
         <input type="hidden" name="_token" value="{{ token }}">
-        <button type="submit">Envoyer un test à {{ admin_email }}</button>
+        <button type="submit" class="second">{{ ui.ico('envoi') }} Envoyer un test à {{ admin_email }}</button>
     </form>
-    {% if newsletter.status == 'scheduled' %}
-    <form method="post" action="{{ path('admin_newsletter_unschedule', {id: newsletter.id}) }}">
-        <input type="hidden" name="_token" value="{{ token }}">
-        <button type="submit">Annuler la programmation</button>
-    </form>
-    {% endif %}
+{% endblock %}
+{% block body %}
+{% set token = csrf_token('newsletter-' ~ newsletter.id) %}
+<div class="deux">
+    <div>
+        <section class="carte">
+            <h2>{{ ui.ico('horloge') }} Calendrier</h2>
+            {% if newsletter.status == 'draft' %}
+                <p>Brouillon : rien n'est programmé.</p>
+            {% elseif newsletter.status == 'scheduled' %}
+                <p>Part le <b>{{ newsletter.scheduledAt|date('d/m/Y \\à H:i') }}</b> (Paris){% if newsletter.releveNumber %}, à la publication du relevé {{ newsletter.releveNumber }}{% endif %}, à {{ confirmed }} abonné{{ confirmed > 1 ? 's' }}.</p>
+                <form method="post" action="{{ path('admin_newsletter_unschedule', {id: newsletter.id}) }}" class="actions">
+                    <input type="hidden" name="_token" value="{{ token }}">
+                    <button type="submit" class="second">Annuler la programmation</button>
+                </form>
+            {% elseif newsletter.status == 'sending' %}
+                <p>Envoi en cours.</p>
+            {% else %}
+                <p>Envoyée le <b>{{ newsletter.sentAt|date('d/m/Y \\à H:i') }}</b> à {{ newsletter.recipients }} adresse{{ newsletter.recipients > 1 ? 's' }}.</p>
+            {% endif %}
+            <p class="discret">Créée le {{ newsletter.createdAt|date('d/m/Y \\à H:i') }}.</p>
+        </section>
+
+        {% if newsletter.editable %}
+        <form method="post" action="{{ path('admin_newsletter_schedule', {id: newsletter.id}) }}" class="carte">
+            <h2>{{ ui.ico('envoi') }} Programmer l'envoi</h2>
+            {% include 'admin/_moments.html.twig' with {with_draft: false, when: '', at_date: '', at_time: '09:00'} %}
+            <input type="hidden" name="_token" value="{{ token }}">
+            <div class="actions"><button type="submit" class="envoi">Programmer l'envoi</button></div>
+        </form>
+        {% endif %}
+    </div>
+    {{ ui.courriel(newsletter.subject, html) }}
 </div>
-
-{% if newsletter.editable %}
-<form method="post" action="{{ path('admin_newsletter_schedule', {id: newsletter.id}) }}" class="pile cadre">
-    <h2>Envoyer à {{ confirmed }} abonné(s) confirmé(s)</h2>
-    <label><input type="radio" name="when" value="now" required> Maintenant (dans la minute)</label>
-    <label><input type="radio" name="when" value="at"> Le <input type="datetime-local" name="at"> (heure de Paris)</label>
-    {% for r in upcoming %}
-    <label><input type="radio" name="when" value="releve:{{ r.number }}"> À la publication du relevé {{ r.number }} ({{ r.publishedAt|date }})</label>
-    {% endfor %}
-    <input type="hidden" name="_token" value="{{ token }}">
-    <button type="submit">Programmer l'envoi</button>
-</form>
-{% endif %}
-
-<h2>Aperçu</h2>
-<article class="apercu">{{ html|raw }}</article>
 {% endblock %}

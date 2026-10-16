@@ -1,3 +1,4 @@
+{% import 'admin/_ui.html.twig' as ui %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -5,17 +6,49 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>{% block title %}Administration{% endblock %} · Observatoire</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="{{ versioned('/admin.css') }}">
 <script src="{{ versioned('/cle-acces.js') }}" defer></script>
+<script src="{{ versioned('/admin.js') }}" defer></script>
 </head>
 <body>
-<header class="barre">
-    <a href="{{ path('admin_index') }}">Observatoire · administration</a>
-    {% if app.user %}<a href="{{ path('admin_logout') }}">Se déconnecter</a>{% endif %}
-</header>
-<main>
-    {% for message in app.flashes('ok') %}<p class="flash">{{ message }}</p>{% endfor %}
-    {% block body %}{% endblock %}
+{% set route = app.request.attributes.get('_route') %}
+{# Signed in: the sidebar. Before that (password, code), one card alone. #}
+{% if is_granted('ROLE_ADMIN') %}
+<div class="cadre-admin">
+    <nav class="barre" aria-label="Administration">
+        <a href="{{ path('admin_index') }}" class="marque"><img src="/favicon.svg" alt=""><span>Observatoire<small>administration</small></span></a>
+        <div class="nav">
+            <a href="{{ path('admin_index') }}"{% if route == 'admin_index' %} aria-current="page"{% endif %}>{{ ui.ico('accueil') }} Tableau de bord</a>
+            <a href="{{ path('admin_newsletter_index') }}"{% if route starts with 'admin_newsletter' %} aria-current="page"{% endif %}>{{ ui.ico('lettre') }} Lettres</a>
+            <a href="{{ path('admin_releves') }}"{% if route in ['admin_releves', 'admin_releve_preview'] %} aria-current="page"{% endif %}>{{ ui.ico('releve') }} Relevés</a>
+            <a href="{{ path('admin_security') }}"{% if route == 'admin_security' %} aria-current="page"{% endif %}>{{ ui.ico('cle') }} Sécurité</a>
+        </div>
+        <div class="nav nav-bas">
+            <a href="{{ path('home') }}">{{ ui.ico('site') }} Voir le site</a>
+            <a href="{{ path('admin_logout') }}">{{ ui.ico('sortie') }} Se déconnecter</a>
+        </div>
+    </nav>
+    <main class="contenu">
+        <header class="entete">
+            <div>
+                {% block fil %}{% endblock %}
+                <h1>{% block heading %}{{ block('title') }}{% endblock %}</h1>
+            </div>
+            <div class="actions">{% block header_actions %}{% endblock %}</div>
+        </header>
+        {% for message in app.flashes('ok') %}<p class="flash">{{ ui.ico('ok') }} {{ message }}</p>{% endfor %}
+        {% for message in app.flashes('erreur') %}<p class="erreur">{{ ui.ico('alerte') }} {{ message }}</p>{% endfor %}
+        {% block body %}{% endblock %}
+    </main>
+</div>
+{% else %}
+<main class="seul">
+    <div class="carte">
+        <span class="marque"><img src="/favicon.svg" alt=""><span>Observatoire<small>administration</small></span></span>
+        {% block body_seul %}{% endblock %}
+    </div>
 </main>
+{% endif %}
 </body>
 </html>

@@ -1,0 +1,27 @@
+{% extends 'admin/layout.html.twig' %}
+{% import 'admin/_ui.html.twig' as ui %}
+{% block title %}Lettres{% endblock %}
+{% block header_actions %}<a href="{{ path('admin_newsletter_new') }}" class="bouton">{{ ui.ico('plus') }} Nouvelle lettre</a>{% endblock %}
+{% block body %}
+<section class="carte serree">
+    <h2>{{ ui.ico('abonnes') }} {{ confirmed }} abonné{{ confirmed > 1 ? 's' }} confirmé{{ confirmed > 1 ? 's' }}</h2>
+    {% if newsletters %}
+    <div class="table"><table>
+        <thead><tr><th>Objet</th><th>État</th><th>Prévue (Paris)</th><th>Envoyée (Paris)</th><th class="nombre">Destinataires</th></tr></thead>
+        <tbody>
+        {% for n in newsletters %}
+            <tr>
+                <td><a href="{{ path('admin_newsletter_show', {id: n.id}) }}">{{ n.subject }}</a></td>
+                <td>{{ ui.statut(n.status) }}{% if n.releveNumber %} <span class="discret">(relevé {{ n.releveNumber }})</span>{% endif %}</td>
+                <td>{{ n.scheduledAt ? n.scheduledAt|date : '' }}</td>
+                <td>{{ n.sentAt ? n.sentAt|date : '' }}</td>
+                <td class="nombre">{{ n.status == 'sent' ? n.recipients : '' }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table></div>
+    {% else %}
+        <div class="vide">{{ ui.ico('lettre') }}<p>Aucune lettre.</p><a href="{{ path('admin_newsletter_new') }}" class="bouton">{{ ui.ico('plus') }} Écrire la première</a></div>
+    {% endif %}
+</section>
+{% endblock %}

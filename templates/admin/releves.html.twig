@@ -1,0 +1,33 @@
+{% extends 'admin/layout.html.twig' %}
+{% import 'admin/_ui.html.twig' as ui %}
+{% block title %}Relevés{% endblock %}
+{% block body %}
+<section class="carte serree">
+    <h2>{{ ui.ico('releve') }} {{ releves|length }} relevé{{ releves|length > 1 ? 's' }}</h2>
+    <div class="table"><table>
+        <thead><tr><th>N°</th><th>Titre</th><th>Mesuré le</th><th>Publication (Paris)</th><th>État</th><th></th></tr></thead>
+        <tbody>
+        {% for r in releves %}
+            <tr>
+                <td>{{ r.number }}</td>
+                <td>{{ r.title }}</td>
+                <td>{{ r.date }}</td>
+                <td>{{ r.publishedAt|date }}</td>
+                <td>{% if r.isPublishedAt(now) %}<span class="badge publie">publié</span>{% else %}<span class="badge a-venir">à venir</span>{% endif %}</td>
+                <td class="fin">{% if r.isPublishedAt(now) %}<a href="{{ path('releve', {number: r.number}) }}" class="bouton second">{{ ui.ico('site') }} Voir</a>{% else %}<a href="{{ path('admin_releve_preview', {number: r.number}) }}" class="bouton second">{{ ui.ico('oeil') }} Aperçu</a>{% endif %}</td>
+            </tr>
+        {% else %}
+            <tr><td colspan="6">Aucun relevé.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table></div>
+</section>
+
+{% if probes %}
+<section class="carte">
+    <h2>{{ ui.ico('sonde') }} Mesures automatiques</h2>
+    <p class="discret">Résultats de la sonde mensuelle, sur le volume, en attente de relecture. Un relevé reste fait à la main : <code>make releve</code>, relecture, commit.</p>
+    <ul>{% for p in probes %}<li><code>var/data/probes/{{ p }}</code></li>{% endfor %}</ul>
+</section>
+{% endif %}
+{% endblock %}

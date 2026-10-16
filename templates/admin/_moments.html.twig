@@ -1,0 +1,19 @@
+{# When the letter leaves. with_draft: the edit page offers "keep it as a draft" too. #}
+<div class="moments">
+    {% if with_draft %}
+    <label class="moment"><input type="radio" name="when" value="draft"{% if when == 'draft' %} checked{% endif %}>
+        <b>Garder en brouillon</b><small>Rien ne part ; un test reste possible ensuite.</small></label>
+    {% endif %}
+    <label class="moment"><input type="radio" name="when" value="now"{% if when == 'now' %} checked{% endif %}{% if not with_draft %} required{% endif %}>
+        <b>Maintenant</b><small>Dans la minute, à {{ confirmed }} abonné{{ confirmed > 1 ? 's' }} confirmé{{ confirmed > 1 ? 's' }}.</small></label>
+    <label class="moment"><input type="radio" name="when" value="at"{% if when == 'at' %} checked{% endif %}>
+        <b>À une date et une heure</b><small>Heure de Paris.</small>
+        <span class="quand">
+            <input type="date" name="at_date" value="{{ at_date }}" min="{{ 'now'|date('Y-m-d') }}" aria-label="Date d'envoi">
+            <input type="time" name="at_time" value="{{ at_time }}" step="300" aria-label="Heure d'envoi">
+        </span></label>
+    {% for r in upcoming %}
+    <label class="moment"><input type="radio" name="when" value="releve:{{ r.number }}"{% if when == 'releve:' ~ r.number %} checked{% endif %}>
+        <b>À la publication du relevé {{ r.number }}</b><small>{{ r.title }} · le {{ r.publishedAt|date('d/m/Y \\à H:i') }}</small></label>
+    {% endfor %}
+</div>

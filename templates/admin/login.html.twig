@@ -1,16 +1,15 @@
 {% extends 'admin/layout.html.twig' %}
+{% import 'admin/_ui.html.twig' as ui %}
 {% block title %}Connexion{% endblock %}
-{% block body %}
+{% block body_seul %}
 <h1>Connexion</h1>
-<p class="actions">
-    <button type="button" id="cle-connexion" hidden data-options="{{ path('admin_passkey_login_options') }}" data-check="{{ path('admin_passkey_login') }}">Utiliser une clé d'accès</button>
-</p>
+<button type="button" id="cle-connexion" hidden data-options="{{ path('admin_passkey_login_options') }}" data-check="{{ path('admin_passkey_login') }}">{{ ui.ico('cle') }} Utiliser une clé d'accès</button>
 <p class="erreur" id="cle-message" hidden></p>
-<p>Ou avec le mot de passe :</p>
+<p class="ou">ou avec le mot de passe</p>
 {% if error %}<p class="erreur">Identifiant ou mot de passe incorrect, ou trop de tentatives.</p>{% endif %}
-<form method="post" action="{{ path('admin_login') }}" class="pile">
-    <label>Identifiant <input type="text" name="_username" value="admin" autocomplete="username" required></label>
-    <label>Mot de passe <input type="password" name="_password" autocomplete="current-password" required autofocus></label>
+<form method="post" action="{{ path('admin_login') }}">
+    <label class="champ"><span>Identifiant</span> <input type="text" name="_username" value="admin" autocomplete="username" required></label>
+    <label class="champ"><span>Mot de passe</span> <input type="password" name="_password" autocomplete="current-password" required autofocus></label>
     <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
     <button type="submit">Se connecter</button>
 </form>

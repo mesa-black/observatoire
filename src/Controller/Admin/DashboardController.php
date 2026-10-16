@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Newsletter;
 use App\Releve\DataBuilder;
 use App\Releve\ReleveRepository;
 use App\Repository\NewsletterRepository;
@@ -16,18 +17,40 @@ use Symfony\Component\Routing\Attribute\Route;
 final class DashboardController extends AbstractController
 {
     #[Route('/admin', name: 'admin_index', methods: ['GET'])]
-    public function index(ReleveRepository $releves, SubscriberRepository $subscribers, NewsletterRepository $newsletters, PasskeyRepository $passkeys, ClockInterface $clock, string $probesDir): Response
+    public function index(ReleveRepository $releves, SubscriberRepository $subscribers, NewsletterRepository $newsletters, PasskeyRepository $passkeys, ClockInterface $clock): Response
     {
+        $now = $clock->now();
+        $all = $releves->all();
+        $upcoming = array_values(array_filter($all, fn ($r) => !$r->isPublishedAt($now)));
+        $history = $newsletters->history();
+
         return $this->render('admin/index.html.twig', [
+            'releves' => $all,
+            'published' => \count($all) - \count($upcoming),
+            'next' => $upcoming[0] ?? null,
+            'counts' => $subscribers->countByStatus(),
+            'newsletters' => $history,
+            'sent' => \count(array_filter($history, fn ($n) => Newsletter::SENT === $n->getStatus())),
+            'passkeys' => $passkeys->all(),
+        ]);
+    }
+
+    #[Route('/admin/releves', name: 'admin_releves', methods: ['GET'])]
+    public function releves(ReleveRepository $releves, ClockInterface $clock, string $probesDir): Response
+    {
+        return $this->render('admin/releves.html.twig', [
             'now' => $clock->now(),
             'releves' => array_reverse($releves->all(), true),
-            'counts' => $subscribers->countByStatus(),
-            'newsletters' => $newsletters->history(),
-            'passkeys' => $passkeys->all(),
             // Optional monthly probe runs (probe CronJob), newest first: for
             // review only, a relevé is still made by hand and committed.
             'probes' => array_reverse(array_map('basename', glob($probesDir.'/*', \GLOB_ONLYDIR) ?: [])),
         ]);
+    }
+
+    #[Route('/admin/securite', name: 'admin_security', methods: ['GET'])]
+    public function security(PasskeyRepository $passkeys): Response
+    {
+        return $this->render('admin/security.html.twig', ['passkeys' => $passkeys->all()]);
     }
 
     /** Any relevé, published or not, exactly as the public will see it. */

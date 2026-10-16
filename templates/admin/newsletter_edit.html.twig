@@ -1,13 +1,28 @@
 {% extends 'admin/layout.html.twig' %}
+{% import 'admin/_ui.html.twig' as ui %}
 {% block title %}{{ newsletter ? 'Modifier la lettre' : 'Nouvelle lettre' }}{% endblock %}
+{% block fil %}<p class="fil"><a href="{{ path('admin_newsletter_index') }}">Lettres</a> › {{ newsletter ? newsletter.subject : 'Nouvelle' }}</p>{% endblock %}
 {% block body %}
-<h1>{{ newsletter ? 'Modifier la lettre' : 'Nouvelle lettre' }}</h1>
-{% if error %}<p class="erreur">{{ error }}</p>{% endif %}
-<form method="post" class="pile">
-    <label>Objet <input type="text" name="subject" value="{{ subject }}" maxlength="200" required></label>
-    <label>Texte, en Markdown (le HTML est échappé ; le lien de désinscription est ajouté automatiquement)
-        <textarea name="body" rows="20" required>{{ body }}</textarea></label>
-    <input type="hidden" name="_token" value="{{ csrf_token('newsletter') }}">
-    <button type="submit">Enregistrer le brouillon</button>
+{% if error %}<p class="erreur">{{ ui.ico('alerte') }} {{ error }}</p>{% endif %}
+<form method="post" class="deux" id="redaction" data-apercu="{{ path('admin_newsletter_preview') }}">
+    <div>
+        <section class="carte">
+            <label class="champ"><span>Objet</span>
+                <input type="text" name="subject" value="{{ subject }}" maxlength="200" required class="sujet" placeholder="Relevé n° 3 : …"></label>
+            <label class="champ"><span>Texte</span>
+                <textarea name="body" rows="18" required placeholder="Bonjour,&#10;&#10;Le **relevé n° 3** est en ligne : …">{{ body }}</textarea>
+                <small>Markdown : **gras**, *italique*, [lien](https://…), listes avec « - ». Le HTML est échappé ; le lien de désinscription est ajouté automatiquement.</small></label>
+        </section>
+        <section class="carte">
+            <h2>{{ ui.ico('horloge') }} Envoi</h2>
+            {% include 'admin/_moments.html.twig' with {with_draft: true} %}
+            <input type="hidden" name="_token" value="{{ csrf_token('newsletter') }}">
+            <div class="actions">
+                <button type="submit" name="_action" value="save" id="enregistrer" data-labels='{"draft": "Enregistrer le brouillon", "now": "Enregistrer et envoyer maintenant", "at": "Enregistrer et programmer", "releve": "Enregistrer et programmer"}'>Enregistrer le brouillon</button>
+                <button type="submit" name="_action" value="preview" class="second" id="previsualiser" formnovalidate>{{ ui.ico('oeil') }} Mettre à jour l'aperçu</button>
+            </div>
+        </section>
+    </div>
+    {{ ui.courriel(subject, preview) }}
 </form>
 {% endblock %}
