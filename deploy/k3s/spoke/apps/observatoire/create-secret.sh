@@ -8,8 +8,10 @@
 #   ADMIN_PASSWORD_HASH  of a password generated here, copied to the clipboard
 #   ADMIN_TOTP_SECRET    generated here; the otpauth:// URI goes to the clipboard
 #                        after the password, to add to an authenticator app
-#   MAILER_DSN           from the environment if set, else null://null: no
-#                        mail provider yet, the newsletter is off
+#   MAILER_DSN           from the environment if set, else the one already in
+#                        the Secret, else null://null
+#
+# To change the admin password alone: rotate-admin-password.sh.
 #
 # Needs the image (for the hasher): IMAGE=ghcr.io/mesa-black/observatoire:<sha>
 # Env vars are read at start: restart the pod afterwards,
@@ -34,9 +36,10 @@ case "$hash" in '$2y$'*|'$argon2'*) ;; *) echo "hashing failed" >&2; exit 1 ;; e
 totp=$(podman run --rm --entrypoint php "$image" bin/console app:admin:totp | sed -n 's/^ADMIN_TOTP_SECRET=//p')
 uri="otpauth://totp/Observatoire%20post-quantique:admin?secret=$totp&issuer=Observatoire%20post-quantique"
 
-# No mail provider yet: the newsletter is off (NEWSLETTER_ENABLED=0) and
-# nothing is asked. Later: MAILER_DSN=<provider DSN> ./create-secret.sh
-dsn=${MAILER_DSN:-null://null}
+# The mail provider's DSN: from the environment, else the one already in the
+# Secret (the Brevo key, set by hand), else null://null. Never silently reset.
+current_dsn=$(k get secret observatoire -o go-template='{{with .data.MAILER_DSN}}{{. | base64decode}}{{end}}' 2>/dev/null || true)
+dsn=${MAILER_DSN:-${current_dsn:-null://null}}
 
 k create secret generic observatoire --dry-run=client -o yaml --from-env-file=<(
   printf 'APP_SECRET=%s\n' "$app_secret"
@@ -50,7 +53,7 @@ echo "Admin password (user: admin) copied to the clipboard: store it now, then p
 read -r
 printf '%s' "$uri" | pbcopy
 echo "TOTP URI copied to the clipboard: add it to the authenticator app."
-unset pw hash dsn app_secret existing totp uri
+unset pw hash dsn current_dsn app_secret existing totp uri
 
 # Check without revealing: key names and lengths only.
 k get secret observatoire -o go-template='{{range $k, $v := .data}}{{$k}}: {{len $v}} chars (base64){{"\n"}}{{end}}'
