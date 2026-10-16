@@ -40,4 +40,6 @@
 /* Sharing, above the newsletter form: one link, no third-party script. */
 .partage { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: 4.5rem; }
 .partage .sur { margin: 0; }
+/* Same weight as the newsletter's « S'inscrire ». */
+.partage .bouton { font: inherit; }
 .partage + .lettre { margin-top: 2rem; }
