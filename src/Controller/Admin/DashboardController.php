@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Releve\DataBuilder;
 use App\Releve\ReleveRepository;
 use App\Repository\NewsletterRepository;
+use App\Repository\PasskeyRepository;
 use App\Repository\SubscriberRepository;
 use Psr\Clock\ClockInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,13 +16,14 @@ use Symfony\Component\Routing\Attribute\Route;
 final class DashboardController extends AbstractController
 {
     #[Route('/admin', name: 'admin_index', methods: ['GET'])]
-    public function index(ReleveRepository $releves, SubscriberRepository $subscribers, NewsletterRepository $newsletters, ClockInterface $clock, string $probesDir): Response
+    public function index(ReleveRepository $releves, SubscriberRepository $subscribers, NewsletterRepository $newsletters, PasskeyRepository $passkeys, ClockInterface $clock, string $probesDir): Response
     {
         return $this->render('admin/index.html.twig', [
             'now' => $clock->now(),
             'releves' => array_reverse($releves->all(), true),
             'counts' => $subscribers->countByStatus(),
             'newsletters' => $newsletters->history(),
+            'passkeys' => $passkeys->all(),
             // Optional monthly probe runs (probe CronJob), newest first: for
             // review only, a relevé is still made by hand and committed.
             'probes' => array_reverse(array_map('basename', glob($probesDir.'/*', \GLOB_ONLYDIR) ?: [])),

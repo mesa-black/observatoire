@@ -2,6 +2,11 @@
 {% block title %}Connexion{% endblock %}
 {% block body %}
 <h1>Connexion</h1>
+<p class="actions">
+    <button type="button" id="cle-connexion" hidden data-options="{{ path('admin_passkey_login_options') }}" data-check="{{ path('admin_passkey_login') }}">Utiliser une clé d'accès</button>
+</p>
+<p class="erreur" id="cle-message" hidden></p>
+<p>Ou avec le mot de passe :</p>
 {% if error %}<p class="erreur">Identifiant ou mot de passe incorrect, ou trop de tentatives.</p>{% endif %}
 <form method="post" action="{{ path('admin_login') }}" class="pile">
     <label>Identifiant <input type="text" name="_username" value="admin" autocomplete="username" required></label>

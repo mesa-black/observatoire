@@ -31,7 +31,8 @@
         "symfony/security-bundle": "7.4.*",
         "symfony/security-csrf": "7.4.*",
         "symfony/twig-bundle": "7.4.*",
-        "symfony/yaml": "7.4.*"
+        "symfony/yaml": "7.4.*",
+        "web-auth/webauthn-lib": "^5.3.9"
     },
     "require-dev": {
         "phpstan/extension-installer": "^1.4.3",

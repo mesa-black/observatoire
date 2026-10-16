@@ -3,6 +3,31 @@
 <h1>Tableau de bord</h1>
 
 <section>
+    <h2>Clés d'accès</h2>
+    <p>Une clé d'accès remplace le mot de passe et le code : Touch ID, Face ID ou le code de l'appareil suffisent. Elle reste sur l'appareil ; le site n'en garde que la partie publique.</p>
+    {% if passkeys %}
+    <table>
+        <thead><tr><th>Nom</th><th>Ajoutée</th><th>Dernière utilisation</th><th></th></tr></thead>
+        <tbody>
+        {% for k in passkeys %}
+            <tr>
+                <td>{{ k.name }}</td>
+                <td>{{ k.createdAt|date('d/m/Y') }}</td>
+                <td>{{ k.lastUsedAt ? k.lastUsedAt|date('d/m/Y H:i') : '—' }}</td>
+                <td><form method="post" action="{{ path('admin_passkey_delete', {id: k.id}) }}"><input type="hidden" name="_token" value="{{ csrf_token('supprimer-cle-' ~ k.id) }}"><button type="submit">Supprimer</button></form></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+    <p class="actions">
+        <input type="text" id="cle-nom" placeholder="Nom de l'appareil (MacBook, iPhone…)" maxlength="64">
+        <button type="button" id="cle-ajout" data-options="{{ path('admin_passkey_options') }}" data-register="{{ path('admin_passkey_register') }}">Ajouter une clé d'accès</button>
+    </p>
+    <p class="erreur" id="cle-ajout-message" hidden></p>
+</section>
+
+<section>
     <h2>Abonnés</h2>
     <p><b>{{ counts.confirmed }}</b> confirmés · <b>{{ counts.pending }}</b> en attente de confirmation (effacés après sept jours).</p>
 </section>
