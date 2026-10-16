@@ -12,14 +12,14 @@ here=$(cd "$(dirname "$0")/.." && pwd)
 dir=$here/releves/$n
 mkdir -p "$dir"
 
-for f in jsonl self.jsonl cost.jsonl self.cost.jsonl csp.jsonl self.csp.jsonl domains.json meta.json ai.jsonl hf.jsonl mail.jsonl; do
+for f in jsonl self.jsonl cost.jsonl self.cost.jsonl csp.jsonl self.csp.jsonl domains.json meta.json ai.jsonl hf.jsonl mail.jsonl mailtls.jsonl; do
     src=$proto/results/$date.$f
     if [ -f "$src" ]; then
         cp "$src" "$dir/$date.$f"
     else
         case "$f" in
             # Optional, as for build.sh: no meta, or cost still being measured.
-            meta.json|cost.jsonl|self.cost.jsonl|ai.jsonl|hf.jsonl|mail.jsonl) echo "  (no $date.$f)" ;;
+            meta.json|cost.jsonl|self.cost.jsonl|ai.jsonl|hf.jsonl|mail.jsonl|mailtls.jsonl) echo "  (no $date.$f)" ;;
             # The list the relevé was measured against: the current one if no snapshot.
             domains.json) cp "$proto/domains.json" "$dir/$date.domains.json"; echo "  $date.domains.json <- domains.json (no snapshot)" ;;
             *) echo "✗ $src is missing" >&2; exit 1 ;;

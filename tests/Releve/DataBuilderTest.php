@@ -40,6 +40,26 @@ final class DataBuilderTest extends TestCase
         $this->assertSame('ia', $built->meta->focus);
     }
 
+    /**
+     * Relevé 3 adds the exchangers' TLS (mailtls.jsonl), joined by MX name.
+     * The prototype builds it as a variant (build.sh 2026-10-16 r3) with its
+     * draft meta; the meta aside, same data.
+     */
+    public function testSameDataAsBuildShForReleve3(): void
+    {
+        $js = (string) file_get_contents(__DIR__.'/../fixtures/data-2026-10-16-r3.js');
+        $expected = json_decode(substr(rtrim($js, ";\n"), \strlen('window.OBSERVATOIRE = ')), false, 512, \JSON_THROW_ON_ERROR);
+
+        $releve = new Releve(3, '2026-10-16', new \DateTimeImmutable(), 'Relevé n° 3', '', \dirname(__DIR__, 2).'/releves/3');
+        $built = (new DataBuilder())->build($releve);
+        $this->assertSame('courriel', $built->meta->focus);
+        $expected->meta = $built->meta;
+
+        $this->assertSame($this->encode($expected), $this->encode($built));
+        $tls = array_filter(array_map(fn ($e) => $e->mail->tls ?? null, array_merge(...array_map(fn ($g) => $g->entries, $built->groups))));
+        $this->assertCount(31, array_filter($tls, fn ($t) => $t->hybrid));
+    }
+
     public function testPartialCostLinesAreSkippedAndUnknownHostsUnreachable(): void
     {
         $releve = new Releve(1, '2020-01-01', new \DateTimeImmutable(), 'T', '', __DIR__.'/../fixtures/releves/1');
