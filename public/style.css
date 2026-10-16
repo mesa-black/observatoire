@@ -403,11 +403,15 @@ pre code { background: none; border: 0; padding: 0; font: inherit; color: inheri
     overflow: auto;
 }
 .fiche::backdrop { background: rgba(20, 22, 24, .55); backdrop-filter: blur(3px); }
+/* Sticky, not absolute: the dialog itself scrolls, and the button stays in
+   its top right corner however long the sheet. Pulled out of the flow by the
+   negative bottom margin, so the header still starts at the very top. */
 .fiche-fermer {
-    position: absolute;
+    position: sticky;
     top: 1.55rem;
-    right: 1.6rem;
     z-index: 1;
+    display: block;
+    margin: 1.55rem 1.6rem -3.75rem auto;
     width: 2.2rem;
     height: 2.2rem;
     border: 0;
