@@ -36,3 +36,8 @@
 .erreur p { color: var(--doux); }
 .erreur .bouton { margin-top: .8rem; background: var(--p-scelle); color: var(--sur-scelle) !important; }
 .erreur .bouton:hover { background: var(--lien); }
+
+/* Sharing, above the newsletter form: one link, no third-party script. */
+.partage { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: 4.5rem; }
+.partage .sur { margin: 0; }
+.partage + .lettre { margin-top: 2rem; }

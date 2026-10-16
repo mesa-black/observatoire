@@ -23,6 +23,20 @@ final class ReleveControllerTest extends WebTestCase
         $this->assertSame([], $client->getResponse()->headers->getCookies());
     }
 
+    public function testTheReleveIsSharedOnThreemaWithItsSummaryAndItsOwnAddress(): void
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/');
+
+        $href = (string) $crawler->filter('.partage a[href^="https://threema.id/compose?text="]')->attr('href');
+        parse_str((string) parse_url($href, \PHP_URL_QUERY), $query);
+        $text = $query['text'] ?? null;
+        $this->assertIsString($text);
+        // The relevé's permanent address, not / which moves to the next one.
+        $this->assertStringEndsWith('/releve/1', $text);
+        $this->assertStringStartsWith('Observatoire post-quantique · Relevé n° 1', $text);
+    }
+
     public function testAReleveStillToComeIsNotFound(): void
     {
         $client = static::createClient();

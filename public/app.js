@@ -140,6 +140,12 @@
     };
     if (M.focus === 'courriel') {
         document.body.classList.add('releve-mail');
+        // The façade, for mail: what one sees from outside is the exchanger's
+        // door and the domain's published policies, not the mailboxes behind.
+        document.querySelector('.facade').replaceChildren(
+            h('b', null, 'On relève des façades. '),
+            `Pour le courrier, la façade, ce sont les serveurs qui reçoivent les messages d'une organisation (ses MX) et les règles qu'elle publie dans son DNS : chiffrement imposé ou non, protection contre l'usurpation. `,
+            `Ce qui se passe ensuite, entre ces serveurs et les boîtes des salariés, ne se voit pas d'ici. Et une organisation peut écrire depuis d'autres serveurs que ceux qui reçoivent.`);
         const withMx = measured.filter(e => e.mail && e.mail.mx.length);
         const sealedMail = withMx.filter(e => postState(e) === 'cachetee');
         const byProv = k => withMx.filter(e => e.mail.provider === k);
@@ -1685,7 +1691,7 @@
                 h('span', { class: 'p-org' }, e.name),
                 h('span', { class: 'p-adr' }, st === 'sans' ? 'pas de MX' : `MX ${m.mx[0]}`),
                 st === 'cachetee' ? h('span', { class: 'cachet', title: m.dane ? 'DANE' : 'MTA-STS enforce' }, m.dane ? 'DANE' : 'STS') : null,
-                st === 'carte' || st === 'entrouverte' ? h('span', { class: 'p-dos' }, h('b', null, 'EN CLAIR SUR LE TRAJET'), h('span', null, `${what}…`)) : null,
+                st !== 'sans' ? h('span', { class: 'p-dos' }, h('b', null, st === 'cachetee' ? 'LISIBLE AU Q-DAY' : 'EN CLAIR SUR LE TRAJET'), h('span', null, `${what}…`)) : null,
                 h('span', { class: 'p-pied' }, `DMARC ${m.dmarc || '—'} · SPF ${m.spf || '—'}${m.dnssec ? ' · DNSSEC' : ''}`),
             );
             card.addEventListener('click', () => { const p = plaqueOf.get(e.host); if (p) openSheet(p); });
@@ -1707,6 +1713,35 @@
             h('p', { class: 'tri-note' }, `Et le Q-Day ? Même cachetée, une lettre voyage en TLS : il faut encore savoir si les serveurs de courrier acceptent l'hybride post-quantique. Cette mesure se fait sur le port 25, fermé depuis la machine de ce brouillon : elle viendra du serveur de l'observatoire.`),
         );
         sw.addEventListener('change', () => sec.classList.toggle('attaque', sw.checked));
+
+        // The Q-Day, once the exchangers' TLS is measured (mail-starttls.sh, from
+        // the server): a letter is sealed against a recorder only if its
+        // exchanger takes the hybrid; the others' wax gives way.
+        const measuredTls = list.filter(e => e.mail.tls && e.mail.tls.reachable);
+        if (measuredTls.length) {
+            const hyb = measuredTls.filter(e => e.mail.tls.hybrid);
+            for (const [i, e] of list.entries()) {
+                const t = e.mail.tls;
+                if (!t || !t.reachable) continue;
+                const card = wall.children[i].firstChild;
+                card.classList.add(t.hybrid ? 'pq' : 'classique');
+                if (t.hybrid) card.append(h('span', { class: 'timbre-pq', title: 'Le serveur de courrier accepte X25519MLKEM768' }, 'ML-KEM'));
+            }
+            const q = h('input', { type: 'checkbox' });
+            sec.querySelector('.tri-commandes').append(h('label', { class: 'bascule' }, q, ' Le Q-Day tombe'));
+            q.addEventListener('change', () => sec.classList.toggle('qday', q.checked));
+            // Who carries the hybrid: counted by holder, most first.
+            const by = new Map();
+            for (const e of hyb) { const n = mailHolder(e)?.name || 'inconnu'; by.set(n, (by.get(n) || 0) + 1); }
+            const holders = [...by].sort((a, b) => b[1] - a[1]).map(([n, c]) => `${c} chez ${n}`).join(', ');
+            const hybFr = hyb.filter(e => mailHolder(e)?.cc === 'FR').length;
+            sec.querySelector('.tri-note').replaceChildren(
+                h('b', null, `Et le Q-Day ? `),
+                `${hyb.length} organisations sur ${measuredTls.length} reçoivent leur courrier sur un serveur qui accepte l'hybride post-quantique (mesuré depuis le serveur de l'observatoire, port 25) : ${holders}. `,
+                hybFr ? '' : `Aucune de celles qui tiennent leur courrier en France. `,
+                `L'hybride ne protège une lettre que si le serveur qui l'envoie le parle aussi. `,
+                `Les autres lettres, cachetées en classique, se décachettent le jour où un ordinateur quantique casse cet échange : cochez « Le Q-Day tombe ».`);
+        }
 
         // Sovereignty of the mail: the country of whoever holds each exchanger.
         const held = list.filter(e => mailHolder(e));
