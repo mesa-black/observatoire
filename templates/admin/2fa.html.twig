@@ -1,16 +1,17 @@
 {% extends 'admin/layout.html.twig' %}
 {% block title %}Code de vérification{% endblock %}
-{% block body %}
+{% block body_seul %}
 <h1>Code de vérification</h1>
 {% if authenticationError %}<p class="erreur">Code incorrect.</p>{% endif %}
-<form method="post" action="{{ checkPathUrl ? checkPathUrl : path(checkPathRoute) }}" class="pile">
-    <label>{% if twoFactorProvider == 'email' %}Code à six chiffres reçu par courriel (valable dix minutes){% else %}Code à six chiffres de votre application d'authentification (Mots de passe, 1Password…){% endif %}
-        <input type="text" name="{{ authCodeParameterName }}" inputmode="numeric" pattern="[0-9]{6}" autocomplete="one-time-code" required autofocus></label>
+<form method="post" action="{{ checkPathUrl ? checkPathUrl : path(checkPathRoute) }}">
+    <label class="champ"><span>{% if twoFactorProvider == 'email' %}Code reçu par courriel{% else %}Code de l'application d'authentification{% endif %}</span>
+        <input type="text" name="{{ authCodeParameterName }}" inputmode="numeric" pattern="[0-9]{6}" autocomplete="one-time-code" required autofocus>
+        <small>{% if twoFactorProvider == 'email' %}Six chiffres, valables dix minutes.{% else %}Six chiffres (Mots de passe, 1Password…).{% endif %}</small></label>
     {% if isTrustedDeviceEnabled is defined and isTrustedDeviceEnabled %}
     <label class="case"><input type="checkbox" name="{{ trustedParameterName }}" value="1" checked> Faire confiance à cet appareil pendant 30 jours</label>
     {% endif %}
     {% if isCsrfProtectionEnabled %}<input type="hidden" name="{{ csrfParameterName }}" value="{{ csrf_token(csrfTokenId) }}">{% endif %}
     <button type="submit">Valider</button>
 </form>
-<p><a href="{{ logoutPath }}">Annuler</a></p>
+<p class="retour"><a href="{{ logoutPath }}">Annuler</a></p>
 {% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'admin/layout.html.twig' %}
+{% import 'admin/_ui.html.twig' as ui %}
+{% block title %}Sécurité{% endblock %}
+{% block body %}
+<section class="carte">
+    <h2>{{ ui.ico('cle') }} Clés d'accès</h2>
+    <p class="discret">Une clé d'accès remplace le mot de passe et le code : Touch ID, Face ID ou le code de l'appareil suffisent. Elle reste sur l'appareil ; le site n'en garde que la partie publique.</p>
+    {% if passkeys %}
+    <div class="table"><table>
+        <thead><tr><th>Nom</th><th>Ajoutée</th><th>Dernière utilisation</th><th></th></tr></thead>
+        <tbody>
+        {% for k in passkeys %}
+            <tr>
+                <td><b>{{ k.name }}</b></td>
+                <td>{{ k.createdAt|date('d/m/Y') }}</td>
+                <td>{{ k.lastUsedAt ? k.lastUsedAt|date('d/m/Y H:i') : '—' }}</td>
+                <td class="fin"><form method="post" action="{{ path('admin_passkey_delete', {id: k.id}) }}"><input type="hidden" name="_token" value="{{ csrf_token('supprimer-cle-' ~ k.id) }}"><button type="submit" class="danger">Supprimer</button></form></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table></div>
+    {% endif %}
+    <div class="ligne">
+        <input type="text" id="cle-nom" placeholder="Nom de l'appareil (MacBook, iPhone…)" maxlength="64" aria-label="Nom de l'appareil">
+        <button type="button" id="cle-ajout" data-options="{{ path('admin_passkey_options') }}" data-register="{{ path('admin_passkey_register') }}">{{ ui.ico('plus') }} Ajouter une clé d'accès</button>
+    </div>
+    <p class="erreur" id="cle-ajout-message" hidden></p>
+</section>
+
+<section class="carte">
+    <h2>{{ ui.ico('bouclier') }} Connexion par mot de passe</h2>
+    <p class="discret">Mot de passe, puis un code à six chiffres envoyé à <b>{{ admin_email }}</b>. Un appareil reconnu ne le redemande pas pendant 30 jours. Le mot de passe se change avec <code>rotate-admin-password.sh</code> (dépôt k3s-stack) : tous les appareils sont alors oubliés.</p>
+</section>
+{% endblock %}

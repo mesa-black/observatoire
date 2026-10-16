@@ -1,84 +1,54 @@
 {% extends 'admin/layout.html.twig' %}
+{% import 'admin/_ui.html.twig' as ui %}
+{% block title %}Tableau de bord{% endblock %}
+{% block header_actions %}<a href="{{ path('admin_newsletter_new') }}" class="bouton">{{ ui.ico('plus') }} Nouvelle lettre</a>{% endblock %}
 {% block body %}
-<h1>Tableau de bord</h1>
+<div class="stats">
+    <div class="stat"><span class="pastille vert">{{ ui.ico('abonnes') }}</span><div><b>{{ counts.confirmed }}</b><span>abonné{{ counts.confirmed > 1 ? 's' }} confirmé{{ counts.confirmed > 1 ? 's' }}</span></div></div>
+    <div class="stat"><span class="pastille">{{ ui.ico('horloge') }}</span><div><b>{{ counts.pending }}</b><span>en attente de confirmation</span></div></div>
+    <div class="stat"><span class="pastille ocre">{{ ui.ico('releve') }}</span><div><b>{{ published }}<small class="discret"> / {{ releves|length }}</small></b><span>relevés publiés</span></div></div>
+    <div class="stat"><span class="pastille">{{ ui.ico('envoi') }}</span><div><b>{{ sent }}</b><span>lettre{{ sent > 1 ? 's' }} envoyée{{ sent > 1 ? 's' }}</span></div></div>
+</div>
 
-<section>
-    <h2>Clés d'accès</h2>
-    <p>Une clé d'accès remplace le mot de passe et le code : Touch ID, Face ID ou le code de l'appareil suffisent. Elle reste sur l'appareil ; le site n'en garde que la partie publique.</p>
-    {% if passkeys %}
-    <table>
-        <thead><tr><th>Nom</th><th>Ajoutée</th><th>Dernière utilisation</th><th></th></tr></thead>
-        <tbody>
-        {% for k in passkeys %}
-            <tr>
-                <td>{{ k.name }}</td>
-                <td>{{ k.createdAt|date('d/m/Y') }}</td>
-                <td>{{ k.lastUsedAt ? k.lastUsedAt|date('d/m/Y H:i') : '—' }}</td>
-                <td><form method="post" action="{{ path('admin_passkey_delete', {id: k.id}) }}"><input type="hidden" name="_token" value="{{ csrf_token('supprimer-cle-' ~ k.id) }}"><button type="submit">Supprimer</button></form></td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {% endif %}
-    <p class="actions">
-        <input type="text" id="cle-nom" placeholder="Nom de l'appareil (MacBook, iPhone…)" maxlength="64">
-        <button type="button" id="cle-ajout" data-options="{{ path('admin_passkey_options') }}" data-register="{{ path('admin_passkey_register') }}">Ajouter une clé d'accès</button>
-    </p>
-    <p class="erreur" id="cle-ajout-message" hidden></p>
-</section>
-
-<section>
-    <h2>Abonnés</h2>
-    <p><b>{{ counts.confirmed }}</b> confirmés · <b>{{ counts.pending }}</b> en attente de confirmation (effacés après sept jours).</p>
-</section>
-
-<section>
-    <h2>Relevés</h2>
-    <table>
-        <thead><tr><th>N°</th><th>Titre</th><th>Mesuré le</th><th>Publication (Paris)</th><th>État</th><th></th></tr></thead>
-        <tbody>
-        {% for r in releves %}
-            <tr>
-                <td>{{ r.number }}</td>
-                <td>{{ r.title }}</td>
-                <td>{{ r.date }}</td>
-                <td>{{ r.publishedAt|date }}</td>
-                <td>{{ r.isPublishedAt(now) ? 'publié' : 'à venir' }}</td>
-                <td>{% if r.isPublishedAt(now) %}<a href="{{ path('releve', {number: r.number}) }}">Voir</a>{% else %}<a href="{{ path('admin_releve_preview', {number: r.number}) }}">Aperçu</a>{% endif %}</td>
-            </tr>
+<div class="deux">
+    <section class="carte">
+        <h2>{{ ui.ico('releve') }} Prochain relevé <a href="{{ path('admin_releves') }}">Tous les relevés</a></h2>
+        {% if next %}
+            <p><b>N° {{ next.number }} · {{ next.title }}</b></p>
+            <p class="discret">Publication le {{ next.publishedAt|date('d/m/Y \\à H:i') }} (Paris)</p>
+            <div class="actions">
+                <a href="{{ path('admin_releve_preview', {number: next.number}) }}" class="bouton second">{{ ui.ico('oeil') }} Aperçu</a>
+                <a href="{{ path('admin_newsletter_new') }}" class="bouton second">{{ ui.ico('lettre') }} Lettre pour ce relevé</a>
+            </div>
         {% else %}
-            <tr><td colspan="6">Aucun relevé.</td></tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</section>
+            <div class="vide">{{ ui.ico('releve') }}<p>Aucun relevé à venir.</p><p class="discret">Un relevé se prépare à la main : <code>make releve</code>, relecture, commit.</p></div>
+        {% endif %}
+    </section>
 
-<section>
-    <h2>Lettres</h2>
-    <p><a href="{{ path('admin_newsletter_new') }}" class="bouton">Nouvelle lettre</a></p>
-    <table>
-        <thead><tr><th>Objet</th><th>État</th><th>Prévue (Paris)</th><th>Envoyée (Paris)</th><th>Destinataires</th></tr></thead>
-        <tbody>
-        {% for n in newsletters %}
-            <tr>
-                <td><a href="{{ path('admin_newsletter_show', {id: n.id}) }}">{{ n.subject }}</a></td>
-                <td>{{ {draft: 'brouillon', scheduled: 'programmée', sending: 'en cours', sent: 'envoyée'}[n.status] }}{% if n.releveNumber %} (relevé {{ n.releveNumber }}){% endif %}</td>
-                <td>{{ n.scheduledAt ? n.scheduledAt|date : '' }}</td>
-                <td>{{ n.sentAt ? n.sentAt|date : '' }}</td>
-                <td>{{ n.status == 'sent' ? n.recipients : '' }}</td>
-            </tr>
+    <section class="carte serree">
+        <h2>{{ ui.ico('lettre') }} Dernières lettres <a href="{{ path('admin_newsletter_index') }}">Toutes</a></h2>
+        {% if newsletters %}
+        <div class="table"><table>
+            <tbody>
+            {% for n in newsletters|slice(0, 5) %}
+                <tr>
+                    <td><a href="{{ path('admin_newsletter_show', {id: n.id}) }}">{{ n.subject }}</a></td>
+                    <td>{{ ui.statut(n.status) }}</td>
+                    <td class="fin discret">{{ n.sentAt ? n.sentAt|date('d/m H:i') : (n.scheduledAt ? n.scheduledAt|date('d/m H:i') : '') }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table></div>
         {% else %}
-            <tr><td colspan="5">Aucune lettre.</td></tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</section>
+            <div class="vide">{{ ui.ico('lettre') }}<p>Aucune lettre pour l'instant.</p><a href="{{ path('admin_newsletter_new') }}" class="bouton">{{ ui.ico('plus') }} Écrire la première</a></div>
+        {% endif %}
+    </section>
+</div>
 
-{% if probes %}
-<section>
-    <h2>Mesures automatiques (facultatif)</h2>
-    <p>Résultats de la sonde mensuelle, sur le volume, en attente de relecture. Un relevé reste fait à la main : <code>make releve</code>, relecture, commit.</p>
-    <ul>{% for p in probes %}<li><code>var/data/probes/{{ p }}</code></li>{% endfor %}</ul>
+{% if not passkeys %}
+<section class="carte">
+    <h2>{{ ui.ico('bouclier') }} Sécurité</h2>
+    <p>Aucune clé d'accès : la connexion passe par le mot de passe et un code par courriel. <a href="{{ path('admin_security') }}">Ajouter une clé d'accès</a> pour se connecter avec Touch ID ou Face ID.</p>
 </section>
 {% endif %}
 {% endblock %}

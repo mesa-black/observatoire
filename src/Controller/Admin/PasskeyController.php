@@ -43,7 +43,7 @@ final class PasskeyController extends AbstractController
         }
         $this->addFlash('ok', \sprintf('Clé d\'accès « %s » ajoutée.', $passkey->getName()));
 
-        return new JsonResponse(['redirect' => $this->generateUrl('admin_index')], Response::HTTP_CREATED);
+        return new JsonResponse(['redirect' => $this->generateUrl('admin_security')], Response::HTTP_CREATED);
     }
 
     #[Route('/admin/cle/{id}/supprimer', name: 'admin_passkey_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
@@ -56,7 +56,7 @@ final class PasskeyController extends AbstractController
         $em->flush();
         $this->addFlash('ok', \sprintf('Clé d\'accès « %s » supprimée.', $passkey->getName()));
 
-        return $this->redirectToRoute('admin_index');
+        return $this->redirectToRoute('admin_security');
     }
 
     /** Public: the login page asks for options before anyone is logged in. */
