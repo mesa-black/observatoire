@@ -2,6 +2,8 @@
 
 namespace App\Tests\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\SchemaTool;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 final class ContentSecurityPolicyTest extends WebTestCase
@@ -34,6 +36,11 @@ final class ContentSecurityPolicyTest extends WebTestCase
     public function testAdminScriptsCarryTheNonceAndTheMusicStaysOnTheRelevePages(): void
     {
         $client = static::createClient();
+        // The dashboard reads the letters: a schema, even when this test runs first.
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $tool = new SchemaTool($em);
+        $tool->dropDatabase();
+        $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
         $this->logInAdmin($client);
         $client->request('GET', '/admin');
         $this->assertResponseIsSuccessful();
