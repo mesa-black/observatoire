@@ -6,6 +6,7 @@ twig:
         format: 'd/m/Y H:i'
     globals:
         admin_email: '%env(ADMIN_EMAIL)%'
+        newsletter_enabled: '%env(bool:NEWSLETTER_ENABLED)%'
 
 when@test:
     twig:

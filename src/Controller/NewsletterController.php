@@ -6,6 +6,7 @@ use App\Entity\Subscriber;
 use App\Newsletter\Subscriptions;
 use App\Newsletter\TooManyRequests;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -22,13 +23,19 @@ use Symfony\Component\Routing\Attribute\Route;
  */
 final class NewsletterController extends AbstractController
 {
-    public function __construct(private readonly Subscriptions $subscriptions)
-    {
+    public function __construct(
+        private readonly Subscriptions $subscriptions,
+        #[Autowire('%env(bool:NEWSLETTER_ENABLED)%')]
+        private readonly bool $enabled,
+    ) {
     }
 
     #[Route('/newsletter', name: 'newsletter_subscribe', methods: ['POST'])]
     public function subscribe(Request $request): Response
     {
+        if (!$this->enabled) {
+            throw $this->createNotFoundException();
+        }
         // Another site's form posting here: the browser says so. No CSRF
         // token, which would need a session cookie; this header is enough for
         // a form whose worst effect is a confirmation mail.
