@@ -47,7 +47,8 @@
 	# plays a track hotlinked from archive.org, which redirects to a mirror.
 	# One directive added, for audio/video only; everything else stays as above.
 	# The one third-party request of the site, listed in SETUP.md as open.
-	@releve path / /releve/*
+	# The previews too (admin, signed link): they show the same page.
+	@releve path / /releve/* /admin/releve/* /apercu/*
 	header @releve >Content-Security-Policy "default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; media-src https://archive.org https://*.archive.org; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; require-trusted-types-for 'script'"
 
 	# app.js and style.css are linked with ?v=<hash of their content>
