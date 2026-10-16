@@ -20,7 +20,14 @@
                 <a href="{{ path('admin_releve_preview', {number: next.number}) }}" class="bouton second">{{ ui.ico('oeil') }} Aperçu</a>
                 <a href="{{ path('admin_newsletter_new') }}" class="bouton second">{{ ui.ico('lettre') }} Lettre pour ce relevé</a>
             </div>
-        {% else %}
+        {% endif %}
+        {% for d in drafts %}
+            <p><b>N° {{ d.number }} · {{ d.title }}</b> <span class="badge draft">brouillon</span></p>
+            <div class="actions">
+                <a href="{{ path('admin_releve_preview', {number: d.number}) }}" class="bouton second">{{ ui.ico('oeil') }} Aperçu</a>
+            </div>
+        {% endfor %}
+        {% if not next and not drafts %}
             <div class="vide">{{ ui.ico('releve') }}<p>Aucun relevé à venir.</p><p class="discret">Un relevé se prépare à la main : <code>make releve</code>, relecture, commit.</p></div>
         {% endif %}
     </section>

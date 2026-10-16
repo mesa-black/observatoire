@@ -95,6 +95,18 @@ final class NewsletterAdminTest extends WebTestCase
         }
     }
 
+    public function testTheDashboardShowsADraftNextToTheNextReleve(): void
+    {
+        $client = $this->freshClient();
+        $client->request('GET', '/admin');
+        $this->assertSelectorTextContains('.carte', 'N° 2');
+        $this->assertSelectorTextContains('.carte .badge.draft', 'brouillon');
+        $this->assertSelectorExists('a[href="/admin/releve/3"]');
+
+        $client->request('GET', '/admin/releve/3');
+        $this->assertResponseIsSuccessful();
+    }
+
     private function freshClient(): KernelBrowser
     {
         $client = static::createClient();
