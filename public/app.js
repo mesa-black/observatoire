@@ -196,7 +196,7 @@
             ].filter(Boolean);
             return done.length ? [` Ce que nous avons décidé : ${done.join(', ')}.`] : [];
         })(),
-        s.page && /fonts.googleapis/.test(s.page.csp) ? ` Sa CSP n'autorise aucun script ; elle autorise en revanche les polices de Google Fonts, un tiers américain que nous devons encore retirer.` : '',
+        s.page && cspOf(s)?.kind === 'aucun' ? ` Sa CSP n'autorise aucun script${/fonts.googleapis/.test(s.page.csp) ? ` ; elle autorise en revanche les polices de Google Fonts, un tiers américain que nous devons encore retirer` : ''}.` : '',
     );
     // What is still wrong at home, from the same measurement: said as plainly
     // as for the others.
@@ -582,6 +582,8 @@
         let kind;
         if (!raw) kind = pg.csp_ro ? 'rapport' : 'absente';
         else if (!src) kind = 'cadres';
+        // 'none' alone: no script at all, stricter than any nonce.
+        else if (low.length === 1 && low[0] === "'none'") kind = 'aucun';
         else if (flags.wildcard || flags.unsafeInline) kind = 'passoire';
         else if (nonce || flags.strictDynamic) kind = 'stricte';
         else kind = 'liste';
@@ -596,7 +598,7 @@
         return { kind, flags, src, allowed: [...hosts], loaded, meta: !pg.csp && !!pg.meta_csp };
     }
     const CSP_LABEL = {
-        stricte: 'stricte (nonce, hash ou strict-dynamic)', liste: 'liste de domaines, sans code inline',
+        aucun: 'aucun script autorisé', stricte: 'stricte (nonce, hash ou strict-dynamic)', liste: 'liste de domaines, sans code inline',
         passoire: 'présente, mais laisse tout passer', cadres: 'présente, mais ne dit rien des scripts',
         rapport: 'en mode rapport seulement', absente: 'absente', bloque: 'non lue (la page a refusé la sonde)',
     };
@@ -725,7 +727,9 @@
             const loadedTxt = p.loaded.length
                 ? ` La page d'accueil charge ${plural(p.loaded.length, 'script ou cadre tiers', 'scripts ou cadres tiers')} : ${p.loaded.join(', ')}${third.length ? `, soit ${third.join(', ')}` : ''}.`
                 : '';
-            if (p.kind === 'stricte') add('Une CSP qui tient.',
+            if (p.kind === 'aucun') add('Une CSP qui n\'autorise aucun script.',
+                `Aucun script ne s'exécute dans la page, injecté ou non : le plus strict, pour une page qui n'en a pas besoin.`, loadedTxt);
+            else if (p.kind === 'stricte') add('Une CSP qui tient.',
                 `Seuls les scripts portant un jeton (nonce) ou une empreinte s'exécutent : un script injecté ne passe pas. ${flags(p)}`, loadedTxt);
             else if (p.kind === 'passoire') add('Une CSP qui laisse tout passer.',
                 p.flags.wildcard ? `Elle autorise des scripts depuis « ${p.flags.wildcard} », c'est-à-dire de n'importe où. ` : `Elle autorise le code inline ('unsafe-inline') : un script injecté dans la page s'exécute. `,
@@ -1413,7 +1417,7 @@
         const read = measured.map(e => [e, cspOf(e)]).filter(([, p]) => p && p.kind !== 'bloque');
         const blocked = measured.filter(e => cspOf(e)?.kind === 'bloque');
         const of = k => read.filter(([, p]) => k.includes(p.kind)).map(([e]) => e);
-        const strict = of(['stricte']);
+        const strict = of(['aucun', 'stricte']);
         $('csp-titre').append(`Seuls `, h('em', null, `${strict.length} sites sur ${read.length}`), ` décident vraiment quel code s'exécute dans leur page.`);
         $('csp-texte').append(
             `Le chiffrement, hybride ou non, s'arrête au navigateur. Ensuite, c'est la Content-Security-Policy qui dit quels scripts ont le droit de s'exécuter, et donc de lire ce qu'on tape : identifiant, IBAN, dossier. `,
@@ -1421,7 +1425,7 @@
             ` Les scripts tiers sont la voie d'attaque classique quand le chiffrement tient.`,
         );
         for (const [label, kinds, cls] of [
-            ['Stricte', ['stricte'], ''], ['Liste de domaines', ['liste'], ''],
+            ['Aucun script', ['aucun'], ''], ['Stricte', ['stricte'], ''], ['Liste de domaines', ['liste'], ''],
             ['Présente, laisse tout passer', ['passoire'], ' ouvert'], ['Muette sur les scripts', ['cadres'], ' ouvert'],
             ['Absente ou en rapport seul', ['absente', 'rapport'], ' ouvert'],
         ]) {
