@@ -8,7 +8,8 @@
 #   ADMIN_PASSWORD_HASH  of a password generated here, copied to the clipboard
 #   ADMIN_TOTP_SECRET    generated here; the otpauth:// URI goes to the clipboard
 #                        after the password, to add to an authenticator app
-#   MAILER_DSN           typed (hidden): the Brevo API key
+#   MAILER_DSN           from the environment if given (a mail provider DSN),
+#                        else null://null: no mail leaves, the newsletter is off
 #
 # Needs the image (for the hasher): IMAGE=ghcr.io/mesa-black/observatoire:<sha>
 # Env vars are read at start: restart the pod afterwards,
