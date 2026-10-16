@@ -8,8 +8,8 @@
 }
 @media (max-width: 48rem) { .lettre { grid-template-columns: 1fr; } }
 .lettre h2 { margin: .5rem 0 .8rem; font: 400 1.9rem/1.1 var(--serif); }
-.lettre p { margin: 0 0 .8rem; color: var(--doux); }
-.lettre-form label { display: block; margin-bottom: .4rem; font-weight: 600; }
+.lettre p { margin: 0 0 .8rem; font-size: .9rem; color: var(--doux); }
+.lettre-form label { display: block; margin-bottom: .4rem; font-size: .9rem; font-weight: 600; }
 .lettre-ligne { display: flex; gap: .6rem; flex-wrap: wrap; }
 .lettre-ligne input {
     flex: 1 1 14rem; min-width: 0; padding: .65rem .8rem;
