@@ -23,7 +23,7 @@ final class ReleveController extends AbstractController
     {
         $latest = $this->releves->latestPublished();
         if (null !== $latest) {
-            return $this->page($latest);
+            return $this->page($latest, true);
         }
         // Before the first relevé, the address already answers: with the date
         // it opens, and the form to be told. Nothing of the relevé itself.
@@ -39,12 +39,12 @@ final class ReleveController extends AbstractController
     #[Route('/releve/{number}', name: 'releve', requirements: ['number' => '[1-9]\d{0,3}'], methods: ['GET', 'HEAD'])]
     public function show(int $number): Response
     {
-        return $this->page($this->releves->findPublished($number) ?? throw new NotFoundHttpException());
+        return $this->page($this->releves->findPublished($number) ?? throw new NotFoundHttpException(), false);
     }
 
-    private function page(Releve $releve): Response
+    private function page(Releve $releve, bool $isHome): Response
     {
-        $response = $this->render('releve/show.html.twig', ['releve' => $releve, 'donnees' => $this->data->json($releve)]);
+        $response = $this->render('releve/show.html.twig', ['releve' => $releve, 'donnees' => $this->data->json($releve), 'is_home' => $isHome]);
         // Short: the page that / shows changes when the next relevé's time comes.
         $response->setPublic();
         $response->setMaxAge(300);

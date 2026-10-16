@@ -39,7 +39,7 @@ cp -R "$site/fonts" "$public/fonts"
 # index.html → Twig. Anything Twig would read as its own syntax is refused
 # rather than escaped: it has never happened, and should be looked at.
 grep -q -E '\{\{|\{%|\{#' "$site/index.html" && fail "index.html contains Twig delimiters"
-for marker in '<script src="data.js" defer></script>' '<script src="app.js" defer></script>' '<link rel="stylesheet" href="style.css">' '<title>Observatoire post-quantique</title>' '<meta name="description" content="' '<footer' '</footer>'; do
+for marker in '<script src="data.js" defer></script>' '<script src="app.js" defer></script>' '<link rel="stylesheet" href="style.css">' '<title>Observatoire post-quantique</title>' '<meta name="description" content="' '<footer' '</footer>' '</head>'; do
     [ "$(count "$marker" "$site/index.html")" = 1 ] || fail "index.html: expected exactly one '$marker'"
 done
 mkdir -p "$(dirname "$template")"
@@ -51,6 +51,8 @@ mkdir -p "$(dirname "$template")"
         -e 's#<link rel="stylesheet" href="style.css">#<link rel="stylesheet" href="{{ versioned('"'"'/style.css'"'"') }}">\
 <link rel="stylesheet" href="{{ versioned('"'"'/site.css'"'"') }}">#' \
         -e 's#href="fonts/#href="/fonts/#g' \
+        -e 's#^</head>#{{ include('"'"'releve/_head.html.twig'"'"') }}\
+</head>#' \
         -e 's#<title>Observatoire post-quantique</title>#<title>{{ releve.title }} · Observatoire post-quantique</title>#' \
         -e 's#<meta name="description" content="[^"]*">#<meta name="description" content="{{ releve.intro }}">#' \
         -e 's#^<footer#{{ include('"'"'newsletter/_form.html.twig'"'"') }}\
@@ -60,7 +62,7 @@ mkdir -p "$(dirname "$template")"
 </footer>#' \
         "$site/index.html"
 } > "$template"
-for marker in 'id="donnees"' "versioned('/app.js')" "versioned('/style.css')" 'releve.title' 'releve.intro' 'newsletter/_form.html.twig' "path('privacy')"; do
+for marker in 'id="donnees"' "versioned('/app.js')" "versioned('/style.css')" 'releve.title' 'releve.intro' 'newsletter/_form.html.twig' "path('privacy')" 'releve/_head.html.twig'; do
     [ "$(count "$marker" "$template")" = 1 ] || fail "template: '$marker' was not inserted"
 done
 
