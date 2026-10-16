@@ -1,6 +1,8 @@
 {# Included at the bottom of every relevé (bin/sync-prototype puts it there).
    If this wording changes, bump App\Newsletter\Subscriptions::CONSENT_VERSION:
    it is what each subscriber is recorded as having agreed to. #}
+{# Off until a mail provider is chosen (NEWSLETTER_ENABLED): no form, no promise. #}
+{% if newsletter_enabled %}
 <section class="wrap lettre" aria-labelledby="lettre-titre">
     <div>
         <p class="sur">Lettre d'information</p>
@@ -21,3 +23,4 @@
         <p class="lettre-note">Un message de confirmation vous sera envoyé : sans clic de votre part, rien n'est gardé. <a href="{{ path('privacy') }}">Ce qui est conservé, et pourquoi</a>.</p>
     </form>
 </section>
+{% endif %}
