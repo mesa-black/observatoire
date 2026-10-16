@@ -158,7 +158,7 @@ Public pages set no cookie. The admin has a session cookie (`SameSite=Strict`,
 
 ## Admin
 
-`/admin` is blocked at the ingress (403), as vault's is. Reach it through the cluster:
-
-    kubectl --context mesa-black -n observatoire port-forward svc/observatoire 8080:80
-    open http://localhost:8080/admin
+`https://observatoire.mesa.black/admin`, from anywhere. A passkey (Touch ID,
+Face ID, the device's PIN) once added from the dashboard; otherwise the
+password, then the TOTP code once per device (trusted 30 days). Sessions last
+30 days; 5 login attempts per 15 minutes.
