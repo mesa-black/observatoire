@@ -21,12 +21,12 @@ final class DashboardController extends AbstractController
     {
         $now = $clock->now();
         $all = $releves->all();
-        $upcoming = array_values(array_filter($all, fn ($r) => !$r->isPublishedAt($now)));
+        $upcoming = array_values(array_filter($all, fn ($r) => $r->isScheduledAt($now)));
         $history = $newsletters->history();
 
         return $this->render('admin/index.html.twig', [
             'releves' => $all,
-            'published' => \count($all) - \count($upcoming),
+            'published' => \count(array_filter($all, fn ($r) => $r->isPublishedAt($now))),
             'next' => $upcoming[0] ?? null,
             'counts' => $subscribers->countByStatus(),
             'newsletters' => $history,

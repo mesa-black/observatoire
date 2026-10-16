@@ -2,6 +2,7 @@
 
 namespace App\Tests\Releve;
 
+use App\Releve\Releve;
 use App\Releve\ReleveRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
@@ -9,6 +10,18 @@ use Symfony\Component\Clock\MockClock;
 final class ReleveRepositoryTest extends TestCase
 {
     private const string DIR = __DIR__.'/../fixtures/releves';
+
+    public function testADraftIsNeverPublishedNorScheduledWhateverItsDate(): void
+    {
+        $now = new \DateTimeImmutable('2026-10-16 12:00:00');
+        $past = new Releve(3, '2026-10-16', $now->modify('-1 day'), 'T', '', '/x', draft: true);
+        $future = new Releve(3, '2026-10-16', $now->modify('+1 day'), 'T', '', '/x', draft: true);
+
+        $this->assertFalse($past->isPublishedAt($now));
+        $this->assertFalse($future->isPublishedAt($now));
+        $this->assertFalse($future->isScheduledAt($now), 'a letter cannot wait for it');
+        $this->assertTrue((new Releve(3, '2026-10-16', $now->modify('+1 day'), 'T', '', '/x'))->isScheduledAt($now));
+    }
 
     public function testOnlyRelevesWhoseTimeHasComeArePublished(): void
     {

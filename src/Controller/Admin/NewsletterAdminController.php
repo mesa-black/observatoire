@@ -206,12 +206,12 @@ final class NewsletterAdminController extends AbstractController
         return 'Choisissez quand la lettre part.';
     }
 
-    /** @return list<Releve> relevés still to come: a letter can wait for one */
+    /** @return list<Releve> relevés still to come: a letter can wait for one (not for a draft) */
     private function upcoming(): array
     {
         $now = $this->clock->now();
 
-        return array_values(array_filter($this->releves->all(), fn (Releve $r) => !$r->isPublishedAt($now)));
+        return array_values(array_filter($this->releves->all(), fn (Releve $r) => $r->isScheduledAt($now)));
     }
 
     private function checkCsrf(Request $request, string $id): void
