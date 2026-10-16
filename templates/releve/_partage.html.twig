@@ -1,0 +1,9 @@
+{# Sharing, by a plain link: nothing loads from Threema until someone clicks,
+   and the app opens with the text written, to edit before sending. The
+   address is the relevé's own (never the preview's, never / which moves). #}
+{% set share_url = site_url ~ path('releve', {number: releve.number}) %}
+{% set share_text = 'Observatoire post-quantique · ' ~ releve.title ~ '\n\n' ~ releve.intro ~ '\n\n' ~ share_url %}
+<section class="wrap partage" aria-label="Partager ce relevé">
+    <p class="sur">Partager ce relevé</p>
+    <a class="bouton" href="https://threema.id/compose?text={{ share_text|url_encode }}" rel="noopener noreferrer" target="_blank">Envoyer sur Threema</a>
+</section>

@@ -55,14 +55,15 @@ mkdir -p "$(dirname "$template")"
 </head>#' \
         -e 's#<title>Observatoire post-quantique</title>#<title>{{ releve.title }} · Observatoire post-quantique</title>#' \
         -e 's#<meta name="description" content="[^"]*">#<meta name="description" content="{{ releve.intro }}">#' \
-        -e 's#^<footer#{{ include('"'"'newsletter/_form.html.twig'"'"') }}\
+        -e 's#^<footer#{{ include('"'"'releve/_partage.html.twig'"'"') }}\
+{{ include('"'"'newsletter/_form.html.twig'"'"') }}\
 \
 <footer#' \
         -e 's#^</footer>#    <p><a href="{{ path('"'"'privacy'"'"') }}">Confidentialité</a></p>\
 </footer>#' \
         "$site/index.html"
 } > "$template"
-for marker in 'id="donnees"' "versioned('/app.js')" 'nonce="{{ csp_nonce() }}"' "versioned('/style.css')" 'releve.title' 'releve.intro' 'newsletter/_form.html.twig' "path('privacy')" 'releve/_head.html.twig'; do
+for marker in 'id="donnees"' "versioned('/app.js')" 'nonce="{{ csp_nonce() }}"' "versioned('/style.css')" 'releve.title' 'releve.intro' 'newsletter/_form.html.twig' 'releve/_partage.html.twig' "path('privacy')" 'releve/_head.html.twig'; do
     [ "$(count "$marker" "$template")" = 1 ] || fail "template: '$marker' was not inserted"
 done
 
