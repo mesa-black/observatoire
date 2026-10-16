@@ -138,8 +138,8 @@ web container's migrations, and exits every hour to be restarted fresh.
 
 Set by the Caddyfile inside the image, for every response, errors included:
 
-    Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self';
-      font-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'self';
+    Content-Security-Policy: default-src 'none'; script-src 'self'; connect-src 'self';
+      style-src 'self'; font-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'self';
       frame-ancestors 'none'; require-trusted-types-for 'script'
     Strict-Transport-Security: max-age=31536000
     X-Content-Type-Options: nosniff
