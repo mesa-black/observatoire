@@ -4,6 +4,13 @@ scheb_two_factor:
     security_tokens:
         - Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken
         - Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken
+    # Where generated email codes are kept: the admin is not an entity.
+    persister: App\Security\AdminCodePersister
+    email:
+        enabled: true
+        digits: 6
+        mailer: App\Security\AdminCodeMailer
+        template: admin/2fa.html.twig
     totp:
         enabled: true
         issuer: 'Observatoire post-quantique'

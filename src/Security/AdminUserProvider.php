@@ -13,6 +13,8 @@ final readonly class AdminUserProvider implements UserProviderInterface
     public function __construct(
         #[\SensitiveParameter] private string $passwordHash,
         #[\SensitiveParameter] private string $totpSecret,
+        private string $adminEmail,
+        private AdminCodeStore $codes,
     ) {
     }
 
@@ -23,7 +25,7 @@ final readonly class AdminUserProvider implements UserProviderInterface
             throw new UserNotFoundException();
         }
 
-        return new AdminUser($this->passwordHash, $this->totpSecret);
+        return new AdminUser($this->passwordHash, $this->totpSecret, $this->adminEmail, $this->codes->get());
     }
 
     public function refreshUser(UserInterface $user): UserInterface

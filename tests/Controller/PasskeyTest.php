@@ -6,6 +6,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 final class PasskeyTest extends WebTestCase
 {
+    use LogsInAdmin;
+
     public function testLoginOptionsArePublicAndAskForUserVerification(): void
     {
         $client = static::createClient();
@@ -33,8 +35,7 @@ final class PasskeyTest extends WebTestCase
         $client->request('POST', '/admin/cle/options', server: ['HTTP_SEC_FETCH_SITE' => 'same-origin']);
         $this->assertResponseRedirects('/admin/connexion');
 
-        $client->request('GET', '/admin/connexion');
-        $client->submitForm('Se connecter', ['_password' => 'secret']);
+        $this->logInAdmin($client);
         $client->request('POST', '/admin/cle/options', server: ['HTTP_SEC_FETCH_SITE' => 'same-origin']);
         $this->assertResponseIsSuccessful();
         $options = json_decode((string) $client->getResponse()->getContent(), true, 16, \JSON_THROW_ON_ERROR);

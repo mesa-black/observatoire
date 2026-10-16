@@ -15,6 +15,7 @@
         "doctrine/orm": "^3.7.5",
         "league/commonmark": "^2.10.3",
         "scheb/2fa-bundle": "^8.6.1",
+        "scheb/2fa-email": "^8.6",
         "scheb/2fa-totp": "^8.6.1",
         "scheb/2fa-trusted-device": "^8.6",
         "symfony/brevo-mailer": "7.4.*",

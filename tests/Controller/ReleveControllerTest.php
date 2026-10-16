@@ -6,6 +6,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 final class ReleveControllerTest extends WebTestCase
 {
+    use LogsInAdmin;
+
     public function testHomeShowsTheLatestPublishedReleveWithItsDataAsJson(): void
     {
         $client = static::createClient();
@@ -37,8 +39,7 @@ final class ReleveControllerTest extends WebTestCase
         $client->request('GET', '/admin/releve/2');
         $this->assertResponseRedirects('/admin/connexion');
 
-        $client->followRedirect();
-        $client->submitForm('Se connecter', ['_password' => 'secret']);
+        $this->logInAdmin($client);
         $client->request('GET', '/admin/releve/2');
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('title', 'Relevé n° 2');

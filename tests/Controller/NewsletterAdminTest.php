@@ -10,6 +10,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 final class NewsletterAdminTest extends WebTestCase
 {
+    use LogsInAdmin;
+
     public function testWriteTestAndScheduleForAReleve(): void
     {
         $client = static::createClient();
@@ -19,8 +21,7 @@ final class NewsletterAdminTest extends WebTestCase
         $tool->dropDatabase();
         $tool->createSchema($em->getMetadataFactory()->getAllMetadata());
 
-        $client->request('GET', '/admin/connexion');
-        $client->submitForm('Se connecter', ['_password' => 'secret']);
+        $this->logInAdmin($client);
         $client->request('GET', '/admin/lettres/nouvelle');
         $client->submitForm('Enregistrer le brouillon', ['subject' => 'Relevé n° 2', 'body' => 'Le relevé **2** arrive.']);
         $client->followRedirect();
