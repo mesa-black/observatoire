@@ -1,7 +1,8 @@
 window.OBSERVATOIRE = {
   "date": "2026-10-15",
   "meta": {
-    "number": 1
+    "number": 1,
+    "published": "2026-10-16"
   },
   "self": {
     "host": "mesa.black",

@@ -70,7 +70,10 @@
 
     const dateFr = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(D.date));
     const M = D.meta || {};
-    $('releve').textContent = `Relevé n° ${M.number || 1} · ${dateFr}`;
+    // The sign carries the day the relevé came out; the measures keep their own
+    // date (dateFr) wherever figures are quoted.
+    const pubFr = M.published ? new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(M.published)) : dateFr;
+    $('releve').textContent = `Relevé n° ${M.number || 1} · ${pubFr}`;
     // A relevé may carry its own headline; the figures under it are always computed.
     if (M.kicker) document.querySelector('.tete .sur').textContent = M.kicker;
     if (M.title) document.querySelector('.tete h1').replaceChildren(M.title[0], h('br'), h('em', null, M.title[1]));
