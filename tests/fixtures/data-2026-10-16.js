@@ -20,7 +20,6 @@ window.OBSERVATOIRE = {
     "protocol": "TLSv1.3",
     "cipher": "TLS_AES_128_GCM_SHA256",
     "protocols": [
-      "tls1_2",
       "tls1_3"
     ],
     "groups": [
@@ -47,16 +46,16 @@ window.OBSERVATOIRE = {
       "cc": "FR",
       "as": "OVH - OVH SAS, FR"
     },
-    "hsts": "max-age=31536000; includesubdomains",
+    "hsts": "max-age=31536000; includesubdomains; preload",
     "front": "other",
     "server": "",
-    "at": "2026-10-15T22:07:33Z",
+    "at": "2026-10-16T18:19:41Z",
     "cost": {
-      "hybrid": 20.8,
-      "classical": 19.3,
-      "hybrid_median": 22.3,
+      "hybrid": 21.2,
+      "classical": 18.3,
+      "hybrid_median": 22.4,
       "classical_median": 20.8,
-      "rtt": 12.8,
+      "rtt": 11.7,
       "n": [
         10,
         10
