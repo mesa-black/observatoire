@@ -82,15 +82,79 @@
         openai: { label: 'OpenAI', hosts: ['chatgpt.com', 'api.openai.com'] },
         anthropic: { label: 'Anthropic', hosts: ['claude.ai', 'api.anthropic.com'] },
         mistral: { label: 'Mistral', hosts: ['chat.mistral.ai', 'api.mistral.ai'] },
-        cursor: { label: 'Cursor', hosts: ['api2.cursor.sh'], what: 'le code source de ses développeurs' },
+        cursor: { label: 'Cursor', hosts: ['api2.cursor.sh'], what: 'le code source de ses développeurs', whatMany: 'le code source de leurs développeurs' },
         perplexity: { label: 'Perplexity', hosts: ['www.perplexity.ai', 'api.perplexity.ai'] },
     };
     const byHostAll = new Map(reachable.map(e => [e.host, e]));
     // A provider is sealed only if every door of it we measured is.
     const providerSealed = k => PROVIDERS[k].hosts.every(x => byHostAll.get(x)?.pq === 'full');
     const lifeOf = e => LIFE[e.life] || LIFE[e.g];
+    // What goes to an AI stays sensitive at least as long as the AI group's
+    // hypothesis says (code, documents), longer if the organisation's own data does.
+    const aiUntil = e => RECORDED + Math.max(lifeOf(e).years, LIFE.ia.years);
     const usersOf = k => measured.filter(e => (e.ai || []).includes(k));
-    if (M.focus === 'ia') {
+    // Relevé 3: who carries each organisation's mail, and whether TLS between
+    // mail servers is required (MTA-STS enforce, DANE) or merely offered.
+    const POST = {
+        microsoft: ['Microsoft 365', 'US'], google: ['Google Workspace', 'US'], proofpoint: ['Proofpoint', 'US'],
+        mimecast: ['Mimecast', 'GB'], cisco: ['Cisco', 'US'], broadcom: ['Broadcom', 'US'], barracuda: ['Barracuda', 'US'],
+        trendmicro: ['Trend Micro', 'JP'], vade: ['Vade', 'FR'], ovhcloud: ['OVHcloud', 'FR'], gandi: ['Gandi', 'FR'],
+        orange: ['Orange', 'FR'], proton: ['Proton', 'CH'], other: ['ses propres serveurs ou un autre', ''], none: ['aucun serveur de courrier', ''],
+    };
+    // Who holds the mail, by name when the exchanger says it (a known provider),
+    // else by the network that announces its address. Country of the parent
+    // company for the American ones, as in relevé 1; of the network otherwise.
+    const MAIL_NET = [
+        [/CLOUDFLARE/i, 'Cloudflare', 'US'], [/IRONP|CISCO/i, 'Cisco', 'US'], [/AMAZON/i, 'Amazon', 'US'], [/MICROSOFT/i, 'Microsoft', 'US'], [/GOOGLE/i, 'Google', 'US'],
+        [/DISIC|INTERMINISTERIELLE/i, 'Réseau de l\'État (DINUM)', 'FR', 'propre'], [/FR-MAE/i, 'Affaires étrangères', 'FR', 'propre'],
+        [/BPCE/i, 'BPCE', 'FR', 'propre'], [/BRS-BOI|BOURSORAMA/i, 'Boursorama', 'FR', 'propre'], [/BNP/i, 'BNP Paribas', 'FR', 'propre'],
+        [/Societe Generale/i, 'Société Générale', 'FR', 'propre'], [/Credit Agricole/i, 'Crédit Agricole', 'FR', 'propre'],
+        [/EURO-INFORMATION/i, 'Euro-Information (Crédit Mutuel)', 'FR', 'propre'], [/LA-POSTE/i, 'La Poste', 'FR', 'propre'],
+        [/CHU-TLSE/i, 'CHU de Toulouse', 'FR', 'propre'], [/cirtilnet/i, 'Sécurité sociale', 'FR', 'propre'],
+        [/RENATER/i, 'Renater', 'FR', 'public'],
+        [/CELESTE/i, 'Celeste', 'FR', 'hebergeur'], [/AS3215|Orange S\.A/i, 'Orange', 'FR', 'hebergeur'], [/Odigo/i, 'Odigo', 'FR', 'hebergeur'],
+        [/ATOS/i, 'Atos', 'FR', 'hebergeur'], [/^OVH/i, 'OVHcloud', 'FR', 'hebergeur'],
+        [/DTAG/i, 'Deutsche Telekom', 'DE'], [/COLT/i, 'Colt', 'GB'],
+    ];
+    const POST_KIND = { vade: 'hebergeur', ovhcloud: 'hebergeur', gandi: 'hebergeur', orange: 'hebergeur' };
+    const mailHolder = e => {
+        const m = e.mail;
+        if (!m || !m.mx.length) return null;
+        if (m.provider !== 'other' && POST[m.provider]) return { name: POST[m.provider][0], cc: POST[m.provider][1], kind: POST_KIND[m.provider] || 'prestataire' };
+        const as = (m.net && m.net.as) || '';
+        const hit = MAIL_NET.find(([re]) => re.test(as));
+        if (hit) return { name: hit[1], cc: hit[2], kind: hit[3] || 'prestataire' };
+        const cc = (as.match(/, ([A-Z]{2})$/) || [])[1] || '';
+        return { name: as.replace(/^\S+ - /, '').replace(/, [A-Z]{2}$/, '') || 'inconnu', cc, kind: 'prestataire' };
+    };
+    const postState = e => {
+        const m = e.mail;
+        if (!m) return null;
+        if (!m.mx.length) return 'sans';
+        if (m.mtasts === 'enforce' || m.dane) return 'cachetee';
+        if (m.mtasts === 'testing') return 'entrouverte';
+        return 'carte';
+    };
+    if (M.focus === 'courriel') {
+        document.body.classList.add('releve-mail');
+        const withMx = measured.filter(e => e.mail && e.mail.mx.length);
+        const sealedMail = withMx.filter(e => postState(e) === 'cachetee');
+        const byProv = k => withMx.filter(e => e.mail.provider === k);
+        const us = withMx.filter(e => POST[e.mail.provider]?.[1] === 'US');
+        const top = Object.keys(POST).filter(k => byProv(k).length && POST[k][1]).sort((a, b) => byProv(b).length - byProv(a).length).slice(0, 5);
+        $('chapo').append(
+            `Sur `, h('strong', null, `${withMx.length} organisations`), ` qui reçoivent du courrier, `,
+            h('strong', null, sealedMail.length), ` imposent qu'il arrive chiffré : `, h('span', null, names(sealedMail)), `. `,
+            `Pour les ${withMx.length - sealedMail.length} autres, le chiffrement entre serveurs n'est que proposé : quelqu'un placé sur le trajet peut obtenir que le message arrive en clair. Pas besoin d'ordinateur quantique, c'est possible aujourd'hui. `,
+            h('strong', null, `${us.length}`), ` confient leur courrier à une entreprise américaine : `, top.map(k => `${POST[k][0]} ${byProv(k).length}`).join(', '), '.',
+        );
+        sources($('chapo'), `les enregistrements MX, `, h('code', null, '_mta-sts'), `, TLSA, DS, `, h('code', null, '_dmarc'), ` et SPF de chaque domaine, lus le ${dateFr} sur ses serveurs DNS faisant autorité ; la politique MTA-STS servie sur `, h('code', null, 'https://mta-sts.<domaine>/'), `. Pour vérifier : `, h('code', null, 'dig +short TXT _mta-sts.danone.com'), '.');
+    } else if (M.focus === 'ia') {
+        // Relevé 2 is its own page: the near horizon first, and none of relevé
+        // 1's blocks (see the vision, at the end).
+        $('q').value = 2027;
+        $('sablier-sonde').textContent = `Ce relevé, comme le premier, a été fait avec des sondes écrites pour l'occasion : OpenSSL 3.5 pour les portes, les serveurs DNS faisant autorité pour les espaces d'IA, l'API publique de Hugging Face pour l'open source. Elles passeront par Sablier.`;
+        document.body.classList.add('releve-ia');
         const orgs = measured.filter(e => e.g !== 'ia');
         const open = orgs.filter(e => (e.ai || []).length);
         const keys = Object.keys(PROVIDERS).filter(k => usersOf(k).length).sort((a, b) => usersOf(b).length - usersOf(a).length);
@@ -101,7 +165,7 @@
             keys.map(k => `${PROVIDERS[k].label} ${usersOf(k).length}`).join(', '), '. ',
             sealedP.length ? `Le chemin vers ${sealedP.map(k => PROVIDERS[k].label).join(', ')} est déjà hybride. ` : '',
             openP.length ? h('span', null, ...openP.map(k => h('span', null, 'Celui vers ', h('strong', null, PROVIDERS[k].label),
-                ` ne l'est pas : ${PROVIDERS[k].what || 'ce qui y part'} chez ${usersOf(k).length} d'entre elles, dont `, names(usersOf(k), 4), `, s'échange en classique. `))) : '',
+                ` ne l'est pas : ${PROVIDERS[k].whatMany || 'ce qui y part'} chez ${usersOf(k).length} d'entre elles, dont `, names(usersOf(k), 4), `, s'échange en classique. `))) : '',
             `Combien de temps cela reste-t-il secret ? Faites avancer le Q-Day.`,
         );
         sources($('chapo'), `les enregistrements DNS publics de chaque organisation (`, h('code', null, 'openai-domain-verification'), `, `,
@@ -195,7 +259,7 @@
         for (const e of measured.filter(o => o.g !== 'ia')) for (const k of e.ai || []) links.push({ e, k, ok: providerSealed(k) });
         links.sort((a, b) => a.ok === b.ok ? a.e.name.localeCompare(b.e.name, 'fr') : a.ok ? -1 : 1);
         const lines = links.map(({ e, k, ok }) => {
-            const until = RECORDED + lifeOf(e).years;
+            const until = aiUntil(e);
             return {
                 e,
                 text: `${pad(e.apexName || e.host.replace(/^(www|app|group|corporate|fr)\./, ''), 26)} → ${pad(PROVIDERS[k].label.toUpperCase(), 12)} `,
@@ -226,6 +290,7 @@
             if (!audio) { audio = new Audio(MUSIC); audio.loop = true; audio.volume = .7; }
             audio.play().then(() => {
                 sound.setAttribute('aria-pressed', 'true'); sound.textContent = 'Couper le son';
+                for (const t of ['pointerdown', 'keydown']) removeEventListener(t, first, true);
             }).catch(() => {});
         };
         const stop = () => {
@@ -238,9 +303,12 @@
             ev.stopPropagation();
             if (audio && !audio.paused) { muted = true; stop(); } else { muted = false; start(); }
         });
-        // The first gesture anywhere on the page starts it, unless cut before.
+        // Tried as soon as the page opens: a browser that already saw the
+        // visitor interact with the site (Chrome, arriving from relevé 1) lets
+        // it play. Otherwise the first gesture anywhere starts it, unless cut before.
         const first = () => { start(); for (const t of ['pointerdown', 'keydown']) removeEventListener(t, first, true); };
         for (const t of ['pointerdown', 'keydown']) addEventListener(t, first, true);
+        start();
 
         let started = false;
         const run = () => {
@@ -363,7 +431,10 @@
     {
         // Say up front how little the year can move, and why: it is the finding.
         const fixed = measured.filter(e => e.pq !== 'none').length;
-        $('curseur-note').textContent =
+        if (M.focus === 'ia') $('curseur-note').textContent =
+            `Le Q-Day règle la vision machine ci-dessous : lancez le temps, et regardez ce qui se lit l'année où il tombe. `
+            + `Ce qui part vers une IA est supposé sensible ${LIFE.ia.years} ans au moins, plus si l'organisation garde des données plus longtemps.`;
+        else $('curseur-note').textContent =
             `${fixed} portes sur ${measured.length} acceptent l'hybride, en tout ou en partie : aucune année ne change leur couleur. `
             + `Les ${measured.length - fixed} autres affichent leurs années et basculent quand le Q-Day dépasse la durée de vie de leurs données. `
             + `Tout le reste de la page est mesuré le jour du relevé.`;
@@ -588,7 +659,7 @@
         }
         if ((e.ai || []).length && e.g !== 'ia') {
             const ok = e.ai.filter(providerSealed), ko = e.ai.filter(k => !providerSealed(k));
-            const until = RECORDED + life.years;
+            const until = aiUntil(e);
             add(`Ouvert à l'IA : ${e.ai.map(k => PROVIDERS[k].label).join(', ')}.`,
                 `D'après ses enregistrements DNS publics, ${e.name} a vérifié son domaine auprès de ${e.ai.length > 1 ? `ces ${e.ai.length} fournisseurs` : 'ce fournisseur'}, ce que demande l'ouverture d'un espace d'entreprise. `,
                 ok.length ? `Vers ${ok.map(k => PROVIDERS[k].label).join(' et ')}, le chemin est hybride : un échange enregistré aujourd'hui y reste illisible après le Q-Day. ` : '',
@@ -596,6 +667,17 @@
                     ? `Vers ${PROVIDERS[k].label}, il est classique : ${PROVIDERS[k].what || 'ce qui y part'}, enregistré aujourd'hui, serait lisible en ${Y} et resterait sensible jusqu'en ${until}, soit ${plural(until - Y + 1, 'année', 'années')} d'exposition. `
                     : `Vers ${PROVIDERS[k].label}, il est classique, mais ce qui y part ne serait plus sensible en ${Y} selon notre hypothèse (jusqu'en ${until}). `),
                 `On ne voit ni ce qui est envoyé, ni en quelle quantité.`);
+        }
+        if (e.mail && M.focus === 'courriel') {
+            const m = e.mail, st = postState(e);
+            const prov = POST[m.provider] || POST.other;
+            if (st === 'sans') add('Pas de courrier.', `Le domaine ${m.apex} ne publie aucun serveur de courrier (MX).`);
+            else add(st === 'cachetee' ? 'Lettre cachetée.' : st === 'entrouverte' ? 'Enveloppe entrouverte.' : 'Carte postale.',
+                `Le courrier de ${m.apex} arrive chez ${prov[0]}${prov[1] ? ` (${COUNTRY_MAIL[prov[1]] || prov[1]})` : ''} : ${m.mx.join(', ')}. `,
+                st === 'cachetee' ? (m.dane ? `Le chiffrement est épinglé par DANE : un expéditeur qui vérifie DNSSEC refuse de livrer en clair.` : `Sa politique MTA-STS est en mode enforce : un expéditeur qui la respecte refuse de livrer sans chiffrement.`)
+                    : st === 'entrouverte' ? `Sa politique MTA-STS est en mode testing : les écarts sont signalés, rien n'est imposé.`
+                        : `Aucune politique MTA-STS ni DANE : le chiffrement entre serveurs n'est que proposé, et un attaquant sur le trajet peut le faire sauter.`,
+                ` DMARC : ${m.dmarc || 'absent'}${m.dmarc === 'reject' ? ' (un faux courriel à son nom est rejeté)' : m.dmarc === 'quarantine' ? ' (mis en indésirables)' : ' (un faux courriel à son nom passe)'}. SPF : ${m.spf || 'absent'}. DNSSEC : ${m.dnssec ? 'oui' : 'non'}.`);
         }
         if ((e.hf || []).length) {
             const tot = k => e.hf.reduce((n, o) => n + (o[k] || 0), 0);
@@ -1190,6 +1272,7 @@
         Automattic: 'US', Imperva: 'US', Radware: 'IL',
         Anthropic: 'US', Meta: 'US', 'GitHub (Microsoft)': 'US', Alibaba: 'CN',
     };
+    const COUNTRY_MAIL = { US: 'États-Unis', GB: 'Royaume-Uni', FR: 'France', JP: 'Japon', CH: 'Suisse', DE: 'Allemagne' };
     const COUNTRY = { US: 'États-Unis', FR: 'France', IL: 'Israël', DE: 'Allemagne', DK: 'Danemark', MT: 'Malte', GB: 'Royaume-Uni', CN: 'Chine', SG: 'Singapour' };
     const lawOf = e => {
         const company = atlasBy.porte(e);
@@ -1422,4 +1505,200 @@
             h('td', null, cspOf(e) ? cspOf(e).kind : '—'),
         ))),
     );
+
+    // ------------------------------------------------------------ the machine's vision (relevé 2)
+    // Every organisation as a target: its own door and its ways to AI. Time runs
+    // from today; until the Q-Day everything recorded is noise, and on that
+    // year what went the classical way turns readable, line by line. What is
+    // sealed stays noise. What is no longer sensitive greys out.
+    if (M.focus === 'ia') {
+        const vis = $('vision');
+        const NOW = RECORDED;
+        const qInput = $('q');
+        const t = h('input', { type: 'range', id: 'vision-t', min: NOW, max: 2050, step: 1, value: NOW, 'aria-label': 'Année' });
+        const tYear = h('span', { class: 'vision-annee' });
+        const qYear = h('span', { class: 'vision-q' });
+        const play = h('button', { type: 'button', class: 'scan-son vision-play' }, '▶ Lancer le temps');
+        const qMinus = h('button', { type: 'button', class: 'vision-btn', 'aria-label': 'Q-Day un an plus tôt' }, '−');
+        const qPlus = h('button', { type: 'button', class: 'vision-btn', 'aria-label': 'Q-Day un an plus tard' }, '+');
+        const moveQ = d => {
+            qInput.value = Math.min(Number(qInput.max), Math.max(Number(qInput.min), Number(qInput.value) + d));
+            qInput.dispatchEvent(new Event('input'));
+        };
+        qMinus.addEventListener('click', () => moveQ(-1));
+        qPlus.addEventListener('click', () => moveQ(1));
+        const count = h('p', { class: 'vision-compte', 'aria-live': 'polite' });
+        const wall = h('ul', { class: 'vision-mur' });
+        const rest = h('ul', { class: 'vision-mur vision-reste', hidden: true });
+        const more = h('button', { type: 'button', class: 'scan-son' });
+
+        const hex = '0123456789abcdef';
+        const junk = n => Array.from({ length: n }, (_, i) => hex[(Math.random() * 16) | 0] + (i % 4 === 3 ? ' ' : '')).join('').trim();
+        const plaqueOf = new Map(plaques.map(p => [p.e.host, p]));
+
+        const targets = measured.filter(e => e.g !== 'ia').map(e => {
+            const life = lifeOf(e);
+            const until = RECORDED + life.years;
+            const what = life.what.split(',')[0];
+            const lines = [{ label: 'PORTE', what, sealed: e.pq === 'full', until }];
+            for (const k of e.ai || []) lines.push({ label: `→ ${PROVIDERS[k].label.toUpperCase()}`, what: PROVIDERS[k].what ? 'code source' : 'prompts, documents confiés', sealed: providerSealed(k), until: aiUntil(e) });
+            const card = h('button', { type: 'button', class: 'cible' });
+            const rows = lines.map(l => {
+                const txt = h('span', { class: 'v-txt' }, junk(12));
+                const st = h('span', { class: 'v-st' });
+                card.append(h('span', { class: 'v-ligne' }, h('span', { class: 'v-lab' }, l.label), txt, st));
+                return { ...l, txt, st, state: '' };
+            });
+            card.prepend(h('span', { class: 'v-org' }, e.name), h('span', { class: 'v-hote' }, e.host));
+            if ((e.hf || []).some(o => o.models)) card.append(h('span', { class: 'v-hf' }, `↗ publie ${e.hf.reduce((n, o) => n + (o.models || 0), 0)} modèles`));
+            card.addEventListener('click', () => { const p = plaqueOf.get(e.host); if (p) openSheet(p); });
+            (e.ai || []).length ? wall.append(h('li', null, card)) : rest.append(h('li', null, card));
+            return { e, card, rows };
+        });
+
+        vis.hidden = false;
+        vis.append(h('div', { class: 'scan-ecran vision-ecran' },
+            h('div', { class: 'scan-tete' },
+                h('span', { class: 'scan-oeil', 'aria-hidden': 'true' }),
+                h('h2', { id: 'vision-titre' }, 'Vision machine · ce qui se lit, année après année'),
+                play,
+            ),
+            h('div', { class: 'vision-temps' },
+                h('div', null, h('span', { class: 'vision-lab' }, 'Année'), tYear),
+                // The Q-Day is set here, the page's own slider being hidden on this relevé.
+                h('div', { class: 'vision-qday' }, h('span', { class: 'vision-lab' }, 'Q-Day'),
+                    h('span', { class: 'vision-pas' }, qMinus, qYear, qPlus)),
+                h('label', { class: 'vision-curseur' }, t),
+            ),
+            count,
+            h('p', { class: 'vision-note' }, `Avant le Q-Day, tout ce qui a été enregistré n'est que du bruit. Le Q-Day venu, ce qui est passé par un chemin classique se lit ; ce qui est passé par un chemin hybride reste illisible. Ce qui part vers une IA est supposé sensible ${LIFE.ia.years} ans au moins, plus si l'organisation garde des données plus longtemps. Les organisations avec un espace chez un fournisseur d'IA d'abord.`),
+            wall,
+            more, rest,
+            h('div', { class: 'scan-balayage', 'aria-hidden': 'true' }),
+        ));
+        const others = targets.filter(x => !(x.e.ai || []).length).length;
+        more.textContent = `Afficher les ${others} autres organisations`;
+        more.addEventListener('click', () => { rest.hidden = !rest.hidden; more.textContent = rest.hidden ? `Afficher les ${others} autres organisations` : 'Masquer les autres'; });
+
+        const paint = () => {
+            const Y = Number(t.value), Q = Number(qInput.value);
+            tYear.textContent = Y; qYear.textContent = Q;
+            let read = 0;
+            for (const x of targets) {
+                let any = false, all = true;
+                for (const r of x.rows) {
+                    const state = Y < Q ? 'crypte' : r.sealed ? 'scelle' : Y <= r.until ? 'lu' : 'perime';
+                    if (state === 'lu') any = true;
+                    if (state !== 'perime' && !r.sealed) all = false;
+                    if (state === r.state) continue;
+                    r.state = state;
+                    r.txt.parentNode.className = `v-ligne ${state}`;
+                    if (state === 'lu' || state === 'perime') r.txt.textContent = r.what.toUpperCase();
+                    else r.txt.textContent = junk(12);
+                    r.st.textContent = { crypte: 'CHIFFRÉ', scelle: '■ SCELLÉ', lu: `LU · SENSIBLE JUSQU'EN ${r.until}`, perime: 'LU · PLUS SENSIBLE' }[state];
+                }
+                x.card.classList.toggle('lue', any);
+                x.card.classList.toggle('perimee', !any && all && Y >= Q && x.rows.some(r => !r.sealed));
+                if (any) read++;
+            }
+            count.replaceChildren(
+                Y < Q ? `${Y}. Le Q-Day n'est pas encore tombé : tout est chiffré.`
+                    : h('span', null, h('b', null, `${read} organisation${read > 1 ? 's' : ''} sur ${targets.length}`), ` dont une partie de ce qui a été enregistré en ${RECORDED} se lit en ${Y}, et compte encore.`));
+        };
+        // The noise itself moves, so the screen looks alive before the Q-Day.
+        if (!reduce) setInterval(() => {
+            for (let i = 0; i < 6; i++) {
+                const x = targets[(Math.random() * targets.length) | 0];
+                const r = x.rows[(Math.random() * x.rows.length) | 0];
+                if (r.state === 'crypte' || r.state === 'scelle') r.txt.textContent = junk(12);
+            }
+        }, 120);
+
+        let timer = null;
+        const stopPlay = () => { clearInterval(timer); timer = null; play.textContent = '▶ Lancer le temps'; };
+        play.addEventListener('click', () => {
+            if (timer) return stopPlay();
+            if (Number(t.value) >= 2050) t.value = NOW;
+            play.textContent = '❚❚ Arrêter';
+            timer = setInterval(() => {
+                t.value = Number(t.value) + 1;
+                paint();
+                if (Number(t.value) >= 2050) stopPlay();
+            }, reduce ? 50 : 650);
+        });
+        t.addEventListener('input', () => { stopPlay(); paint(); });
+        qInput.addEventListener('input', paint);
+        paint();
+    }
+
+
+    // ------------------------------------------------------------ the sorting office (relevé 3)
+    // Every organisation's mail as a piece of post: a sealed letter when TLS
+    // between servers is required, a postcard when it is only offered. The
+    // switch puts someone on the way: postcards turn over.
+    if (M.focus === 'courriel') {
+        // What fits on a stamp.
+        const STAMP = { microsoft: 'M365', google: 'Google', proofpoint: 'Proof­point', mimecast: 'Mime­cast', trendmicro: 'Trend', other: 'privé', none: '—' };
+        const sec = h('section', { class: 'wrap tri', 'aria-labelledby': 'tri-titre' });
+        document.querySelector('.machine').before(sec);
+        const sw = h('input', { type: 'checkbox', id: 'attaque' });
+        const wall = h('ul', { class: 'tri-mur' });
+        const plaqueOf = new Map(plaques.map(p => [p.e.host, p]));
+        const order = { cachetee: 0, entrouverte: 1, carte: 2, sans: 3 };
+        const list = measured.filter(e => e.mail).sort((a, b) => order[postState(a)] - order[postState(b)] || a.name.localeCompare(b.name, 'fr'));
+        for (const e of list) {
+            const m = e.mail, st = postState(e), prov = POST[m.provider] || POST.other;
+            const what = lifeOf(e).what.split(',')[0];
+            const card = h('button', { type: 'button', class: `piece ${st}${mailHolder(e)?.cc === 'FR' ? ' fr' : ''}` },
+                h('span', { class: 'timbre', title: `Courrier tenu par ${mailHolder(e)?.name || prov[0]}` }, m.provider === 'other' ? (mailHolder(e)?.name.split(/[ (]/)[0] || 'privé') : (STAMP[m.provider] || prov[0].split(' ')[0]), (mailHolder(e)?.cc || prov[1]) ? h('small', null, mailHolder(e)?.cc || prov[1]) : null),
+                h('span', { class: 'p-org' }, e.name),
+                h('span', { class: 'p-adr' }, st === 'sans' ? 'pas de MX' : `MX ${m.mx[0]}`),
+                st === 'cachetee' ? h('span', { class: 'cachet', title: m.dane ? 'DANE' : 'MTA-STS enforce' }, m.dane ? 'DANE' : 'STS') : null,
+                st === 'carte' || st === 'entrouverte' ? h('span', { class: 'p-dos' }, h('b', null, 'EN CLAIR SUR LE TRAJET'), h('span', null, `${what}…`)) : null,
+                h('span', { class: 'p-pied' }, `DMARC ${m.dmarc || '—'} · SPF ${m.spf || '—'}${m.dnssec ? ' · DNSSEC' : ''}`),
+            );
+            card.addEventListener('click', () => { const p = plaqueOf.get(e.host); if (p) openSheet(p); });
+            wall.append(h('li', null, card));
+        }
+        const counts = Object.fromEntries(Object.keys(order).map(k => [k, list.filter(e => postState(e) === k).length]));
+        sec.append(
+            h('p', { class: 'sur' }, 'Le tri postal'),
+            h('h2', { id: 'tri-titre' }, `${counts.cachetee} lettres cachetées, ${counts.carte + counts.entrouverte} cartes postales.`),
+            h('div', { class: 'tri-commandes' },
+                h('label', { class: 'bascule' }, sw, ' Un attaquant se place sur le trajet'),
+                h('span', { class: 'tri-legende' },
+                    h('span', null, h('i', { class: 'mini cachetee' }), `cachetée (MTA-STS enforce ou DANE) ${counts.cachetee}`),
+                    h('span', null, h('i', { class: 'mini entrouverte' }), `entrouverte (MTA-STS testing) ${counts.entrouverte}`),
+                    h('span', null, h('i', { class: 'mini carte' }), `carte postale ${counts.carte}`),
+                    counts.sans ? h('span', null, h('i', { class: 'mini sans' }), `pas de courrier ${counts.sans}`) : null),
+            ),
+            wall,
+            h('p', { class: 'tri-note' }, `Et le Q-Day ? Même cachetée, une lettre voyage en TLS : il faut encore savoir si les serveurs de courrier acceptent l'hybride post-quantique. Cette mesure se fait sur le port 25, fermé depuis la machine de ce brouillon : elle viendra du serveur de l'observatoire.`),
+        );
+        sw.addEventListener('change', () => sec.classList.toggle('attaque', sw.checked));
+
+        // Sovereignty of the mail: the country of whoever holds each exchanger.
+        const held = list.filter(e => mailHolder(e));
+        const byCc = new Map();
+        for (const e of held) { const k = mailHolder(e).cc || '?'; if (!byCc.has(k)) byCc.set(k, []); byCc.get(k).push(e); }
+        const fr = byCc.get('FR') || [], usM = byCc.get('US') || [];
+        const frSw = h('input', { type: 'checkbox' });
+        sec.querySelector('.tri-commandes').append(h('label', { class: 'bascule' }, frSw, ` Courrier tenu en France seulement (${fr.length})`));
+        frSw.addEventListener('change', () => sec.classList.toggle('france', frSw.checked));
+        const KIND = { propre: 'Son propre réseau', public: 'Réseau public', hebergeur: 'Prestataire ou hébergeur français' };
+        const souv = h('div', { class: 'tri-souv' },
+            h('p', { class: 'sur' }, 'Souveraineté du courrier'),
+            h('h3', null, `Tenu en France : ${fr.length} sur ${held.length}. Par une entreprise américaine : ${usM.length}.`),
+            h('p', null, `Ici la France tient mieux qu'ailleurs : l'État achemine son courrier par son propre réseau interministériel, les grandes banques par les leurs. Le CAC 40 et les licornes, eux, l'ont confié à Google, Microsoft ou Proofpoint. `,
+                `Et le courrier tenu en France n'est pas pour autant mieux fermé : `, h('b', null, `${plural(fr.filter(e => postState(e) === 'cachetee').length, 'lettre cachetée', 'lettres cachetées')} sur ${fr.length}`),
+                fr.some(e => postState(e) === 'cachetee') ? h('span', null, ' : ', names(fr.filter(e => postState(e) === 'cachetee'))) : '', '.'),
+            h('ul', { class: 'tri-souv-liste' }, Object.entries(KIND).map(([k, label]) => {
+                const sub = fr.filter(e => mailHolder(e).kind === k);
+                return sub.length ? h('li', null, h('b', null, `${label} · ${sub.length}`), ' ', names(sub, 99), '.') : null;
+            }), h('li', null, h('b', null, 'Ailleurs · '), [...byCc].filter(([k]) => k !== 'FR').sort((a, b) => b[1].length - a[1].length).map(([k, l]) => `${COUNTRY_MAIL[k] || k} ${l.length}`).join(', '), '.')),
+        );
+        wall.before(souv);
+        sources(souv.querySelector('ul'), `pour chaque domaine, l'adresse du serveur de courrier de plus haute priorité, et le réseau qui l'annonce (Team Cymru), lus le ${dateFr}. Le prestataire est reconnu au nom du serveur quand il le dit (Google, Microsoft, Proofpoint…), au réseau sinon.`);
+    }
+
 })();

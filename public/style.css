@@ -650,3 +650,231 @@ pre code { background: none; border: 0; padding: 0; font: inherit; color: inheri
 .sources b { color: var(--encre); }
 .sources code { font-size: .92em; }
 .tete .sources { max-width: 36rem; }
+
+/* ------------------------------------------------------------ relevé 2: its own page */
+.releve-ia #atlas-bloc, .releve-ia .analyses, .releve-ia .chiffres, .releve-ia #groupes, .releve-ia .reglages { display: none; }
+.vision { margin: 1.5rem auto 3rem; }
+.vision-ecran { padding-bottom: 1.6rem; }
+.vision-temps { display: flex; flex-wrap: wrap; align-items: end; gap: 1rem 2.2rem; margin: .4rem 0 .8rem; }
+.vision-lab { display: block; font: 600 .62rem/1 var(--mono); letter-spacing: .2em; color: #7d2a24; }
+.vision-annee { font: 400 3.4rem/1 var(--serif); color: #ff3b30; text-shadow: 0 0 14px rgba(255, 50, 40, .6); font-variant-numeric: tabular-nums; }
+.vision-q { font: 400 2rem/1 var(--serif); color: #ffb3ad; }
+.vision-curseur { flex: 1; min-width: 12rem; }
+.vision-curseur input { width: 100%; accent-color: #ff3b30; }
+.vision-compte { margin: 0 0 .4rem; color: #ffb3ad; font-size: .8rem; min-height: 1.3em; }
+.vision-compte b { color: #ff3b30; }
+.vision-note { margin: 0 0 1rem; color: #7d2a24; font-size: .7rem; line-height: 1.5; max-width: 52rem; }
+.vision-mur { display: grid; grid-template-columns: repeat(auto-fill, minmax(15.5rem, 1fr)); gap: .5rem; margin: 0 0 1rem; padding: 0; list-style: none; }
+.vision-reste { margin-top: 1rem; }
+.cible {
+    position: relative; display: flex; flex-direction: column; gap: .15rem; width: 100%; height: 100%;
+    padding: .7rem .8rem; border: 0; border-radius: 4px; background: rgba(255, 30, 20, .03); color: #7d2a24; text-align: left; cursor: pointer;
+    font: 500 .66rem/1.45 var(--mono);
+    /* Target brackets, drawn by four corner gradients. */
+    background-image:
+        linear-gradient(#5a1511, #5a1511), linear-gradient(#5a1511, #5a1511), linear-gradient(#5a1511, #5a1511), linear-gradient(#5a1511, #5a1511),
+        linear-gradient(#5a1511, #5a1511), linear-gradient(#5a1511, #5a1511), linear-gradient(#5a1511, #5a1511), linear-gradient(#5a1511, #5a1511);
+    background-repeat: no-repeat;
+    background-size: 10px 1.5px, 1.5px 10px, 10px 1.5px, 1.5px 10px, 10px 1.5px, 1.5px 10px, 10px 1.5px, 1.5px 10px;
+    background-position: 0 0, 0 0, 100% 0, 100% 0, 0 100%, 0 100%, 100% 100%, 100% 100%;
+    transition: background-color .4s, color .4s;
+}
+.cible:hover, .cible:focus-visible { background-color: rgba(255, 30, 20, .08); outline: none; }
+.cible .v-org { font: 700 .8rem/1.2 var(--sans); color: #ff8a80; }
+.cible .v-hote { opacity: .7; margin-bottom: .25rem; overflow-wrap: anywhere; }
+.v-ligne { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); column-gap: .4rem; }
+.v-ligne .v-st { grid-column: 2; font-size: .58rem; letter-spacing: .08em; }
+.v-ligne .v-txt { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.v-ligne.scelle { color: #5a1511; }
+.v-ligne.lu { color: #ff3b30; text-shadow: 0 0 6px rgba(255, 50, 40, .7); }
+.v-ligne.lu .v-txt { animation: ligne .4s steps(8) both; font-weight: 700; }
+.v-ligne.perime { color: #6f6e69; text-decoration: line-through; }
+.cible .v-hf { margin-top: .2rem; color: #ffb3ad; font-size: .6rem; }
+.cible.lue { color: #ff8a80; background-color: rgba(255, 30, 20, .1); animation: cible .8s ease-out; }
+.cible.lue { background-image:
+        linear-gradient(#ff3b30, #ff3b30), linear-gradient(#ff3b30, #ff3b30), linear-gradient(#ff3b30, #ff3b30), linear-gradient(#ff3b30, #ff3b30),
+        linear-gradient(#ff3b30, #ff3b30), linear-gradient(#ff3b30, #ff3b30), linear-gradient(#ff3b30, #ff3b30), linear-gradient(#ff3b30, #ff3b30); }
+.cible.perimee { opacity: .45; }
+@keyframes cible { 0% { box-shadow: 0 0 0 0 rgba(255, 59, 48, .9); } 100% { box-shadow: 0 0 0 14px rgba(255, 59, 48, 0); } }
+.vision .scan-son { margin-top: .2rem; }
+@media (prefers-reduced-motion: reduce) { .cible.lue, .v-ligne.lu .v-txt { animation: none; } }
+
+/* ------------------------------------------------------------ relevé 2: sheets and Sablier in the machine's colours
+   The page's own tokens, redefined inside these two places only: every
+   component under them (plaques, chips, the map, the code blocks) follows. */
+.releve-ia .fiche,
+.releve-ia .sablier {
+    --papier: #0b0606; --creme: #120808; --encre: #ffb3ad; --doux: #c4554c; --pale: #7d2a24; --filet: #3a0d0b;
+    --lien: #ff8a80; --vif: #ff3b30; --ardoise: #7d2a24;
+    --p-scelle: #3a0d0b; --p-expose: #ff3b30; --p-perime: #1e100f;
+    --sur-scelle: #ffb3ad; --sur-expose: #0b0606; --liseret: rgba(255, 59, 48, .55);
+    --voile: rgba(11, 6, 6, .55);
+}
+.releve-ia .fiche {
+    background:
+        repeating-linear-gradient(to bottom, rgba(255, 255, 255, .025) 0 1px, transparent 1px 3px),
+        #0b0606;
+    color: var(--encre);
+    box-shadow: 0 0 0 1px #3a0d0b, 0 0 60px rgba(255, 30, 20, .25), 0 24px 60px -20px rgba(0, 0, 0, .8);
+}
+.releve-ia .fiche::backdrop { background: rgba(5, 0, 0, .78); }
+.releve-ia .fiche-tete { font-family: var(--mono); }
+.releve-ia .fiche-tete h2 { color: inherit; text-shadow: 0 0 10px rgba(255, 50, 40, .45); }
+.releve-ia .fiche-tete.ouvert { color: #0b0606; }
+.releve-ia .fiche-fermer { background: transparent; color: #ff3b30; box-shadow: inset 0 0 0 1px #ff3b30; }
+.releve-ia .fiche-fermer:hover { background: #ff3b30; color: #0b0606; }
+.releve-ia .fiche-in h3 { font-family: var(--mono); font-weight: 600; font-size: .78rem; letter-spacing: .18em; text-transform: uppercase; color: #ff3b30; }
+.releve-ia .constats li { border-left-color: #5a1511; }
+.releve-ia .constats li.contexte { border-left-color: #ff3b30; }
+.releve-ia .fiche-in dd.m, .releve-ia .puce { font-family: var(--mono); }
+.releve-ia .puce.oui { box-shadow: inset 0 0 0 1px #7d2a24; }
+.releve-ia .fiche-in pre { background: #160909; box-shadow: inset 0 0 0 1px #3a0d0b; color: #ffb3ad; }
+.releve-ia .carte-cadre { background: #0f0707; }
+.releve-ia .carte .liens line { stroke: #3a0d0b; }
+.releve-ia .carte circle { stroke: #0b0606; }
+.releve-ia .carte .org circle { fill: #ff3b30; filter: drop-shadow(0 0 6px rgba(255, 50, 40, .8)); }
+.releve-ia .carte .scelle circle { fill: #5a1511; }
+.releve-ia .carte .etiquette rect { fill: #0b0606; stroke: #3a0d0b; }
+
+.releve-ia .sablier {
+    background: repeating-linear-gradient(to bottom, rgba(255, 255, 255, .025) 0 1px, transparent 1px 3px), #0b0606;
+    color: #ffb3ad;
+    box-shadow: inset 0 0 0 1px #3a0d0b, inset 0 0 80px rgba(255, 30, 20, .12);
+    transform: none;
+}
+.releve-ia .sablier .sur { color: #ff3b30; font-family: var(--mono); letter-spacing: .2em; }
+.releve-ia .sablier h2 { color: #ff3b30; text-shadow: 0 0 12px rgba(255, 50, 40, .5); }
+.releve-ia .sablier p { color: #c4554c; }
+.releve-ia .sablier pre { background: #160909; color: #ffb3ad; box-shadow: inset 0 0 0 1px #3a0d0b; }
+.releve-ia .sablier .bouton { background: transparent; color: #ff3b30 !important; box-shadow: inset 0 0 0 1px #ff3b30; font-family: var(--mono); letter-spacing: .06em; }
+.releve-ia .sablier .bouton:hover { background: #ff3b30; color: #0b0606 !important; }
+
+/* ------------------------------------------------------------ relevé 2: the sign seen by the machine */
+.releve-ia .enseigne {
+    background: repeating-linear-gradient(to bottom, rgba(255, 255, 255, .03) 0 1px, transparent 1px 3px), #0b0606;
+    color: #ff3b30;
+    box-shadow: inset 0 0 0 2px #ff3b30, inset 0 0 0 5px #0b0606, inset 0 0 0 6px rgba(255, 59, 48, .45), 0 0 40px rgba(255, 30, 20, .35), 0 18px 40px -18px rgba(0, 0, 0, .7);
+    overflow: hidden;
+}
+.releve-ia .enseigne .haut, .releve-ia .enseigne .bas { color: #ff8a80; font-family: var(--mono); }
+.releve-ia .enseigne .nom { color: #ff3b30; text-shadow: 0 0 10px rgba(255, 50, 40, .8), -2px 0 rgba(0, 255, 255, .25), 2px 0 rgba(255, 0, 80, .35); animation: glitch 4.2s steps(1) infinite; }
+.releve-ia .enseigne .bas::before { background: #ff3b30; box-shadow: 0 0 8px #ff3b30; }
+/* A red eye in the corner, and a scan bar crossing the sign. */
+.releve-ia .enseigne::before {
+    content: ""; position: absolute; top: .9rem; right: 1rem; width: .55rem; height: .55rem; border-radius: 50%;
+    background: radial-gradient(circle at 40% 40%, #ffb3ad, #ff2a1f 45%, #6d0702 75%); box-shadow: 0 0 10px 3px rgba(255, 40, 30, .8);
+    animation: oeil 2.4s ease-in-out infinite;
+}
+.releve-ia .enseigne::after {
+    content: ""; position: absolute; left: 0; right: 0; top: -40%; height: 40%; pointer-events: none;
+    background: linear-gradient(to bottom, transparent, rgba(255, 40, 30, .18), transparent);
+    animation: balayage 3.2s linear infinite;
+}
+@keyframes glitch {
+    0%, 86%, 100% { transform: none; clip-path: none; }
+    88% { transform: translate(-3px, 0); clip-path: inset(10% 0 55% 0); }
+    90% { transform: translate(3px, 1px); clip-path: inset(55% 0 8% 0); }
+    92% { transform: translate(-1px, 0); clip-path: none; opacity: .6; }
+    94% { transform: none; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .releve-ia .enseigne .nom, .releve-ia .enseigne::before, .releve-ia .enseigne::after { animation: none; } }
+
+/* ------------------------------------------------------------ relevé 3: the sorting office */
+.releve-mail #atlas-bloc, .releve-mail .analyses, .releve-mail .chiffres, .releve-mail #groupes, .releve-mail .reglages, .releve-mail .machine { display: none; }
+.tri { margin: 1rem auto 3rem; padding-block: 2rem 2.4rem; background:
+    radial-gradient(circle at 20% 10%, rgba(255, 255, 255, .25), transparent 40%),
+    repeating-linear-gradient(45deg, rgba(120, 80, 30, .05) 0 2px, transparent 2px 6px), #c9a878; border-radius: 14px; }
+.tri .sur { color: #5b3b16; }
+.tri h2 { margin: .4rem 0 1rem; font: 400 clamp(2rem, 5vw, 3rem)/1.05 var(--serif); color: #2b1a08; }
+.tri-commandes { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1.6rem; margin-bottom: 1.2rem; color: #3b2610; font-size: .85rem; }
+.tri-commandes .bascule { font-weight: 800; }
+.tri-legende { display: flex; flex-wrap: wrap; gap: .3rem 1rem; font-size: .76rem; }
+.tri-legende span { display: inline-flex; align-items: center; gap: .3rem; }
+.mini { width: .9rem; height: .65rem; border-radius: 2px; display: inline-block; background: #fbf7ee; box-shadow: inset 0 0 0 1px #8a6a3c; }
+.mini.cachetee { background: radial-gradient(circle, #8f1d14 35%, #fbf7ee 40%); }
+.mini.carte { background: repeating-linear-gradient(to bottom, #fbf7ee 0 2px, #c9b48c 2px 3px); }
+.mini.sans { opacity: .4; }
+.tri-mur { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: .9rem; margin: 0; padding: 0; list-style: none; }
+.piece {
+    position: relative; display: flex; flex-direction: column; gap: .2rem; width: 100%; min-height: 8.5rem; padding: .9rem 1rem .8rem;
+    border: 0; border-radius: 3px; text-align: left; cursor: pointer; color: #2b1a08; font: 400 .8rem/1.35 var(--sans);
+    background: #fbf7ee; box-shadow: 0 2px 0 rgba(60, 35, 10, .25), 0 10px 18px -12px rgba(60, 35, 10, .6);
+    transition: transform .5s cubic-bezier(.2, .7, .2, 1);
+}
+.piece:hover { transform: translateY(-3px) rotate(-.6deg); }
+/* The envelope's flaps, drawn with two gradients. */
+.piece.cachetee, .piece.entrouverte {
+    background:
+        linear-gradient(to bottom right, transparent calc(50% - 1px), #d8c7a5 50%, transparent calc(50% + 1px)) top left / 50% 55% no-repeat,
+        linear-gradient(to bottom left, transparent calc(50% - 1px), #d8c7a5 50%, transparent calc(50% + 1px)) top right / 50% 55% no-repeat,
+        #f6efdf;
+}
+.piece.entrouverte { transform: rotate(.8deg); }
+.piece.carte { background: linear-gradient(to right, transparent calc(55% - 1px), #c9b48c 55%, transparent calc(55% + 1px)), repeating-linear-gradient(to bottom, transparent 0 1.35rem, rgba(140, 110, 60, .25) 1.35rem calc(1.35rem + 1px)), #fbf7ee; }
+.piece.sans { opacity: .45; }
+.p-org { font: 800 .95rem/1.2 var(--sans); padding-right: 4.2rem; }
+.p-adr { font: 400 .68rem/1.3 var(--mono); color: #6b5232; overflow-wrap: anywhere; padding-right: 4.2rem; }
+.p-pied { margin-top: auto; font: 500 .62rem/1.3 var(--mono); color: #6b5232; letter-spacing: .02em; }
+.timbre {
+    position: absolute; top: .6rem; right: .6rem; z-index: 0; width: 3.4rem; min-height: 3.9rem; padding: .35rem .25rem; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #2e4a55; font: 800 .56rem/1.1 var(--sans); text-align: center; text-transform: uppercase; letter-spacing: .02em; hyphens: manual;
+}
+/* The perforated paper sits behind the print, so the mask never cuts the text. */
+.timbre::before {
+    content: ""; position: absolute; inset: 0; z-index: -1; background: #fff; box-shadow: inset 0 0 0 3px #e9dfc8;
+    -webkit-mask: radial-gradient(circle at 3px 3px, transparent 2px, #000 2.5px) -3px -3px / 6px 6px; mask: radial-gradient(circle at 3px 3px, transparent 2px, #000 2.5px) -3px -3px / 6px 6px;
+}
+.timbre small { display: block; margin-top: .2rem; font: 600 .7rem/1 var(--mono); color: #a5582a; }
+.cachet {
+    position: absolute; right: 1rem; bottom: 1.7rem; transform: rotate(-12deg);
+    width: 3rem; height: 3rem; border-radius: 50%; display: grid; place-items: center;
+    background: radial-gradient(circle at 35% 30%, #c2392b, #8f1d14 60%, #5e0f09); color: #f3c9c2; font: 800 .62rem/1 var(--mono); letter-spacing: .08em;
+    box-shadow: 0 0 0 3px rgba(143, 29, 20, .35), 0 3px 6px rgba(0, 0, 0, .35);
+}
+/* The back of a postcard: hidden until someone stands on the way. */
+.p-dos { display: none; flex-direction: column; gap: .1rem; margin-top: .3rem; padding: .35rem .5rem; background: #fff3e0; border-left: 3px solid #a5582a; font: 500 .7rem/1.35 var(--mono); color: #a5582a; }
+.p-dos b { font-size: .62rem; letter-spacing: .1em; }
+.tri.attaque .piece.carte, .tri.attaque .piece.entrouverte { animation: retourne .6s ease-out both; }
+.tri.attaque .p-dos { display: flex; }
+.tri.attaque .piece.cachetee { box-shadow: 0 0 0 2px #8f1d14, 0 10px 18px -12px rgba(60, 35, 10, .6); }
+@keyframes retourne { 0% { transform: rotateY(0); } 50% { transform: rotateY(90deg); } 100% { transform: rotateY(0); } }
+.tri-note { margin: 1.4rem 0 0; max-width: 46rem; font-size: .8rem; color: #3b2610; font-style: italic; }
+@media (prefers-reduced-motion: reduce) { .tri.attaque .piece { animation: none; } .piece:hover { transform: none; } }
+.tri.france .piece:not(.fr) { opacity: .18; filter: grayscale(1); }
+.piece.fr .timbre small { color: #2e4a55; }
+.tri-souv { margin: 0 0 1.4rem; padding: 1rem 1.2rem; background: rgba(251, 247, 238, .7); border-radius: 8px; color: #2b1a08; }
+.tri-souv h3 { margin: .3rem 0 .5rem; font: 400 1.6rem/1.15 var(--serif); }
+.tri-souv p { margin: 0 0 .6rem; font-size: .88rem; max-width: 52rem; }
+.tri-souv-liste { margin: 0; padding-left: 1.1rem; font-size: .82rem; }
+.tri-souv-liste li { margin-bottom: .3rem; }
+.tri-souv .sources { color: #5b3b16; }
+
+/* Relevé 3, more contrast: a darker kraft, whiter post, darker ink. */
+.tri { background: radial-gradient(circle at 20% 10%, rgba(255, 255, 255, .18), transparent 40%), repeating-linear-gradient(45deg, rgba(80, 50, 15, .07) 0 2px, transparent 2px 6px), #a9824e; }
+.tri .sur, .tri-commandes, .tri-note { color: #1c1105; }
+.tri h2 { color: #140b02; }
+.piece { color: #140b02; background-color: #fffcf4; box-shadow: 0 0 0 1px rgba(60, 35, 10, .35), 0 3px 0 rgba(40, 22, 5, .35), 0 12px 20px -12px rgba(40, 22, 5, .7); }
+.piece.cachetee, .piece.entrouverte { background-color: #fdf6e6; }
+.piece.carte { background-color: #fffcf4; }
+.p-adr, .p-pied { color: #3d2a12; }
+.timbre { color: #1d3540; }
+.timbre small { color: #8a3f15; }
+.tri-souv { background: #fffaf0; box-shadow: 0 0 0 1px rgba(60, 35, 10, .3); }
+.tri-souv .sources { color: #3d2a12; }
+.tri-legende .mini { box-shadow: inset 0 0 0 1px #3d2a12; }
+.releve-ia .machine { display: none; }
+.vision-pas { display: inline-flex; align-items: center; gap: .4rem; }
+.vision-btn { width: 1.6rem; height: 1.6rem; border: 1px solid #ff3b30; border-radius: 4px; background: transparent; color: #ff3b30; font: 600 1rem/1 var(--mono); cursor: pointer; }
+.vision-btn:hover, .vision-btn:focus-visible { background: #ff3b30; color: #0b0606; outline: none; }
+
+/* Sablier's link: the pill, but thin. Same in every relevé. */
+.sablier .bouton, .releve-ia .sablier .bouton {
+    padding: .4rem .95rem; border-radius: 999px; background: transparent; border: 0;
+    box-shadow: inset 0 0 0 1px currentColor;
+    color: #fff !important; font: 500 .8rem/1.2 var(--mono); letter-spacing: .03em;
+}
+.sablier .bouton span { transition: transform .2s; }
+.sablier .bouton:hover { background: #fff; color: var(--p-scelle) !important; }
+.sablier .bouton:hover span { transform: translateX(3px); }
+.releve-ia .sablier .bouton { color: #ff8a80 !important; }
+.releve-ia .sablier .bouton:hover { background: #ff3b30; color: #0b0606 !important; }

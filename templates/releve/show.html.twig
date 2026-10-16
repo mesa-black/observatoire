@@ -33,7 +33,7 @@
 
 <section class="wrap scan" id="scan" hidden aria-labelledby="scan-titre"></section>
 
-<div class="wrap">
+<div class="wrap" id="atlas-bloc">
     <section class="atlas" aria-labelledby="atlas-titre">
         <p class="sur">Qui tient les portes</p>
         <h2 id="atlas-titre"></h2>
@@ -89,6 +89,8 @@
     </div>
 </div>
 
+<section class="wrap vision" id="vision" hidden aria-labelledby="vision-titre"></section>
+
 <main class="wrap">
     <p class="nous" id="nous"></p>
     <div id="groupes"></div>
@@ -131,7 +133,7 @@
             <p class="sur">Mesuré avec Sablier</p>
             <h2 id="sablier-titre">Faites le relevé chez vous.</h2>
             <p>Sablier est l'outil libre de BlackMesa qui inventorie la cryptographie d'un projet et dit combien de temps elle tient. Il sait aussi demander à un serveur ce qu'il négocie réellement, y compris l'hybride post-quantique.</p>
-            <p>Ce premier relevé a été fait avec une sonde OpenSSL 3.5 écrite pour l'occasion ; les suivants passeront par Sablier.</p>
+            <p id="sablier-sonde">Ce premier relevé a été fait avec une sonde OpenSSL 3.5 écrite pour l'occasion ; les suivants passeront par Sablier.</p>
         </div>
         <div>
             <pre><code>git clone https://github.com/mesa-black/sablier
