@@ -1,19 +1,25 @@
 {% extends 'layout.html.twig' %}
 {% block title %}Confidentialité{% endblock %}
 {% block body %}
-    {# DRAFT, to be reviewed by the owner before going live (SETUP.md). #}
-    <h1>Confidentialité et lettre d'information</h1>
+    <h1>Confidentialité</h1>
 
     <h2>La page</h2>
-    <p>Consulter l'Observatoire ne dépose aucun cookie et ne déclenche aucune mesure d'audience. Polices et scripts sont servis depuis ce site ; aucune requête ne part vers un tiers. Le serveur ne tient pas de journal des visites.</p>
+    <p>Consulter l'Observatoire ne dépose aucun cookie et ne déclenche aucune mesure d'audience. Polices et scripts sont servis depuis ce site. Le serveur ne tient pas de journal des visites.</p>
+    <p>Une exception : le relevé n° 2 propose une musique, chargée depuis archive.org seulement si vous la lancez (premier clic sur la page). archive.org reçoit alors votre adresse IP, comme pour toute page qui en vient.</p>
 
+    {% if newsletter_enabled %}
+    {# The wording subscribers agreed to: bump Subscriptions::CONSENT_VERSION with it. #}
     <h2>La lettre d'information</h2>
     <p>Si vous vous inscrivez, nous conservons votre adresse électronique, la date de votre demande, la date de votre confirmation et la version du texte d'inscription que vous avez accepté. Rien d'autre : ni nom, ni adresse IP, ni suivi des ouvertures ou des clics.</p>
     <p><b>Finalité</b> : vous envoyer un message à chaque nouveau relevé. <b>Base légale</b> : votre consentement, recueilli en deux temps (le formulaire, puis le lien envoyé à l'adresse indiquée).</p>
     <p><b>Durée</b> : une demande non confirmée est effacée au bout de sept jours. Une adresse confirmée est conservée jusqu'à votre désinscription, qui l'efface immédiatement et entièrement.</p>
-    <p><b>Destinataires</b> : les messages sont envoyés par Brevo (Sendinblue SAS, France), qui traite l'adresse pour notre compte, le temps de l'envoi.</p>
+    <p><b>Destinataires</b> : le service d'envoi qui achemine les messages, le temps de l'envoi.</p>
     <p><b>Vos droits</b> : accès, rectification, effacement, retrait du consentement à tout moment, par le lien présent dans chaque message ou en écrivant à <a href="mailto:{{ admin_email }}">{{ admin_email }}</a>. Vous pouvez aussi saisir la CNIL.</p>
+    {% else %}
+    <h2>Aucune donnée personnelle</h2>
+    <p>Il n'y a pas de lettre d'information pour l'instant : l'Observatoire ne recueille aucune adresse, ni aucune autre donnée personnelle.</p>
+    {% endif %}
 
     <h2>Responsable</h2>
-    <p>Jérôme Nadaud, BlackMesa.</p>
+    <p>Jérôme Nadaud, BlackMesa. Pour toute question : <a href="mailto:{{ admin_email }}">{{ admin_email }}</a>.</p>
 {% endblock %}

@@ -28,3 +28,11 @@
 .court h2 { margin: 2rem 0 .5rem; font: 400 1.5rem/1.2 var(--serif); }
 .court form { margin: 1.5rem 0; }
 .court .bouton { border: 0; cursor: pointer; font: inherit; }
+
+/* Error pages: a plaque of their own, in the colours of an expired one. */
+.erreur .enseigne { max-width: 19rem; margin: 1.5rem 0 2.5rem; }
+.erreur .introuvable { background: var(--p-perime); color: var(--doux); box-shadow: inset 0 0 0 4px var(--p-perime), inset 0 0 0 5.5px var(--filet); }
+.erreur .introuvable .bas::before { background: var(--filet); }
+.erreur p { color: var(--doux); }
+.erreur .bouton { margin-top: .8rem; background: var(--p-scelle); color: var(--sur-scelle) !important; }
+.erreur .bouton:hover { background: var(--lien); }

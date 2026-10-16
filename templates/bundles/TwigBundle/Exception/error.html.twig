@@ -1,0 +1,16 @@
+{# Every other error in prod (500, 405…). Says nothing about the cause: the
+   logs have it, the visitor does not need it. #}
+{% extends 'layout.html.twig' %}
+{% block title %}Erreur {{ status_code }}{% endblock %}
+{% block body %}
+<div class="erreur">
+    <div class="plaque enseigne introuvable" role="img" aria-label="Erreur {{ status_code }}">
+        <span class="haut">Observatoire</span>
+        <span class="nom">Incident</span>
+        <span class="bas">Erreur n° {{ status_code }}</span>
+    </div>
+    <h1>La mesure n'a pas abouti.</h1>
+    <p>Le serveur n'a pas pu répondre à cette demande. Réessayez dans un instant ; si cela persiste, c'est de notre côté.</p>
+    <p><a class="bouton" href="{{ path('home') }}">Retour au dernier relevé</a></p>
+</div>
+{% endblock %}
