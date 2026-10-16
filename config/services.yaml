@@ -32,6 +32,10 @@ when@test:
     parameters:
         app.releves_dir: '%kernel.project_dir%/tests/fixtures/releves'
     services:
+        # Fetched by PreviewTest to sign its own link.
+        App\Releve\PreviewLinks:
+            autowire: true
+            public: true
         # Time stands still in tests, and they move it themselves.
         Psr\Clock\ClockInterface:
             class: Symfony\Component\Clock\MockClock
