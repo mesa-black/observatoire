@@ -49,6 +49,12 @@ final class DataBuilder
             }
         }
         $selfPages = $this->slurp($file('self.csp.jsonl'));
+        // Relevé 3 on: the exchangers' TLS (mail-starttls.sh, from the server), by MX name.
+        // ($mailtls | map({(.mx): (. | del(.mx))}) | add // {}) as $tlsBy
+        $tlsBy = [];
+        foreach ($this->slurp($file('mailtls.jsonl'), completeOnly: true) as $t) {
+            $tlsBy[$t->mx] = $this->without($t, 'mx');
+        }
 
         // ($c | map({(.host): {cost}}) | add // {}) as $cost
         $cost = [];
@@ -72,7 +78,13 @@ final class DataBuilder
         foreach ($domains->groups as $g) {
             $entries = [];
             foreach ($g->entries as $e) {
-                $entries[] = $this->merge($e, $by[$e->host] ?? (object) ['reachable' => false]);
+                $entry = $this->merge($e, $by[$e->host] ?? (object) ['reachable' => false]);
+                // if (.mail? and ((.mail.mx // []) | length) > 0 and ($tlsBy | length) > 0) then .mail.tls = ($tlsBy[.mail.mx[0]] // null) else . end
+                if (isset($entry->mail) && $entry->mail instanceof \stdClass && [] !== ($entry->mail->mx ?? []) && [] !== $tlsBy) {
+                    $entry->mail = clone $entry->mail;
+                    $entry->mail->tls = $tlsBy[$entry->mail->mx[0]] ?? null;
+                }
+                $entries[] = $entry;
             }
             $groups[] = (object) ['key' => $g->key ?? null, 'label' => $g->label ?? null, 'entries' => $entries];
         }

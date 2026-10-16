@@ -1,0 +1,38 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><style>
+@font-face { font-family: "Bricolage"; src: url("../public/fonts/bricolage-grotesque-400-normal.woff2"); font-weight: 400; }
+@font-face { font-family: "Bricolage"; src: url("../public/fonts/bricolage-grotesque-800-normal.woff2"); font-weight: 800; }
+@font-face { font-family: "Serif"; src: url("../public/fonts/instrument-serif-400-normal.woff2"); }
+@font-face { font-family: "Serif"; src: url("../public/fonts/instrument-serif-400-italic.woff2"); font-style: italic; }
+@font-face { font-family: "Mono"; src: url("../public/fonts/ibm-plex-mono-500-normal.woff2"); }
+* { box-sizing: border-box; margin: 0; }
+body { width: 1200px; height: 630px; background: repeating-linear-gradient(90deg, rgba(90,60,20,.05) 0 2px, transparent 2px 5px), radial-gradient(circle at 30% 35%, #e3cfa8, #c9ad7e 75%); color: #2b1a08; font-family: "Bricolage"; position: relative; overflow: hidden; }
+/* The envelope, with its stamp and its seal. */
+.env { position: absolute; left: 60px; top: 150px; width: 430px; height: 300px; padding: 34px 30px; border-radius: 4px; background: #fffcf4; transform: rotate(-3deg);
+  box-shadow: 0 0 0 1px rgba(60,35,10,.35), 0 4px 0 rgba(40,22,5,.3), 0 24px 40px -18px rgba(40,22,5,.7); }
+.haut { display: block; font: 500 15px/1 "Mono"; letter-spacing: .28em; text-transform: uppercase; color: #6b5232; }
+.nom { display: block; margin: 14px 0 16px; font: 400 54px/.95 "Serif"; white-space: nowrap; color: #2b1a08; }
+.bas { font: 500 16px/1 "Mono"; color: #6b5232; }
+.timbre { position: absolute; top: 22px; right: 22px; width: 64px; height: 76px; display: grid; place-items: center; background: #fff; box-shadow: inset 0 0 0 3px #e9dfc8, 0 0 0 1px #c9b48c; color: #2e4a55; font: 800 11px/1.1 "Bricolage"; text-align: center; text-transform: uppercase; }
+.cachet { position: absolute; right: 34px; bottom: 30px; width: 74px; height: 74px; border-radius: 50%; display: grid; place-items: center; transform: rotate(-12deg);
+  background: radial-gradient(circle at 35% 30%, #c2392b, #8f1d14 60%, #5e0f09); color: #f3c9c2; font: 800 15px/1 "Mono"; letter-spacing: .08em; box-shadow: 0 0 0 4px rgba(143,29,20,.35), 0 4px 8px rgba(0,0,0,.35); }
+.droite { position: absolute; left: 545px; top: 64px; right: 50px; }
+h1 { font: 400 66px/.98 "Serif"; color: #2b1a08; }
+h1 em { color: #8f1d14; }
+.chiffres { display: flex; gap: 36px; margin-top: 38px; }
+.n { font: 400 74px/1 "Serif"; color: #2b1a08; }
+.n.rouge { color: #8f1d14; }
+.lib { margin-top: 6px; font: 500 16px/1.3 "Mono"; max-width: 270px; color: #5a4020; }
+.pied { position: absolute; left: 545px; bottom: 48px; font: 500 17px/1 "Mono"; color: #6b5232; }
+.pied b { color: #2b1a08; }
+</style></head><body>
+<div class="env"><span class="haut">Observatoire</span><span class="nom">Post-quantique</span><span class="bas">Relevé n° 3 · 16 décembre 2026</span>
+  <span class="timbre">ML-<br>KEM</span><span class="cachet">STS</span></div>
+<div class="droite">
+  <h1>Lettre scellée<br><em>ou carte postale&nbsp;?</em></h1>
+  <div class="chiffres">
+    <div><div class="n rouge">3</div><div class="lib">organisations sur 111 imposent que leur courrier arrive chiffré</div></div>
+    <div><div class="n">31</div><div class="lib">le reçoivent sur un serveur post-quantique : aucune en France</div></div>
+  </div>
+</div>
+<p class="pied"><b>observatoire.mesa.black</b> · relevé n° 3</p>
+</body></html>
