@@ -27,6 +27,19 @@ final class DataBuilderTest extends TestCase
         $this->assertCount(115, array_merge(...array_map(fn ($g) => $g->entries, $built->groups)));
     }
 
+    /** Relevé 2 adds the AI group, ai.sh, hf.sh and mail.sh: same parity. */
+    public function testSameDataAsBuildShForReleve2(): void
+    {
+        $js = (string) file_get_contents(__DIR__.'/../fixtures/data-2026-10-16.js');
+        $expected = json_decode(substr(rtrim($js, ";\n"), \strlen('window.OBSERVATOIRE = ')), false, 512, \JSON_THROW_ON_ERROR);
+
+        $releve = new Releve(2, '2026-10-16', new \DateTimeImmutable(), 'Relevé n° 2', '', \dirname(__DIR__, 2).'/releves/2');
+        $built = (new DataBuilder())->build($releve);
+
+        $this->assertSame($this->encode($expected), $this->encode($built));
+        $this->assertSame('ia', $built->meta->focus);
+    }
+
     public function testPartialCostLinesAreSkippedAndUnknownHostsUnreachable(): void
     {
         $releve = new Releve(1, '2020-01-01', new \DateTimeImmutable(), 'T', '', __DIR__.'/../fixtures/releves/1');
