@@ -17,11 +17,19 @@ final readonly class Releve
         public string $title,
         public string $intro,
         public string $dir,
+        /** "draft": true in meta.json: never published, whatever the date, until the flag goes. */
+        public bool $draft = false,
     ) {
     }
 
     public function isPublishedAt(\DateTimeImmutable $now): bool
     {
-        return $this->publishedAt <= $now;
+        return !$this->draft && $this->publishedAt <= $now;
+    }
+
+    /** Waiting for its date: what the waiting page and a letter can count on. A draft is not. */
+    public function isScheduledAt(\DateTimeImmutable $now): bool
+    {
+        return !$this->draft && $this->publishedAt > $now;
     }
 }

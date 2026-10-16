@@ -13,7 +13,7 @@
                 <td>{{ r.title }}</td>
                 <td>{{ r.date }}</td>
                 <td>{{ r.publishedAt|date }}</td>
-                <td>{% if r.isPublishedAt(now) %}<span class="badge publie">publié</span>{% else %}<span class="badge a-venir">à venir</span>{% endif %}</td>
+                <td>{% if r.isPublishedAt(now) %}<span class="badge publie">publié</span>{% elseif r.draft %}<span class="badge draft">brouillon</span>{% else %}<span class="badge a-venir">à venir</span>{% endif %}</td>
                 <td class="fin">{% if r.isPublishedAt(now) %}<a href="{{ path('releve', {number: r.number}) }}" class="bouton second">{{ ui.ico('site') }} Voir</a>{% else %}<a href="{{ path('admin_releve_preview', {number: r.number}) }}" class="bouton second">{{ ui.ico('oeil') }} Aperçu</a>{% endif %}</td>
             </tr>
         {% else %}

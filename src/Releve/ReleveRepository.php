@@ -70,7 +70,7 @@ final class ReleveRepository
     {
         $now = $this->clock->now();
         foreach ($this->all() as $releve) {
-            if (!$releve->isPublishedAt($now)) {
+            if ($releve->isScheduledAt($now)) {
                 return $releve;
             }
         }
@@ -111,6 +111,7 @@ final class ReleveRepository
             (string) ($meta['title'] ?? 'Relevé n° '.$number),
             (string) ($meta['intro'] ?? ''),
             $dir,
+            true === ($meta['draft'] ?? false),
         );
     }
 }

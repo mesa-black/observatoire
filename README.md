@@ -71,6 +71,11 @@ decides. `/` is the latest relevé whose `published` time (Paris) has passed,
 the admin (`/admin/releve/N`). No deploy is needed on publication day; the
 public page is cached 5 minutes.
 
+`"draft": true` in `meta.json` holds a relevé back whatever its date: never
+published, not announced by the waiting page, not offered as a moment for a
+letter, shown as « brouillon » in the admin, which can still preview it.
+Remove the flag (and check `published`) to schedule it.
+
 ## The newsletter
 
 - **Subscribe**: email only, on every relevé. The answer is the same whether the
