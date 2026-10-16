@@ -1,0 +1,17 @@
+{# Shown for every 404 in prod (debug off), instead of Symfony's default page:
+   that one is in English and styles itself inline, which the CSP refuses. #}
+{% extends 'layout.html.twig' %}
+{% block title %}Page introuvable{% endblock %}
+{% block body %}
+<div class="erreur">
+    <div class="plaque enseigne introuvable" role="img" aria-label="Erreur 404 : page introuvable">
+        <span class="haut">Observatoire</span>
+        <span class="nom">Introuvable</span>
+        <span class="bas">Erreur n° 404</span>
+    </div>
+    <h1>Cherché en √N, trouvé nulle part.</h1>
+    <p>Un ordinateur quantique fouille une liste en désordre bien plus vite qu'un ordinateur classique : en √N essais au lieu de N, c'est l'algorithme de Grover. Il ne trouve pas pour autant ce qui n'y est pas, et cette page n'y est pas.</p>
+    <p>L'adresse est peut-être mal recopiée, ou elle désigne un relevé pas encore paru : chacun ne s'ouvre qu'à sa date.</p>
+    <p><a class="bouton" href="{{ path('home') }}">Retour au dernier relevé</a></p>
+</div>
+{% endblock %}

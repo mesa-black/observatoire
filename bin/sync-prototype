@@ -58,7 +58,7 @@ mkdir -p "$(dirname "$template")"
         -e 's#^<footer#{{ include('"'"'newsletter/_form.html.twig'"'"') }}\
 \
 <footer#' \
-        -e 's#^</footer>#    <p><a href="{{ path('"'"'privacy'"'"') }}">Confidentialité et lettre d'"'"'information</a></p>\
+        -e 's#^</footer>#    <p><a href="{{ path('"'"'privacy'"'"') }}">Confidentialité</a></p>\
 </footer>#' \
         "$site/index.html"
 } > "$template"
