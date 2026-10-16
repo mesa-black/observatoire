@@ -4,6 +4,7 @@ namespace App\Security;
 
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfiguration;
 use Scheb\TwoFactorBundle\Model\Totp\TotpConfigurationInterface;
+use Scheb\TwoFactorBundle\Model\Email\TwoFactorInterface as EmailTwoFactorInterface;
 use Scheb\TwoFactorBundle\Model\Totp\TwoFactorInterface;
 use Scheb\TwoFactorBundle\Model\TrustedDeviceInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -14,14 +15,37 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * (Secret `observatoire`), so that the database holds readers and letters
  * only, and losing it never locks the owner out.
  */
-final class AdminUser implements UserInterface, PasswordAuthenticatedUserInterface, TwoFactorInterface, TrustedDeviceInterface
+final class AdminUser implements UserInterface, PasswordAuthenticatedUserInterface, TwoFactorInterface, EmailTwoFactorInterface, TrustedDeviceInterface
 {
     public const string USERNAME = 'admin';
 
     public function __construct(
         private readonly string $passwordHash,
         private readonly string $totpSecret,
+        private readonly string $email = '',
+        private ?string $emailCode = null,
     ) {
+    }
+
+    /** The second factor by email: a code sent to ADMIN_EMAIL, asked once per device. */
+    public function isEmailAuthEnabled(): bool
+    {
+        return '' !== $this->email;
+    }
+
+    public function getEmailAuthRecipient(): string
+    {
+        return $this->email;
+    }
+
+    public function getEmailAuthCode(): ?string
+    {
+        return $this->emailCode;
+    }
+
+    public function setEmailAuthCode(string $authCode): void
+    {
+        $this->emailCode = $authCode;
     }
 
     public function getUserIdentifier(): string
@@ -67,6 +91,6 @@ final class AdminUser implements UserInterface, PasswordAuthenticatedUserInterfa
      */
     public function getTrustedTokenVersion(): int
     {
-        return crc32($this->passwordHash.'|'.$this->totpSecret);
+        return crc32($this->passwordHash.'|'.$this->totpSecret.'|'.$this->email);
     }
 }

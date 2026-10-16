@@ -32,6 +32,10 @@ when@test:
     parameters:
         app.releves_dir: '%kernel.project_dir%/tests/fixtures/releves'
     services:
+        # Read back by the tests to type the mailed code.
+        App\Security\AdminCodeStore:
+            autowire: true
+            public: true
         # Fetched by PreviewTest to sign its own link.
         App\Releve\PreviewLinks:
             autowire: true
