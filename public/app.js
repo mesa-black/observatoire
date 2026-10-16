@@ -187,7 +187,15 @@
         h('b', null, 'On commence par nous. '),
         h('code', null, s.host), ` · ${s.pq === 'full' ? `scellé, ${s.hits} connexions sur ${s.tries}` : 'pas scellé'} · ${s.group} · ${s.protocol}`,
         s.cost ? ` · hybride ${String(s.cost.hybrid).replace('.', ',')} ms contre ${String(s.cost.classical).replace('.', ',')} ms en classique. ` : '. ',
-        `Nous ne l'avons pas configuré : c'est le comportement par défaut du proxy qui sert ce site. Une façade scellée sans décision, comme beaucoup d'autres ci-dessous.`,
+        `L'hybride, nous ne l'avons pas configuré : c'est le comportement par défaut du proxy qui sert ce site. Une façade scellée sans décision, comme beaucoup d'autres ci-dessous.`,
+        // What we did decide, once measured: TLS 1.3 alone, HSTS asking to be preloaded.
+        ...(() => {
+            const done = [
+                (s.protocols || []).length && !(s.protocols || []).includes('tls1_2') ? 'TLS 1.3 seulement' : '',
+                s.hsts && /preload/i.test(s.hsts) ? 'HSTS demandé en préchargement dans les navigateurs' : '',
+            ].filter(Boolean);
+            return done.length ? [` Ce que nous avons décidé : ${done.join(', ')}.`] : [];
+        })(),
         s.page && /fonts.googleapis/.test(s.page.csp) ? ` Sa CSP n'autorise aucun script ; elle autorise en revanche les polices de Google Fonts, un tiers américain que nous devons encore retirer.` : '',
     );
     // What is still wrong at home, from the same measurement: said as plainly
