@@ -207,9 +207,9 @@
         !s.hsts ? `pas de HSTS : un visiteur peut être ramené en HTTP` : !/preload/i.test(s.hsts) ? `notre HSTS n'est pas préchargé dans les navigateurs : la toute première visite peut encore être détournée en HTTP` : '',
     ].filter(Boolean);
     if (wrong.length) $('nous').append(' ', h('b', null, 'Ce qui ne va pas chez nous : '), wrong.join(' ; '), '.');
-    // Relevé 2 opens on its screens (who sends what to which AI, the
-    // machine's vision): we come first, right under the façade note.
-    if (M.focus === 'ia') {
+    // A themed relevé (2: the AI, 3: the mail) opens on its own screens: we
+    // come first, right under the façade note.
+    if (M.focus) {
         const box = h('div', { class: 'wrap' });
         $('scan').before(box);
         box.append($('nous'));
