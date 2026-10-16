@@ -1,0 +1,34 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><style>
+@font-face { font-family: "Bricolage"; src: url("../public/fonts/bricolage-grotesque-400-normal.woff2"); font-weight: 400; }
+@font-face { font-family: "Bricolage"; src: url("../public/fonts/bricolage-grotesque-800-normal.woff2"); font-weight: 800; }
+@font-face { font-family: "Serif"; src: url("../public/fonts/instrument-serif-400-normal.woff2"); }
+@font-face { font-family: "Serif"; src: url("../public/fonts/instrument-serif-400-italic.woff2"); font-style: italic; }
+@font-face { font-family: "Mono"; src: url("../public/fonts/ibm-plex-mono-500-normal.woff2"); }
+* { box-sizing: border-box; margin: 0; }
+body { width: 1200px; height: 630px; background: #f3efe7; font-family: "Bricolage"; color: #1f2326; position: relative; overflow: hidden; }
+.plaque { position: absolute; left: 60px; top: 175px; width: 430px; padding: 34px 30px 28px; border-radius: 14px; background: #2e4a55; color: #fff; text-align: center; transform: rotate(-3deg);
+  box-shadow: inset 0 0 0 5px #2e4a55, inset 0 0 0 7px rgba(255,255,255,.75), 0 24px 40px -20px rgba(0,0,0,.5); }
+.haut { font: 800 15px/1 "Bricolage"; letter-spacing: .28em; text-transform: uppercase; opacity: .9; }
+.nom { display: block; margin: 16px 0 18px; font: 400 56px/.95 "Serif"; white-space: nowrap; }
+.bas { font: 500 16px/1 "Mono"; opacity: .9; }
+.bas::before { content: ""; display: block; height: 2px; width: 70%; margin: 0 auto 14px; background: rgba(255,255,255,.7); }
+.droite { position: absolute; left: 540px; top: 70px; right: 60px; }
+h1 { font: 400 78px/.95 "Serif"; }
+h1 em { color: #a5582a; }
+.chiffres { display: flex; gap: 36px; margin-top: 40px; }
+.n { font: 400 78px/1 "Serif"; }
+.n.ocre { color: #a5582a; }
+.lib { margin-top: 6px; font: 800 18px/1.25 "Bricolage"; max-width: 250px; }
+.pied { position: absolute; left: 540px; bottom: 50px; font: 500 17px/1 "Mono"; color: #5b6064; }
+.pied b { color: #2e4a55; }
+</style></head><body>
+<div class="plaque"><span class="haut">Observatoire</span><span class="nom">Post-quantique</span><span class="bas">Relevé n° 1 · 16 octobre 2026</span></div>
+<div class="droite">
+  <h1>Enregistré <em>aujourd'hui</em>,<br>lu demain.</h1>
+  <div class="chiffres">
+    <div><div class="n">92 %</div><div class="lib">des portes derrière un CDN sont post-quantiques</div></div>
+    <div><div class="n ocre">28 %</div><div class="lib">sur les serveurs des organisations elles-mêmes</div></div>
+  </div>
+</div>
+<p class="pied"><b>observatoire.mesa.black</b> · 115 organisations françaises</p>
+</body></html>
