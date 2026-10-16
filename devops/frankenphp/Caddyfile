@@ -28,9 +28,11 @@
 	# this origin), so the DOM sinks it could reach are locked with Trusted
 	# Types; and forms may post, to this origin only (newsletter, admin).
 	# The page's data is a <script type="application/json">: not executed, so
-	# no 'unsafe-inline' and no nonce.
+	# no 'unsafe-inline' and no nonce. The passkey script (admin) fetches its
+	# WebAuthn options from this origin: connect-src 'self', or the browser
+	# blocks the request before it leaves (default-src 'none').
 	header {
-		Content-Security-Policy "default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; require-trusted-types-for 'script'"
+		Content-Security-Policy "default-src 'none'; script-src 'self'; connect-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; require-trusted-types-for 'script'"
 		X-Content-Type-Options "nosniff"
 		Referrer-Policy "no-referrer"
 		Permissions-Policy "accelerometer=(), camera=(), display-capture=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), browsing-topics=()"
@@ -49,7 +51,7 @@
 	# The one third-party request of the site, listed in SETUP.md as open.
 	# The previews too (admin, signed link): they show the same page.
 	@releve path / /releve/* /admin/releve/* /apercu/*
-	header @releve >Content-Security-Policy "default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; media-src https://archive.org https://*.archive.org; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; require-trusted-types-for 'script'"
+	header @releve >Content-Security-Policy "default-src 'none'; script-src 'self'; connect-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; media-src https://archive.org https://*.archive.org; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; require-trusted-types-for 'script'"
 
 	# app.js and style.css are linked with ?v=<hash of their content>
 	# (App\Twig\AssetExtension): a new version is a new URL, so the old one can
