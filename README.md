@@ -155,3 +155,10 @@ https://*.archive.org` for the soundtrack of relevé 2, by the owner's decision
 Public pages set no cookie. The admin has a session cookie (`SameSite=Strict`,
 `HttpOnly`, `Secure` behind TLS), CSRF tokens on every form, login throttling
 (5 attempts / 15 min) and optional TOTP.
+
+## Admin
+
+`/admin` is blocked at the ingress (403), as vault's is. Reach it through the cluster:
+
+    kubectl --context mesa-black -n observatoire port-forward svc/observatoire 8080:80
+    open http://localhost:8080/admin

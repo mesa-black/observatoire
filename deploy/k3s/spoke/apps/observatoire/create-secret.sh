@@ -8,8 +8,8 @@
 #   ADMIN_PASSWORD_HASH  of a password generated here, copied to the clipboard
 #   ADMIN_TOTP_SECRET    generated here; the otpauth:// URI goes to the clipboard
 #                        after the password, to add to an authenticator app
-#   MAILER_DSN           from the environment if given (a mail provider DSN),
-#                        else null://null: no mail leaves, the newsletter is off
+#   MAILER_DSN           from the environment if set, else null://null: no
+#                        mail provider yet, the newsletter is off
 #
 # Needs the image (for the hasher): IMAGE=ghcr.io/mesa-black/observatoire:<sha>
 # Env vars are read at start: restart the pod afterwards,
@@ -50,7 +50,7 @@ echo "Admin password (user: admin) copied to the clipboard: store it now, then p
 read -r
 printf '%s' "$uri" | pbcopy
 echo "TOTP URI copied to the clipboard: add it to the authenticator app."
-unset pw hash key app_secret existing totp uri
+unset pw hash dsn app_secret existing totp uri
 
 # Check without revealing: key names and lengths only.
 k get secret observatoire -o go-template='{{range $k, $v := .data}}{{$k}}: {{len $v}} chars (base64){{"\n"}}{{end}}'

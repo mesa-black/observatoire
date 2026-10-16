@@ -43,3 +43,44 @@ spec:
   retry:
     attempts: 3
     initialInterval: 500ms
+---
+# /admin refused from the internet, as for vault: the admin is reached with
+#   kubectl --context mesa-black -n observatoire port-forward svc/observatoire 8080:80
+# then http://localhost:8080/admin. Password and TOTP still apply; this removes
+# the login page from the internet altogether. A second Ingress for the longer
+# path (Traefik ranks routers by rule length, so /admin wins over /) whose only
+# middleware lets nobody through: 403. No cert-manager annotation: it reuses
+# observatoire-tls, a second one would make a second, competing Certificate.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: observatoire-admin
+  namespace: observatoire
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.middlewares: observatoire-nobody@kubernetescrd
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts: [observatoire.mesa.black]
+      secretName: observatoire-tls
+  rules:
+    - host: observatoire.mesa.black
+      http:
+        paths:
+          - path: /admin
+            pathType: Prefix
+            backend:
+              service:
+                name: observatoire
+                port:
+                  name: http
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: nobody
+  namespace: observatoire
+spec:
+  ipAllowList:
+    sourceRange: [127.0.0.1/32]
