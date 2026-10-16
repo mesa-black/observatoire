@@ -30,7 +30,7 @@ final class ReleveController extends AbstractController
         // it opens, and the form to be told. Nothing of the relevé itself.
         $next = $this->releves->nextScheduled() ?? throw new NotFoundHttpException();
         $response = $this->render('releve/bientot.html.twig', ['when' => self::frenchDate($next->publishedAt), 'short' => preg_replace('/ \d{4} à .*$/', '', self::frenchDate($next->publishedAt)), 'at' => $next->publishedAt->format(\DATE_ATOM), 'next' => $next]);
-        $response->setPublic();
+        $response->setPrivate();
         $response->setMaxAge(60);
 
         return $response;
@@ -61,7 +61,8 @@ final class ReleveController extends AbstractController
     {
         $response = $this->render('releve/show.html.twig', ['releve' => $releve, 'donnees' => $this->data->json($releve), 'is_home' => $isHome]);
         // Short: the page that / shows changes when the next relevé's time comes.
-        $response->setPublic();
+        // Private: it carries a script nonce, which no shared cache may hand out.
+        $response->setPrivate();
         $response->setMaxAge(300);
 
         return $response;

@@ -16,7 +16,8 @@ items are in the order they can be done.
       site's only third-party request (visitors' IP addresses reach archive.org),
       it contradicts the footer's "rien qui vienne d'ailleurs", and the track is
       copyrighted. To clear before publication: rights, or self-hosting a
-      licensed file (then drop `media-src` from the Caddyfile), or no music.
+      licensed file (then drop `media-src` from
+      `src/Security/ContentSecurityPolicy.php`), or no music.
 - [ ] **Organisations to warn before naming them** — list who gets a heads-up
       (and how long before) for relevés 1 and 2, especially those shown as
       "classique" or with third-party scripts on their home page.
