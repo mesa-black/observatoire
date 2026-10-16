@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Releve\DataBuilder;
+use App\Releve\PreviewLinks;
 use App\Releve\Releve;
 use App\Releve\ReleveRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -40,6 +41,20 @@ final class ReleveController extends AbstractController
     public function show(int $number): Response
     {
         return $this->page($this->releves->findPublished($number) ?? throw new NotFoundHttpException(), false);
+    }
+
+    /** Before its time, for whoever holds the signed link: never indexed. */
+    #[Route('/apercu/{number}/{token}', name: 'apercu', requirements: ['number' => '[1-9]\d{0,3}', 'token' => '[0-9a-f]{24}'], methods: ['GET', 'HEAD'])]
+    public function preview(int $number, string $token, PreviewLinks $links): Response
+    {
+        if (!$links->isValid($number, $token)) {
+            throw new NotFoundHttpException();
+        }
+        $response = $this->page($this->releves->find($number) ?? throw new NotFoundHttpException(), false);
+        $response->setPrivate();
+        $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+
+        return $response;
     }
 
     private function page(Releve $releve, bool $isHome): Response
