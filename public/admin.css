@@ -79,6 +79,8 @@ code { font-family: var(--mono); font-size: .88em; }
 .contenu > * + *, .deux > div > * + * { margin-top: 1.2rem; }
 .carte.serree { padding: 0; overflow: hidden; }
 .carte.serree > h2 { padding: 1.1rem 1.4rem 0; }
+.carte.serree > p { padding: .5rem 1.4rem 0; }
+.carte.serree > p:last-child { padding-bottom: 1.1rem; }
 .grille { display: grid; gap: 1.2rem; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); align-items: start; }
 .deux { display: grid; gap: 1.2rem; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
 @media (max-width: 64rem) { .deux { grid-template-columns: 1fr; } }
@@ -90,6 +92,10 @@ code { font-family: var(--mono); font-size: .88em; }
 .stat .pastille.vert { background: var(--vert-fond); color: var(--vert); }
 .stat b { display: block; font-size: 1.6rem; font-weight: 800; line-height: 1.1; }
 .stat span { color: var(--doux); font-size: .85rem; }
+/* Each figure opens the page it counts. */
+a.stat { color: inherit; text-decoration: none; transition: border-color .15s; }
+a.stat:hover { border-color: var(--lien); }
+a.stat:focus-visible { outline: 2px solid var(--lien); outline-offset: 2px; }
 
 .vide { text-align: center; padding: 2rem 1rem; color: var(--doux); }
 .vide .ico { width: 2rem; height: 2rem; color: var(--pale); margin-bottom: .5rem; }

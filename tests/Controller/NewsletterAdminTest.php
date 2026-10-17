@@ -102,6 +102,9 @@ final class NewsletterAdminTest extends WebTestCase
         $this->assertSelectorTextContains('.carte', 'N° 2');
         $this->assertSelectorTextContains('.carte .badge.draft', 'brouillon');
         $this->assertSelectorExists('a[href="/admin/releve/3"]');
+        // Each figure opens the page it counts.
+        $this->assertSelectorExists('a.stat[href="/admin/abonnes#confirmes"]');
+        $this->assertSelectorExists('a.stat[href="/admin/abonnes#en-attente"]');
 
         $client->request('GET', '/admin/releve/3');
         $this->assertResponseIsSuccessful();
