@@ -27,8 +27,9 @@ final class DashboardController extends AbstractController
         return $this->render('admin/index.html.twig', [
             'releves' => $all,
             'published' => \count(array_filter($all, fn ($r) => $r->isPublishedAt($now))),
-            'next' => $upcoming[0] ?? null,
-            // Not "next": no date holds for them, but the admin still previews them.
+            // Every scheduled one, not only the first: the one after it is reviewed too.
+            'upcoming' => $upcoming,
+            // Not upcoming: no date holds for them, but the admin still previews them.
             'drafts' => array_values(array_filter($all, fn ($r) => $r->draft)),
             'counts' => $subscribers->countByStatus(),
             'newsletters' => $history,
