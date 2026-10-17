@@ -18,6 +18,8 @@ class Subscriber
 {
     public const string PENDING = 'pending';
     public const string CONFIRMED = 'confirmed';
+    /** How long a request nobody confirmed is kept: the daily purge and the admin both read it. */
+    public const int PENDING_KEPT_DAYS = 7;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

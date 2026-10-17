@@ -87,7 +87,7 @@ final class NewsletterAdminTest extends WebTestCase
     public function testEveryAdminPageRenders(): void
     {
         $client = $this->freshClient();
-        foreach (['/admin' => 'Tableau de bord', '/admin/lettres' => 'Lettres', '/admin/releves' => 'Relevés', '/admin/securite' => 'Sécurité'] as $url => $title) {
+        foreach (['/admin' => 'Tableau de bord', '/admin/lettres' => 'Lettres', '/admin/releves' => 'Relevés', '/admin/abonnes' => 'Abonnés', '/admin/securite' => 'Sécurité'] as $url => $title) {
             $client->request('GET', $url);
             $this->assertResponseIsSuccessful($url);
             $this->assertSelectorTextContains('.entete h1', $title);

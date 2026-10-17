@@ -111,7 +111,9 @@ hour at most), never next to the subscriber. No open or click tracking: no
 pixel, no rewritten links. The server keeps no access log.
 
 Retention: unconfirmed requests are deleted after 7 days; unsubscribing deletes
-the row at once. Brevo processes the address as a processor, at send time.
+the row at once. The admin's « Abonnés » page lists confirmed readers and pending
+requests apart, and deletes an address on request (art. 17): the row goes, as
+when the reader unsubscribes. Brevo processes the address as a processor, at send time.
 The privacy page (`/confidentialite`) says this to readers; its text is a draft
 for the owner to validate (SETUP.md).
 
