@@ -2,6 +2,7 @@
 
 namespace App\Scheduler;
 
+use App\Entity\Subscriber;
 use App\Newsletter\Sender;
 use App\Repository\SubscriberRepository;
 use Psr\Clock\ClockInterface;
@@ -25,6 +26,6 @@ final readonly class Handlers
     #[AsMessageHandler]
     public function purgePendingSubscribers(PurgePendingSubscribers $message): void
     {
-        $this->subscribers->deletePendingBefore($this->clock->now()->modify('-7 days'));
+        $this->subscribers->deletePendingBefore($this->clock->now()->modify('-'.Subscriber::PENDING_KEPT_DAYS.' days'));
     }
 }

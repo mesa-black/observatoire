@@ -10,6 +10,13 @@
         if (at && !at.checked) { at.checked = true; at.dispatchEvent(new Event('change', { bubbles: true })); }
     });
 
+    // A form that deletes asks first (subscribers page). The CSP forbids an
+    // inline onclick; without this script the button deletes directly.
+    document.addEventListener('submit', e => {
+        const question = e.target.dataset?.confirm;
+        if (question && !window.confirm(question)) e.preventDefault();
+    });
+
     const form = document.getElementById('redaction');
     if (!form) return;
 

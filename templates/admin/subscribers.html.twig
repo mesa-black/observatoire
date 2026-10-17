@@ -1,0 +1,52 @@
+{% extends 'admin/layout.html.twig' %}
+{% import 'admin/_ui.html.twig' as ui %}
+{% block title %}Abonnés{% endblock %}
+{% macro supprimer(s) %}
+    <form method="post" action="{{ path('admin_subscriber_delete', {id: s.id}) }}" data-confirm="Supprimer {{ s.email }} ? L'adresse et la preuve de son consentement sont effacées, sans retour possible.">
+        <input type="hidden" name="_token" value="{{ csrf_token('subscriber-' ~ s.id) }}">
+        <button type="submit" class="second">Supprimer</button>
+    </form>
+{% endmacro %}
+{% block body %}
+<section class="carte serree" id="confirmes">
+    <h2>{{ ui.ico('abonnes') }} {{ confirmed|length }} abonné{{ confirmed|length > 1 ? 's' }} confirmé{{ confirmed|length > 1 ? 's' }}</h2>
+    {% if confirmed %}
+    <div class="table"><table>
+        <thead><tr><th>Adresse</th><th>Demande (Paris)</th><th>Confirmation (Paris)</th><th>Consentement</th><th></th></tr></thead>
+        <tbody>
+        {% for s in confirmed %}
+            <tr>
+                <td>{{ s.email }}</td>
+                <td>{{ s.requestedAt|date }}</td>
+                <td>{{ s.confirmedAt ? s.confirmedAt|date : '' }}</td>
+                <td class="discret">{{ s.consentVersion }}</td>
+                <td class="fin">{{ _self.supprimer(s) }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table></div>
+    {% else %}
+        <div class="vide">{{ ui.ico('abonnes') }}<p>Aucun abonné confirmé.</p></div>
+    {% endif %}
+</section>
+
+<section class="carte serree" id="en-attente">
+    <h2>{{ ui.ico('horloge') }} {{ pending|length }} en attente de confirmation</h2>
+    <p class="discret">Ces personnes n'ont pas encore cliqué sur le lien reçu par courriel : elles ne reçoivent rien. Sans confirmation, la demande est effacée d'elle-même après {{ pending_kept_days }} jours.</p>
+    {% if pending %}
+    <div class="table"><table>
+        <thead><tr><th>Adresse</th><th>Demande (Paris)</th><th>Effacée à partir du (Paris)</th><th></th></tr></thead>
+        <tbody>
+        {% for s in pending %}
+            <tr>
+                <td>{{ s.email }}</td>
+                <td>{{ s.requestedAt|date }}</td>
+                <td>{{ s.requestedAt|date_modify('+' ~ pending_kept_days ~ ' days')|date }}</td>
+                <td class="fin">{{ _self.supprimer(s) }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table></div>
+    {% endif %}
+</section>
+{% endblock %}

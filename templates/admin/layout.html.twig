@@ -21,6 +21,7 @@
         <div class="nav">
             <a href="{{ path('admin_index') }}"{% if route == 'admin_index' %} aria-current="page"{% endif %}>{{ ui.ico('accueil') }} Tableau de bord</a>
             <a href="{{ path('admin_newsletter_index') }}"{% if route starts with 'admin_newsletter' %} aria-current="page"{% endif %}>{{ ui.ico('lettre') }} Lettres</a>
+            <a href="{{ path('admin_subscriber_index') }}"{% if route starts with 'admin_subscriber' %} aria-current="page"{% endif %}>{{ ui.ico('abonnes') }} Abonnés</a>
             <a href="{{ path('admin_releves') }}"{% if route in ['admin_releves', 'admin_releve_preview'] %} aria-current="page"{% endif %}>{{ ui.ico('releve') }} Relevés</a>
             <a href="{{ path('admin_security') }}"{% if route == 'admin_security' %} aria-current="page"{% endif %}>{{ ui.ico('cle') }} Sécurité</a>
         </div>

@@ -25,6 +25,12 @@ class SubscriberRepository extends ServiceEntityRepository
         return $counts;
     }
 
+    /** @return list<Subscriber> for the admin: one status, the most recent request first */
+    public function withStatus(string $status): array
+    {
+        return $this->findBy(['status' => $status], ['requestedAt' => 'DESC', 'id' => 'DESC']);
+    }
+
     /** @return iterable<Subscriber> */
     public function confirmed(): iterable
     {
