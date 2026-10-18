@@ -59,7 +59,10 @@ final class ReleveController extends AbstractController
 
     private function page(Releve $releve, bool $isHome): Response
     {
-        $response = $this->render('releve/show.html.twig', ['releve' => $releve, 'donnees' => $this->data->json($releve), 'is_home' => $isHome]);
+        // The course has no measurements: its own template, and no data to build.
+        $response = $releve->isCourse()
+            ? $this->render('releve/cours.html.twig', ['releve' => $releve, 'is_home' => $isHome])
+            : $this->render('releve/show.html.twig', ['releve' => $releve, 'donnees' => $this->data->json($releve), 'is_home' => $isHome]);
         // Short: the page that / shows changes when the next relevé's time comes.
         // Private: it carries a script nonce, which no shared cache may hand out.
         $response->setPrivate();

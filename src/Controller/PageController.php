@@ -13,4 +13,16 @@ final class PageController extends AbstractController
     {
         return $this->render('page/privacy.html.twig');
     }
+
+    /** The course for good: the same chapters as relevé 5, without its date. */
+    #[Route('/comprendre', name: 'course', methods: ['GET', 'HEAD'])]
+    public function course(): Response
+    {
+        $response = $this->render('page/comprendre.html.twig');
+        // Private: it carries a script nonce (the live test), which no shared cache may hand out.
+        $response->setPrivate();
+        $response->setMaxAge(300);
+
+        return $response;
+    }
 }

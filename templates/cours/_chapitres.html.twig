@@ -1,0 +1,120 @@
+{# The course's nine chapters, shared by /comprendre and relevé 5. Written for a
+   general audience: every term is explained where it first appears and kept
+   in the glossary, whose anchors (#g-…) other pages may link to. Figures come
+   from the 16 October 2026 measurements. The live test (data-handshake) stays
+   hidden unless cours.js gets an answer from handshake.mesa.black. #}
+<nav class="sommaire" aria-label="Les chapitres">
+    <ol>
+        <li><a href="#porte">La porte d'entrée</a></li>
+        <li><a href="#secret">Un secret, devant tout le monde</a></li>
+        <li><a href="#q-day">Le Q-Day</a></li>
+        <li><a href="#ml-kem">Une nouvelle recette : ML-KEM</a></li>
+        <li><a href="#hybride">L'hybride</a></li>
+        <li><a href="#signatures">Ce qui peut attendre</a></li>
+        <li><a href="#cle">Qui tient la clé</a></li>
+        <li><a href="#verifier">Vérifiez vous-même</a></li>
+        <li><a href="#glossaire">Le glossaire</a></li>
+    </ol>
+</nav>
+
+<section class="chapitre" id="porte" aria-labelledby="porte-titre">
+    <h2 id="porte-titre">La porte d'entrée</h2>
+    <p>Quand vous ouvrez le site de votre banque, un petit cadenas apparaît dans la barre d'adresse. Il veut dire deux choses : personne ne peut lire ce qui passe entre vous et la banque, et c'est bien la banque qui vous répond, pas un imposteur.</p>
+    <p>Ce cadenas, c'est <b>TLS</b> (<i>Transport Layer Security</i>), le protocole qui chiffre le web. Le « S » de HTTPS, c'est lui. Chaque fois que vous arrivez sur un site, votre navigateur et le serveur commencent par une <b>poignée de main</b> (<i>handshake</i>) : en quelques millisecondes, ils se mettent d'accord sur la manière de chiffrer, le serveur prouve son identité, et ils fabriquent ensemble une clé secrète que personne d'autre ne connaît.</p>
+    <p>Cette poignée de main se fait à la <b>porte d'entrée</b> du site : le premier serveur qui répond. C'est elle que l'Observatoire mesure, chaque mois, pour 115 organisations françaises. Ce qui se passe derrière la porte, on ne le voit pas d'ici, et on ne prétend pas le voir.</p>
+    <p class="a-essayer" data-handshake hidden></p>
+</section>
+
+<section class="chapitre" id="secret" aria-labelledby="secret-titre">
+    <h2 id="secret-titre">Un secret, devant tout le monde</h2>
+    <p>Voici le tour de magie au cœur de tout ça. Votre navigateur et le serveur ne se sont jamais rencontrés. Tout ce qu'ils se disent passe par Internet, où n'importe qui peut écouter. Et pourtant, à la fin de la poignée de main, ils partagent un secret que l'espion qui a tout entendu ignore.</p>
+    <p>L'image la plus simple est celle des <b>pots de peinture</b>. Chacun choisit une couleur secrète. Ils partent d'une couleur commune, publique, disons du jaune. Chacun mélange sa couleur secrète au jaune et envoie le mélange à l'autre : l'espion voit passer les deux mélanges. Puis chacun ajoute sa propre couleur secrète au mélange reçu. Les deux obtiennent exactement la même teinte finale, jaune plus secret A plus secret B. L'espion, lui, a les deux mélanges mais ne sait pas « démélanger » la peinture pour retrouver les secrets.</p>
+    <figure class="pots" aria-label="Deux mélanges passent en public, la teinte finale reste secrète">
+        <span class="pot jaune">public</span><span class="signe">+</span><span class="pot a">secret A</span><span class="signe">→</span><span class="pot ja">mélange envoyé</span>
+        <span class="pot jaune">public</span><span class="signe">+</span><span class="pot b">secret B</span><span class="signe">→</span><span class="pot jb">mélange envoyé</span>
+        <figcaption>Chacun ajoute son secret au mélange de l'autre : même teinte des deux côtés, jamais envoyée.</figcaption>
+    </figure>
+    <p>C'est l'<b>échange de clés</b>, inventé en 1976 par Whitfield Diffie et Martin Hellman. En vrai, on ne mélange pas de la peinture mais des nombres, avec une opération facile à faire et quasi impossible à défaire. Aujourd'hui, la recette la plus utilisée s'appelle <b>X25519</b> : elle calcule sur une <b>courbe elliptique</b>, une courbe mathématique particulière nommée Curve25519. Rapide, sûre, partout.</p>
+    <p>Sûre… contre les ordinateurs d'aujourd'hui.</p>
+</section>
+
+<section class="chapitre" id="q-day" aria-labelledby="q-day-titre">
+    <h2 id="q-day-titre">Le Q-Day</h2>
+    <p>Un <b>ordinateur quantique</b> n'est pas un ordinateur classique plus rapide. Il calcule autrement, et pour certains problèmes très précis, il change tout. En 1994, le mathématicien Peter Shor a montré qu'un ordinateur quantique assez grand saurait justement « démélanger la peinture » : retrouver le secret à partir de ce qui est passé en public. X25519 tomberait, et avec lui RSA et toutes les courbes elliptiques.</p>
+    <p>Le jour où une telle machine existera, on l'appelle le <b>Q-Day</b>. Personne ne connaît la date. Certains disent dix ans, d'autres vingt, d'autres jamais. L'Observatoire ne parie pas : dans chaque relevé, c'est vous qui faites avancer le curseur.</p>
+    <p>Mais voici ce qui rend la question urgente <b>aujourd'hui</b> : quelqu'un peut <b>enregistrer maintenant</b> tout le trafic chiffré qu'il intercepte, le stocker, et le <b>déchiffrer plus tard</b>, le jour du Q-Day. En anglais : <i>harvest now, decrypt later</i>. Vos échanges de 2026 avec votre banque sont peut-être déjà sur un disque quelque part, en attendant la machine qui les ouvrira.</p>
+    <p>Ce n'est un problème que pour ce qui doit rester secret longtemps. Un code de connexion qui expire dans cinq minutes, peu importe. Un dossier médical, un secret industriel, une conversation diplomatique, beaucoup plus. C'est pour ça que chaque relevé associe à chaque organisation la <b>durée de vie</b> de ses données.</p>
+</section>
+
+<section class="chapitre" id="ml-kem" aria-labelledby="ml-kem-titre">
+    <h2 id="ml-kem-titre">Une nouvelle recette : ML-KEM</h2>
+    <p>Les cryptographes n'ont pas attendu. Depuis 2016, le NIST, l'institut américain des normes, a organisé un concours mondial pour trouver des recettes qui résistent aux ordinateurs quantiques. En août 2024, il a publié la gagnante pour l'échange de clés : <b>ML-KEM</b> (norme FIPS 203), issue d'une proposition nommée Kyber.</p>
+    <p>ML-KEM ne repose plus sur des courbes, mais sur des <b>réseaux euclidiens</b> (<i>lattices</i>). L'image : un immense quadrillage dans des centaines de dimensions, et un point légèrement décalé au hasard. Retrouver de quel point exact du quadrillage il vient est facile si l'on a la bonne carte, et effroyablement difficile sinon, y compris pour un ordinateur quantique, autant qu'on le sache.</p>
+    <p>Le <b>768</b> de ML-KEM-768 indique sa taille, et donc son niveau de sécurité : le niveau intermédiaire des trois proposés, celui que tout le monde a choisi pour le web.</p>
+</section>
+
+<section class="chapitre" id="hybride" aria-labelledby="hybride-titre">
+    <h2 id="hybride-titre">L'hybride, ou pourquoi on garde les deux</h2>
+    <p>ML-KEM est récent. Les cryptographes sont confiants, mais une recette jeune peut avoir un défaut qu'on n'a pas encore trouvé. X25519, lui, est éprouvé depuis vingt ans, mais tombera au Q-Day.</p>
+    <p>La solution retenue partout : <b>les deux à la fois</b>. La poignée de main fait un échange X25519 <i>et</i> un échange ML-KEM, et combine les deux secrets pour fabriquer la clé finale. Pour lire la conversation, un attaquant devrait casser <b>les deux</b>. Si ML-KEM a un défaut caché, X25519 tient encore aujourd'hui ; au Q-Day, X25519 tombe mais ML-KEM tient. C'est un échange <b>hybride</b>, celui que l'ANSSI recommande explicitement.</p>
+    <p>Et voilà le nom qui revient dans tous les relevés, enfin décodé :</p>
+    <table class="decortique">
+        <caption>X25519MLKEM768, morceau par morceau</caption>
+        <tbody>
+            <tr><th scope="row"><code>X25519</code></th><td>la recette classique, éprouvée</td></tr>
+            <tr><th scope="row"><code>MLKEM</code></th><td>la recette post-quantique, normalisée en 2024</td></tr>
+            <tr><th scope="row"><code>768</code></th><td>sa taille, son niveau de sécurité</td></tr>
+        </tbody>
+    </table>
+    <p><b>X25519MLKEM768</b>, c'est l'hybride. Quand un relevé dit qu'une porte est <b>scellée</b>, c'est qu'elle l'accepte.</p>
+    <p>Combien ça coûte ? Les messages sont un peu plus gros, d'environ un kilo-octet, et sur les portes que nous avons mesurées en octobre 2026, la poignée de main hybride prenait en médiane <b>1,8 milliseconde</b> de plus que la classique. Imperceptible.</p>
+</section>
+
+<section class="chapitre" id="signatures" aria-labelledby="signatures-titre">
+    <h2 id="signatures-titre">Ce qui peut attendre : les signatures</h2>
+    <p>La poignée de main fait deux choses : elle fabrique la clé secrète (l'échange de clés, des chapitres précédents) et elle prouve l'identité du serveur, grâce à un <b>certificat</b> signé par une autorité de confiance.</p>
+    <p>Cette signature-là n'a pas la même urgence. Pour se faire passer pour votre banque, un attaquant doit falsifier une signature <b>au moment</b> où vous vous connectez. Il ne peut pas enregistrer une signature aujourd'hui pour en profiter dans dix ans : la connexion sera finie depuis longtemps. Il n'y a pas d'« enregistrer maintenant » pour les signatures.</p>
+    <p>Les signatures post-quantiques existent (ML-DSA, normalisée elle aussi en 2024), et les certificats changeront. Mais sans urgence pour vos données : un certificat se remplace tous les trois mois, sans rien déménager. C'est pour ça que l'Observatoire juge les portes sur leur <b>échange de clés</b>, et pas sur leur certificat.</p>
+</section>
+
+<section class="chapitre" id="cle" aria-labelledby="cle-titre">
+    <h2 id="cle-titre">Qui tient la clé</h2>
+    <p>Une précision qui change la lecture de tous les relevés : la porte d'entrée d'une organisation n'est pas forcément chez elle. Très souvent, c'est un <b>CDN</b> (<i>Content Delivery Network</i>), comme Cloudflare, Akamai ou CloudFront d'Amazon, qui répond à sa place : un réseau mondial de serveurs qui accélère et protège des milliers de sites à la fois.</p>
+    <p>Le CDN fait la poignée de main, donc il <b>tient la clé</b> : il déchiffre le trafic à l'entrée, puis le transmet au serveur de l'organisation. Et quand un CDN active l'hybride, il le fait pour <b>tous</b> ses clients d'un coup. En octobre 2026, 67 des 80 portes scellées l'étaient grâce à leur CDN, sans que l'organisation ait rien eu à décider. Sur les 13 organisations qui gardent leur clé sur leur propre réseau, 2 seulement avaient l'hybride.</p>
+    <p>Une dernière condition : l'hybride n'existe que dans <b>TLS 1.3</b>, la version actuelle du protocole. Une porte restée en TLS 1.2 ne peut pas le proposer, quoi qu'il arrive. En octobre 2026, c'était encore le cas du CIC, du Crédit Agricole, du ministère des Armées, de Mon espace santé et de Renault.</p>
+</section>
+
+<section class="chapitre" id="verifier" aria-labelledby="verifier-titre">
+    <h2 id="verifier-titre">Vérifiez vous-même</h2>
+    <p>Rien de ce que publie l'Observatoire ne demande de nous croire sur parole.</p>
+    <ul>
+        <li><b>Dans votre navigateur</b> : dans Chrome ou Edge, touche F12, onglet <i>Sécurité</i> (<i>Security</i>). La ligne <i>Key exchange</i> indique <code>X25519MLKEM768</code> quand la connexion est hybride.</li>
+        <li><b>En ligne de commande</b>, avec OpenSSL 3.5 ou plus récent : <code>openssl s_client -connect www.exemple.fr:443 -groups X25519MLKEM768</code>. Si la poignée de main réussit, la porte est scellée.</li>
+        <li><b>Avec notre outil</b> : Sablier, l'outil open source qui fait ces mesures, vérifie la même chose sur vos propres serveurs, avec <code>sablier probe votre-site.fr</code>.</li>
+    </ul>
+    <p>Et votre navigateur à vous ? Les versions récentes de Chrome, Edge, Firefox et Safari parlent toutes l'hybride.</p>
+    <p class="a-essayer" data-handshake hidden></p>
+</section>
+
+<section class="chapitre" id="glossaire" aria-labelledby="glossaire-titre">
+    <h2 id="glossaire-titre">Le glossaire</h2>
+    <dl class="glossaire">
+        <dt id="g-cdn">CDN</dt><dd>Réseau de serveurs qui répond à la place d'un site pour l'accélérer et le protéger. Il tient la clé de la porte d'entrée.</dd>
+        <dt id="g-certificat">Certificat</dt><dd>Pièce d'identité d'un site, signée par une autorité de confiance. Prouve qu'on parle au bon serveur.</dd>
+        <dt id="g-courbe">Courbe elliptique</dt><dd>Famille de calculs mathématiques utilisée par la cryptographie actuelle (X25519). Cassée par un ordinateur quantique.</dd>
+        <dt id="g-echange">Échange de clés</dt><dd>Moment de la poignée de main où les deux côtés fabriquent un secret commun sans jamais l'envoyer.</dd>
+        <dt id="g-harvest">Enregistrer maintenant, déchiffrer plus tard</dt><dd><i>Harvest now, decrypt later</i> : stocker aujourd'hui du trafic chiffré pour le lire au Q-Day.</dd>
+        <dt id="g-https">HTTPS</dt><dd>Le web chiffré : HTTP transporté dans TLS.</dd>
+        <dt id="g-hybride">Hybride</dt><dd>Échange de clés qui combine une recette classique et une recette post-quantique : il faut casser les deux.</dd>
+        <dt id="g-ml-kem">ML-KEM</dt><dd>La recette post-quantique d'échange de clés, normalisée en 2024 (FIPS 203).</dd>
+        <dt id="g-ml-dsa">ML-DSA</dt><dd>Son équivalent pour les signatures (FIPS 204).</dd>
+        <dt id="g-poignee">Poignée de main</dt><dd><i>Handshake</i> : les premiers échanges d'une connexion chiffrée.</dd>
+        <dt id="g-porte">Porte d'entrée</dt><dd>Le premier serveur qui répond quand on se connecte à un site. C'est ce que l'Observatoire mesure.</dd>
+        <dt id="g-post-quantique">Post-quantique</dt><dd>Qui résiste, autant qu'on le sache, à un ordinateur quantique.</dd>
+        <dt id="g-q-day">Q-Day</dt><dd>Le jour, inconnu, où un ordinateur quantique saura casser l'échange de clés classique.</dd>
+        <dt id="g-scellee">Scellée</dt><dd>Dans nos relevés : une porte qui accepte l'échange hybride X25519MLKEM768.</dd>
+        <dt id="g-tls">TLS</dt><dd>Le protocole qui chiffre les connexions sur Internet. Sa version 1.3 est la seule à porter l'hybride.</dd>
+        <dt id="g-x25519">X25519</dt><dd>La recette classique d'échange de clés la plus répandue.</dd>
+        <dt id="g-x25519mlkem768">X25519MLKEM768</dt><dd>L'hybride : X25519 et ML-KEM-768 ensemble.</dd>
+    </dl>
+</section>

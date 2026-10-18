@@ -28,9 +28,13 @@ final class SitemapController extends AbstractController
         if (null !== $latest) {
             array_unshift($urls, [$siteUrl.'/', $latest->publishedAt]);
         }
+        // The course page is always out; its text changes with the code, so no date.
+        $urls[] = [$siteUrl.$this->generateUrl('course'), null];
         $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
         foreach ($urls as [$loc, $at]) {
-            $xml .= sprintf("  <url><loc>%s</loc><lastmod>%s</lastmod></url>\n", htmlspecialchars($loc, \ENT_XML1), $at->format('Y-m-d'));
+            $xml .= null === $at
+                ? sprintf("  <url><loc>%s</loc></url>\n", htmlspecialchars($loc, \ENT_XML1))
+                : sprintf("  <url><loc>%s</loc><lastmod>%s</lastmod></url>\n", htmlspecialchars($loc, \ENT_XML1), $at->format('Y-m-d'));
         }
         $xml .= "</urlset>\n";
         $response = new Response($xml, 200, ['Content-Type' => 'application/xml; charset=utf-8']);

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{% block title %}{% endblock %} · Observatoire post-quantique</title>
 <meta name="referrer" content="no-referrer">
-<meta name="robots" content="noindex">
+{% block robots %}<meta name="robots" content="noindex">{% endblock %}
 <link rel="stylesheet" href="{{ versioned('/style.css') }}">
 <link rel="stylesheet" href="{{ versioned('/site.css') }}">
 {% block head %}{% endblock %}
@@ -17,7 +17,7 @@
 </main>
 <footer class="wrap pied">
     <p>Un projet BlackMesa. Pas de cookie, pas de traceur, rien qui vienne d'ailleurs.</p>
-    <p><a href="{{ path('privacy') }}">Confidentialité</a></p>
+    <p><a href="{{ path('course') }}">Comprendre</a> · <a href="{{ path('privacy') }}">Confidentialité</a></p>
 </footer>
 </body>
 </html>

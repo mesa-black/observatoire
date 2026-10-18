@@ -43,3 +43,42 @@
 /* Same weight as the newsletter's « S'inscrire ». */
 .partage .bouton { font: inherit; }
 .partage + .lettre { margin-top: 2rem; }
+
+/* The course (/comprendre and relevé 5): one column for reading, a numbered
+   table of contents, a box for the live test, the name taken apart. */
+.cours { max-width: 44rem; padding-block: 3rem 1rem; counter-reset: chapitre; }
+.cours h1 { margin: .5rem 0 1rem; font: 400 clamp(2.4rem, 6vw, 3.4rem)/1.05 var(--serif); }
+.cours h1 em { color: var(--vif); }
+.cours a { color: var(--lien); }
+.chapo-cours { font-size: 1.1rem; color: var(--doux); }
+.releve-cours { margin: 1.5rem 0 0; font: 500 .8rem var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--vif); }
+.sommaire { margin: 2rem 0 1rem; padding: 1rem 1.3rem; background: var(--papier); border: 1px solid var(--filet); border-radius: 10px; }
+.sommaire ol { margin: 0; padding-left: 1.3rem; columns: 2 14rem; column-gap: 2rem; }
+.sommaire li { margin: .2rem 0; }
+.chapitre { margin-top: 3rem; padding-top: 1.6rem; border-top: 1px solid var(--filet); counter-increment: chapitre; scroll-margin-top: 1rem; }
+.chapitre h2 { margin: 0 0 .8rem; font: 400 1.9rem/1.15 var(--serif); }
+.chapitre h2::before { content: counter(chapitre) ". "; color: var(--vif); }
+.chapitre p, .chapitre li { line-height: 1.65; }
+.a-essayer { margin: 1.4rem 0 0; padding: .9rem 1.1rem; border-left: 4px solid var(--vif); background: var(--papier); border-radius: 0 8px 8px 0; }
+.a-essayer.hybride { border-left-color: #c9a03f; }
+.decortique { margin: 1rem 0; border-collapse: collapse; }
+.decortique caption { text-align: left; font-size: .85rem; color: var(--doux); padding-bottom: .4rem; }
+.decortique th, .decortique td { padding: .45rem .9rem; border-bottom: 1px solid var(--filet); text-align: left; }
+.decortique th code { font-size: 1.05rem; }
+.decortique td { font-size: 1rem; color: var(--encre); }
+.pots { display: grid; grid-template-columns: repeat(5, auto); justify-content: start; align-items: center; gap: .5rem .4rem; margin: 1.4rem 0; }
+.pot { display: inline-block; padding: .35rem .7rem; border-radius: 999px; font-size: .8rem; font-weight: 600; color: #1f2326; }
+.pot.jaune { background: #f2d36b; }
+.pot.a { background: #e58f73; } .pot.b { background: #7fb2d9; }
+.pot.ja { background: #eda46c; } .pot.jb { background: #b5c7a0; }
+.pots .signe { color: var(--doux); }
+.pots figcaption { grid-column: 1 / -1; font-size: .85rem; color: var(--doux); }
+.glossaire { display: grid; grid-template-columns: max-content 1fr; gap: .5rem 1.2rem; }
+.glossaire dt { font-weight: 700; }
+.glossaire dd { margin: 0; color: var(--doux); }
+.glossaire :target { color: var(--vif); }
+@media (max-width: 34rem) {
+    .glossaire { grid-template-columns: 1fr; gap: .1rem; }
+    .glossaire dd { margin-bottom: .6rem; }
+    .pots { grid-template-columns: repeat(5, auto); font-size: .9em; }
+}
