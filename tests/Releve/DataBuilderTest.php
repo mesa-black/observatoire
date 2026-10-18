@@ -60,6 +60,26 @@ final class DataBuilderTest extends TestCase
         $this->assertCount(31, array_filter($tls, fn ($t) => $t->hybrid));
     }
 
+    /**
+     * Relevé 4 adds who holds the key of each door (cle.jsonl), per host. The
+     * prototype builds it as a variant (build.sh 2026-10-16 r4) with its draft
+     * meta; the meta aside, same data.
+     */
+    public function testSameDataAsBuildShForReleve4(): void
+    {
+        $js = (string) file_get_contents(__DIR__.'/../fixtures/data-2026-10-16-r4.js');
+        $expected = json_decode(substr(rtrim($js, ";\n"), \strlen('window.OBSERVATOIRE = ')), false, 512, \JSON_THROW_ON_ERROR);
+
+        $releve = new Releve(4, '2026-10-16', new \DateTimeImmutable(), 'Relevé n° 4', '', \dirname(__DIR__, 2).'/releves/4');
+        $built = (new DataBuilder())->build($releve);
+        $this->assertSame('cle', $built->meta->focus);
+        $expected->meta = $built->meta;
+
+        $this->assertSame($this->encode($expected), $this->encode($built));
+        $kinds = array_map(fn ($e) => $e->cle->kind ?? null, array_merge(...array_map(fn ($g) => $g->entries, $built->groups)));
+        $this->assertNotContains(null, $kinds, 'every door has a holder');
+    }
+
     public function testPartialCostLinesAreSkippedAndUnknownHostsUnreachable(): void
     {
         $releve = new Releve(1, '2020-01-01', new \DateTimeImmutable(), 'T', '', __DIR__.'/../fixtures/releves/1');

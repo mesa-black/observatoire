@@ -39,9 +39,10 @@ final class DataBuilder
         $costs = $this->slurp($file('cost.jsonl'), completeOnly: true);
         $selfCosts = $this->slurp($file('self.cost.jsonl'), completeOnly: true);
         $pages = $this->slurp($file('csp.jsonl'));
-        // Relevé 2 on: AI providers (ai.sh), Hugging Face (hf.sh), mail (mail.sh). Optional.
+        // Relevé 2 on: AI providers (ai.sh), Hugging Face (hf.sh), mail (mail.sh);
+        // relevé 4 on: who holds the key (cle.sh). Optional.
         $extra = [];
-        foreach (['ai', 'hf', 'mail'] as $key) {
+        foreach (['ai', 'hf', 'mail', 'cle'] as $key) {
             if (is_file($file($key.'.jsonl'))) {
                 foreach ($this->slurp($file($key.'.jsonl'), completeOnly: true) as $row) {
                     $extra[$key][$row->host] = (object) [$key => $row->{$key} ?? null];
@@ -69,9 +70,9 @@ final class DataBuilder
         // ($r | map({(.host): (. + ($cost[.host] // {cost: null}) + ($page[.host] // {page: null}))}) | add) as $by
         $by = [];
         foreach ($results as $r) {
-            // ... + ($aiBy[.host] // {}) + ($hfBy[.host] // {}) + ($mailBy[.host] // {})
+            // ... + ($aiBy[.host] // {}) + ($hfBy[.host] // {}) + ($mailBy[.host] // {}) + ($cleBy[.host] // {})
             $by[$r->host] = $this->merge($r, $cost[$r->host] ?? (object) ['cost' => null], $page[$r->host] ?? (object) ['page' => null],
-                $extra['ai'][$r->host] ?? new \stdClass(), $extra['hf'][$r->host] ?? new \stdClass(), $extra['mail'][$r->host] ?? new \stdClass());
+                $extra['ai'][$r->host] ?? new \stdClass(), $extra['hf'][$r->host] ?? new \stdClass(), $extra['mail'][$r->host] ?? new \stdClass(), $extra['cle'][$r->host] ?? new \stdClass());
         }
 
         $groups = [];
