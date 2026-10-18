@@ -19,6 +19,8 @@ final class ContentSecurityPolicyTest extends WebTestCase
         $csp = (string) $client->getResponse()->headers->get('Content-Security-Policy');
         $this->assertMatchesRegularExpression("#script-src 'nonce-[A-Za-z0-9+/]{24}' 'strict-dynamic';#", $csp);
         $this->assertStringContainsString("object-src 'none'", $csp);
+        // handshake.mesa.black tells the reader which key exchange their browser negotiated.
+        $this->assertStringContainsString("connect-src 'self' https://handshake.mesa.black;", $csp);
         $this->assertStringContainsString("base-uri 'none'", $csp);
         $this->assertStringContainsString("require-trusted-types-for 'script'", $csp);
         $this->assertStringContainsString('media-src https://archive.org', $csp);

@@ -51,6 +51,6 @@ final class ContentSecurityPolicy implements EventSubscriberInterface
             return;
         }
         $media = preg_match(self::MEDIA_PATHS, $event->getRequest()->getPathInfo()) ? " media-src https://archive.org https://*.archive.org;" : '';
-        $event->getResponse()->headers->set('Content-Security-Policy', "default-src 'none'; script-src 'nonce-{$this->nonce()}' 'strict-dynamic'; object-src 'none'; connect-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:;{$media} base-uri 'none'; form-action 'self'; frame-ancestors 'none'; require-trusted-types-for 'script'");
+        $event->getResponse()->headers->set('Content-Security-Policy', "default-src 'none'; script-src 'nonce-{$this->nonce()}' 'strict-dynamic'; object-src 'none'; connect-src 'self' https://handshake.mesa.black; style-src 'self'; font-src 'self'; img-src 'self' data:;{$media} base-uri 'none'; form-action 'self'; frame-ancestors 'none'; require-trusted-types-for 'script'");
     }
 }
