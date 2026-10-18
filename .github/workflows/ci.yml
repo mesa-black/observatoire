@@ -110,6 +110,23 @@ jobs:
             org.opencontainers.image.description=Observatoire post-quantique, Symfony on FrankenPHP
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      -
+        # handshake (devops/handshake): tells a reader's browser which key
+        # exchange its connection negotiated, for the course. Its own image,
+        # same commit tag; its tests run inside the build.
+        name: Build and push handshake
+        uses: docker/build-push-action@v6
+        with:
+          context: devops/handshake
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ghcr.io/mesa-black/handshake:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.description=handshake, the TLS key exchange a browser just negotiated
+          cache-from: type=gha,scope=handshake
+          cache-to: type=gha,mode=max,scope=handshake
 
   # GitOps, exactly as the blog: one line changed in k3s-stack, Argo CD does
   # the rest. Rollback = git revert of that commit.
@@ -135,8 +152,10 @@ jobs:
         name: Point the Observatoire at this build
         working-directory: k3s-stack
         run: |
-          yq -i '(.images[] | select(.name == "ghcr.io/mesa-black/observatoire")).newTag = "${{ github.sha }}"' \
-            spoke/apps/observatoire/kustomization.yaml
+          for image in observatoire handshake; do
+            yq -i "(.images[] | select(.name == \"ghcr.io/mesa-black/$image\")).newTag = \"${{ github.sha }}\"" \
+              spoke/apps/observatoire/kustomization.yaml
+          done
           git diff --stat
       -
         name: Commit and push
