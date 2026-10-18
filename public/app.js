@@ -130,29 +130,59 @@
         const cc = (as.match(/, ([A-Z]{2})$/) || [])[1] || '';
         return { name: as.replace(/^\S+ - /, '').replace(/, [A-Z]{2}$/, '') || 'inconnu', cc, kind: 'prestataire' };
     };
-    // Relevé 4: the doors measured at both dates, and what changed. Compared on
-    // the raw verdict: the « on demand » downgrade above has no twin in the
-    // previous measurement, and would read as a door losing the hybrid.
+    // Relevé 4: the doors measured at both dates, and what changed, subject by
+    // subject. The verdict is compared raw: the « on demand » downgrade above
+    // has no twin in the previous measurement, and would read as a loss. A
+    // certificate counts as changed when its kind of key or its issuer does,
+    // not when it is merely renewed.
     function keyMoves() {
         const both = measured.filter(e => e.cle?.prev && e.cle.prev.reachable !== false && e.cle.prev.pq);
-        const was = e => e.cle.prev.pq === 'full', is = e => (e.onDemand ? 'full' : e.pq) === 'full';
         const prev = both[0]?.cle.prev.date;
+        const P = e => e.cle.prev;
+        const was = e => P(e).pq === 'full', is = e => (e.onDemand ? 'full' : e.pq) === 'full';
+        const old = l => (l || []).some(v => v === 'tls1' || v === 'tls1_1');
+        const t13 = l => (l || []).includes('tls1_3');
+        const certKind = c => !c ? '' : /rsa/i.test(c.key) ? `RSA ${c.bits}` : `ECDSA ${c.curve || c.bits}`;
+        const certOf = c => !c ? '' : `${certKind(c)}, ${c.issuer || '?'}`;
+        const csp = pg => !!pg && !!(pg.csp || pg.meta_csp);
+        const served = e => P(e).page?.code === 200 && e.page?.code === 200;
+        const topics = [
+            ["l'hybride post-quantique", "gagné", e => !was(e) && is(e)],
+            ["l'hybride post-quantique", "perdu", e => was(e) && !is(e)],
+            ['de mains', 'changé', e => P(e).name && P(e).name !== e.cle.name, e => `${P(e).name} → ${e.cle.name}`],
+            ['TLS 1.0 et 1.1', 'fermé', e => old(P(e).protocols) && !old(e.protocols)],
+            ['TLS 1.0 ou 1.1', 'rouvert', e => !old(P(e).protocols) && old(e.protocols)],
+            ['TLS 1.3', 'ouvert', e => !t13(P(e).protocols) && t13(e.protocols)],
+            ['TLS 1.3', 'fermé', e => t13(P(e).protocols) && !t13(e.protocols)],
+            ['de certificat', 'changé', e => P(e).cert && e.cert && (certKind(P(e).cert) !== certKind(e.cert) || P(e).cert.issuer !== e.cert.issuer), e => `${certOf(P(e).cert)} → ${certOf(e.cert)}`],
+            // HSTS is left out: probe.sh reads it on one HEAD request, and a door
+            // that answers a robot with a 403, or one edge with and one without,
+            // flips between two runs a day apart (BlaBlaCar, Caisse d'Épargne).
+            // The policy is compared only when the home page answered 200 both
+            // times: a blocking page has no policy, and is not a withdrawal.
+            ['une politique de contenu (CSP)', 'ajouté', e => served(e) && !P(e).page.csp && csp(e.page)],
+            ['leur politique de contenu (CSP)', 'retiré', e => served(e) && P(e).page.csp && !csp(e.page)],
+        ].map(([what, verb, test, detail]) => ({ what, verb, detail, doors: both.filter(test) }));
+        const moved = new Set(topics.flatMap(t => t.doors));
+        const pick = (verb, what) => topics.find(t => t.verb === verb && t.what === what).doors;
         return {
-            prev, compared: both.length,
+            prev, compared: both.length, topics, moved: [...moved],
             prevFr: prev ? new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(prev)) : '',
-            gained: both.filter(e => !was(e) && is(e)),
-            lost: both.filter(e => was(e) && !is(e)),
-            moved: both.filter(e => e.cle.prev.name && e.cle.prev.name !== e.cle.name),
+            since: M.depuis ? `le relevé ${M.depuis}` : null,
+            gained: pick('gagné', "l'hybride post-quantique"), lost: pick('perdu', "l'hybride post-quantique"), hands: pick('changé', 'de mains'),
         };
     }
-    // One sentence for the chapô: only what moved, or that nothing did.
+    // One sentence for the chapô: the hybrid and the hands first, then how many
+    // doors moved at all; or that nothing did.
     function depuis(m) {
+        const when = m.since ? `Depuis ${m.since} (${m.prevFr})` : `Depuis la mesure du ${m.prevFr}`;
+        if (!m.moved.length) return `${when}, aucune porte n'a bougé.`;
         const parts = [
             m.gained.length && `${plural(m.gained.length, 'porte a gagné', 'portes ont gagné')} l'hybride`,
             m.lost.length && `${plural(m.lost.length, "l'a perdu", "l'ont perdu")}`,
-            m.moved.length && `${plural(m.moved.length, 'a changé', 'ont changé')} de mains`,
+            m.hands.length && `${plural(m.hands.length, 'a changé', 'ont changé')} de mains`,
         ].filter(Boolean);
-        return parts.length ? `Depuis la mesure du ${m.prevFr} : ${parts.join(', ')}.` : `Depuis la mesure du ${m.prevFr}, aucune porte n'a bougé.`;
+        return `${when} : ${parts.length ? parts.join(', ') + ' ; ' : ''}${plural(m.moved.length, 'porte a bougé', 'portes ont bougé')} en tout.`;
     }
     const postState = e => {
         const m = e.mail;
@@ -1811,64 +1841,131 @@
     // is their CDN's default, and the doors that keep their own key are the
     // ones without it. Then what moved since the previous measurement.
     if (M.focus === 'cle') {
-        const KINDS = [
-            ['cdn', 'Un CDN', 'un réseau qui répond pour des milliers de sites à la fois'],
-            ['cloud', 'Un cloud', "l'équilibreur de charge d'un géant du nuage"],
-            ['hebergeur', 'Un hébergeur', 'un prestataire qui loue ses serveurs'],
-            ['propre', 'Son propre réseau', "celui de l'organisation ou de son groupe, la clé reste chez elle"],
-        ];
         const keyed = measured.filter(e => e.cle);
         const sec = h('section', { class: 'wrap qui cle', 'aria-labelledby': 'cle-titre' });
         $('atlas-bloc').before(sec);
-        const bars = h('div', { class: 'barres' });
-        const lists = h('ul', { class: 'cle-liste' });
-        for (const [k, label, what] of KINDS) {
-            const sub = keyed.filter(e => e.cle.kind === k), ok = sub.filter(e => e.pq === 'full');
-            if (!sub.length) continue;
-            const fill = h('div', { class: 'rempli' });
-            const row = h('div', { class: 'barre' },
-                h('span', { class: 'lib' }, label, h('small', null, `${ok.length} portes scellées sur ${sub.length}`)),
-                h('div', { class: 'piste', role: 'img', 'aria-label': `${label} : ${pct(ok.length, sub.length)} % scellées` }, fill),
-                h('span', { class: 'pct' }, `${pct(ok.length, sub.length)} %`, h('small', null, 'scellées')));
-            bars.append(row);
-            new IntersectionObserver((entries, obs) => {
-                if (entries[0].isIntersecting) { fill.style.width = `${pct(ok.length, sub.length)}%`; obs.disconnect(); }
-            }, { threshold: .4 }).observe(row);
-            const by = new Map();
-            for (const e of sub) by.set(e.cle.name, (by.get(e.cle.name) || 0) + 1);
-            lists.append(h('li', null, h('b', null, `${label} · ${sub.length}`), ` — ${what} : `,
-                [...by].sort((a, b) => b[1] - a[1]).map(([n, c]) => `${n} ${c}`).join(', '), '.'));
+
+        // The key rings: one per holder, one key per organisation, brass when
+        // its door takes the hybrid, iron when it does not. A ring's size
+        // follows its number of keys. Drawn with s_(), never as markup: the
+        // page's policy forbids HTML sinks.
+        const RINGS = [
+            ['cdn', 'Les CDN', 'le réseau qui répond devant le site'],
+            ['cloud', 'Les clouds', "l'équilibreur de charge d'un géant du nuage"],
+            ['hebergeur', 'Les hébergeurs', 'un prestataire qui loue ses serveurs'],
+            ['propre', 'Les réseaux maison', "l'organisation tient sa clé elle-même"],
+        ];
+        const sealedOf = e => e.pq === 'full';
+        const plaqueOf = new Map(plaques.map(p => [p.e.host, p]));
+        const openOf = e => () => { const p = plaqueOf.get(e.host); if (p) openSheet(p); };
+        const holders = new Map();
+        for (const e of keyed) {
+            if (!holders.has(e.cle.name)) holders.set(e.cle.name, { name: e.cle.name, kind: e.cle.kind, cc: e.cle.country, keys: [] });
+            holders.get(e.cle.name).keys.push(e);
         }
-        const cdnSealed = keyed.filter(e => e.cle.kind === 'cdn' && e.pq === 'full').length;
-        const sealedAll = keyed.filter(e => e.pq === 'full').length;
+        const ringsOf = k => [...holders.values()].filter(x => x.kind === k)
+            .sort((a, b) => b.keys.length - a.keys.length || b.keys.filter(sealedOf).length - a.keys.filter(sealedOf).length || a.name.localeCompare(b.name, 'fr'));
+        // A key points along +x, the hole of its bow at the origin, where the ring passes.
+        const BLADE = 'M6.5,-3.8 H12 V-2.3 H42 L44.8,-0.3 V2.3 H40.5 V6.6 H37.8 V4.3 H35.2 V7.4 H32.2 V4.3 H29.6 V2.3 H12 V3.8 H6.5 Z';
+        const keyOf = (x, y, deg, e) => s_('g', { class: `cle-svg ${sealedOf(e) ? 'or' : 'fer'}`, transform: `translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(${deg.toFixed(1)})` },
+            s_('title', null, `${e.name} · ${sealedOf(e) ? 'post-quantique' : 'classique'}`),
+            s_('path', { d: BLADE, class: 'metal' }), s_('circle', { r: 8.6, class: 'metal' }), s_('circle', { r: 3.3, class: 'trou' }));
+        const ringOf = (keys, scale, label) => {
+            const n = keys.length, r = Math.round(10 + 14.4 * Math.sqrt(n));
+            // Many keys spread all round the ring; a few hang below, fanned out.
+            const angles = keys.map((_, i) => n >= 10 ? 90 + 360 * (i + .5) / n : 90 + (i - (n - 1) / 2) * 24);
+            let x0 = -r - 4, x1 = r + 4, y0 = -r - 4, y1 = r + 4;
+            for (const a of angles) {
+                const c = Math.cos(a * Math.PI / 180), s = Math.sin(a * Math.PI / 180);
+                for (const d of [r, r + 47]) { x0 = Math.min(x0, c * d - 9); x1 = Math.max(x1, c * d + 9); y0 = Math.min(y0, s * d - 9); y1 = Math.max(y1, s * d + 9); }
+            }
+            x0 -= 6; y0 -= 6; x1 += 6; y1 += 6;
+            return s_('svg', { class: 'anneau', viewBox: `${x0.toFixed(1)} ${y0.toFixed(1)} ${(x1 - x0).toFixed(1)} ${(y1 - y0).toFixed(1)}`,
+                width: ((x1 - x0) * scale).toFixed(0), height: ((y1 - y0) * scale).toFixed(0), role: 'img', 'aria-label': label },
+                keys.map((e, i) => keyOf(Math.cos(angles[i] * Math.PI / 180) * r, Math.sin(angles[i] * Math.PI / 180) * r, angles[i], e)),
+                s_('circle', { r, class: 'anneau-fil' }));
+        };
+        const nameOf = e => h('button', { type: 'button', class: `nom-cle ${sealedOf(e) ? 'or' : 'fer'}` }, e.name);
+        const trousseau = h('div', { class: 'trousseau' },
+            // The gradients, once for every key on the page.
+            s_('svg', { width: 0, height: 0, 'aria-hidden': 'true', class: 'defs-cles' }, s_('defs', null,
+                ...[['cle-or', '#f3dc92', '#d1a845', '#9c7322'], ['cle-fer', '#c5c9cc', '#90959a', '#62676b'], ['cle-rouille', '#c4743c', '#93461f', '#5f2c13']]
+                    .map(([id, a, b, c]) => s_('linearGradient', { id, x1: 0, y1: 0, x2: 0, y2: 1 },
+                        s_('stop', { offset: 0, 'stop-color': a }), s_('stop', { offset: '.5', 'stop-color': b }), s_('stop', { offset: 1, 'stop-color': c }))))));
+        const cdnSealed = keyed.filter(e => e.cle.kind === 'cdn' && sealedOf(e)).length;
+        const sealedAll = keyed.filter(sealedOf).length;
+        for (const [k, title, sub] of RINGS) {
+            const rs = ringsOf(k);
+            if (!rs.length) continue;
+            const all = rs.flatMap(x => x.keys), ok = all.filter(sealedOf).length;
+            const row = h('div', { class: 'anneaux' });
+            for (const x of rs) {
+                const gold = x.keys.filter(sealedOf).length, n = x.keys.length;
+                x.keys.sort((a, b) => sealedOf(b) - sealedOf(a) || a.name.localeCompare(b.name, 'fr'));
+                const big = n >= 20, small = n <= 2;
+                const names = h('div', { class: 'noms-cles' }, x.keys.map(e => { const b = nameOf(e); b.addEventListener('click', openOf(e)); return b; }));
+                row.append(h('div', { class: `anneau-carte${big ? ' grand' : small ? ' petit' : ''}` },
+                    ringOf(x.keys, big ? 1 : small ? .62 : n >= 10 ? .78 : .9, `${x.name} : ${n} clés, ${gold} en laiton`),
+                    h('div', { class: 'anneau-legende' },
+                        h('b', null, x.name, ' ', h('span', { class: `pays${x.cc === 'FR' ? ' fr' : ''}` }, x.cc)),
+                        h('small', null, n === 1 ? `1 clé · ${gold ? 'laiton' : 'fer'}` : `${n} clés · ${gold} en laiton`),
+                        names)));
+            }
+            if (k === 'cdn') row.append(h('div', { class: 'encart' }, h('b', null, `${cdnSealed} `, h('em', null, `sur ${sealedAll}.`)),
+                h('p', null, `Des ${sealedAll} portes scellées, ${cdnSealed} le sont par leur CDN. Les clés ont été refaites sur le trousseau du prestataire, pas chez l'organisation.`)));
+            if (k === 'cloud') {
+                const sized = rs.filter(x => x.keys.length >= 3).map(x => ({ x, s: x.keys.filter(sealedOf).length }));
+                const worst = sized.reduce((a, b) => (!a || b.s / b.x.keys.length < a.s / a.x.keys.length ? b : a), null);
+                const best = sized.reduce((a, b) => (!a || b.s / b.x.keys.length > a.s / a.x.keys.length ? b : a), null);
+                if (worst && best && worst !== best) row.append(h('div', { class: 'encart' }, h('b', null, `${worst.x.name} : `, h('em', null, `${worst.s} sur ${worst.x.keys.length}.`)),
+                    h('p', null, `Même rang de géant américain, autre résultat : ${best.x.name} a ${best.s} clés sur ${best.x.keys.length} en laiton, ${worst.x.name} ${worst.s ? worst.s : 'aucune'}.`)));
+            }
+            const fill = h('i', { style: `--p: ${pct(ok, all.length)}%` });
+            trousseau.append(h('div', { class: 'bande' },
+                h('div', { class: 'bande-tete' },
+                    h('h3', null, title, h('em', null, ` · ${sub}`)),
+                    h('span', { class: 'bande-compte' }, `${plural(rs.length, 'trousseau', 'trousseaux')} · ${plural(all.length, 'clé', 'clés')}`),
+                    h('span', { class: 'bande-barre', role: 'img', 'aria-label': `${pct(ok, all.length)} % en laiton` }, fill, `${ok}/${all.length} en laiton · ${pct(ok, all.length)} %`)),
+                row));
+        }
+        const qday = h('input', { type: 'checkbox' });
+        qday.addEventListener('change', () => trousseau.classList.toggle('qday', qday.checked));
+        const iron = keyed.filter(e => !sealedOf(e)).length;
         const us = keyed.filter(e => e.cle.country === 'US');
+        const biggest = [...holders.values()].sort((a, b) => b.keys.length - a.keys.length)[0];
+        const allGold = biggest.keys.every(sealedOf);
         sec.append(
             h('p', { class: 'sur' }, 'Qui tient la clé'),
-            h('h2', { id: 'cle-titre' }, `Le post-quantique des portes françaises, `, h('em', null, `c'est d'abord celui de leur CDN.`)),
-            h('p', null, `La clé d'une porte d'entrée, c'est celle de la connexion TLS : qui y répond peut lire ce qui passe. `,
-                `${pct(cdnSealed, sealedAll)} % des portes scellées le sont par un CDN, qui a activé l'hybride pour tous ses clients. `,
-                `Et ${us.length} sur ${keyed.length} sont tenues par une entreprise américaine, que sa loi peut contraindre à livrer ce qu'elle voit passer, hybride ou pas.`),
+            h('h2', { id: 'cle-titre' }, `${holders.size} trousseaux pour ${keyed.length} portes. `, h('em', null, `Le plus gros, celui de ${biggest.name}, est ${allGold ? 'tout' : 'presque tout'} en laiton.`)),
+            h('div', { class: 'trousseau-tete' },
+                h('p', null, `Chaque porte d'entrée est une clé, accrochée au trousseau de celui qui répond à sa connexion chiffrée, et qui peut donc lire ce qui passe. `,
+                    `En laiton, elle parle déjà l'hybride post-quantique ; en fer, elle reste classique. `,
+                    `${us.length} clés sur ${keyed.length} pendent au trousseau d'une entreprise américaine, que sa loi peut contraindre à livrer ce qu'elle voit passer, hybride ou pas.`),
+                h('div', { class: 'trousseau-legende' },
+                    h('span', null, h('i', { class: 'mini-cle laiton' }), `laiton · post-quantique `, h('b', null, sealedAll)),
+                    h('span', null, h('i', { class: 'mini-cle fer' }), `fer · classique `, h('b', null, iron)),
+                    h('label', { class: 'bascule' }, qday, ` Le Q-Day tombe : ${iron} clés de fer rouillent d'un coup`))),
             h('span', { class: 'fixe' }, `Mesuré le ${dateFr} · ne dépend pas du Q-Day`),
-            bars, lists,
+            trousseau,
+            h('p', { class: 'trousseau-note' }, `Une clé, une porte d'entrée HTTPS ; la taille du trousseau suit son nombre de clés. Chaque nom ouvre la fiche de l'organisation.`),
         );
 
-        // What moved since the previous measurement, door by door.
+        // What moved since the previous measurement, subject by subject.
         const moves = keyMoves();
         if (moves.prev) {
             const ch = h('section', { class: 'wrap qui cle-depuis', 'aria-labelledby': 'depuis-titre' });
             sec.after(ch);
-            const line = (e, what) => h('li', null, h('b', null, e.name), ` (${e.host}) : ${what}`);
-            const changes = [
-                ...moves.gained.map(e => line(e, `a gagné l'hybride${e.cle.prev.name !== e.cle.name ? `, en passant de ${e.cle.prev.name} à ${e.cle.name}` : ` (${e.cle.name})`}.`)),
-                ...moves.lost.map(e => line(e, `a perdu l'hybride${e.cle.prev.name !== e.cle.name ? `, en passant de ${e.cle.prev.name} à ${e.cle.name}` : ''}.`)),
-                ...moves.moved.filter(e => !moves.gained.includes(e) && !moves.lost.includes(e)).map(e => line(e, `a changé de mains, de ${e.cle.prev.name} à ${e.cle.name}.`)),
-            ];
+            const when = moves.since ? `${moves.since}, le ${moves.prevFr}` : `la mesure du ${moves.prevFr}`;
+            const rows = moves.topics.filter(t => t.doors.length).map(t => h('li', null,
+                h('b', null, `${plural(t.doors.length, `porte a ${t.verb}`, `portes ont ${t.verb}`)} ${t.what}`), ' : ',
+                t.detail ? t.doors.map(e => `${e.name} (${t.detail(e)})`).join(', ') : names(t.doors, 99), '.'));
             ch.append(
-                h('p', { class: 'sur' }, `Depuis le ${moves.prevFr}`),
-                h('h2', { id: 'depuis-titre' }, changes.length ? `${plural(changes.length, 'porte a bougé', 'portes ont bougé')}.` : `Aucune porte n'a bougé.`),
-                h('p', null, `Les mêmes portes, mesurées de la même façon le ${moves.prevFr} et le ${dateFr}. ${moves.compared} étaient joignables les deux fois.`),
+                h('p', { class: 'sur' }, moves.since ? `Depuis ${moves.since}` : `Depuis le ${moves.prevFr}`),
+                h('h2', { id: 'depuis-titre' }, moves.moved.length ? `${plural(moves.moved.length, 'porte a bougé', 'portes ont bougé')}, ${plural(moves.compared - moves.moved.length, "n'a pas changé", "n'ont pas changé")}.` : `Aucune porte n'a bougé.`),
+                h('p', null, `Les mêmes portes, mesurées de la même façon : ${when}, puis le ${dateFr}. ${moves.compared} étaient joignables les deux fois. `,
+                    `On compte l'hybride, qui tient la clé, les versions de TLS acceptées, le certificat (un renouvellement ne compte pas, un changement de type de clé ou d'émetteur oui) et la politique de contenu de la page d'accueil quand elle a répondu les deux fois.`),
             );
-            if (changes.length) ch.append(h('ul', { class: 'cle-liste' }, changes));
+            if (rows.length) ch.append(h('ul', { class: 'cle-liste' }, rows));
         }
     }
 
