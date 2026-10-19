@@ -61,9 +61,7 @@ final class DashboardController extends AbstractController
     public function preview(int $number, ReleveRepository $releves, DataBuilder $data): Response
     {
         $releve = $releves->find($number) ?? throw new NotFoundHttpException();
-        $response = $releve->isCourse()
-            ? $this->render('releve/cours.html.twig', ['releve' => $releve, 'is_home' => false])
-            : $this->render('releve/show.html.twig', ['releve' => $releve, 'donnees' => $data->json($releve), 'is_home' => false]);
+        $response = $this->render('releve/show.html.twig', ['releve' => $releve, 'donnees' => $data->json($releve), 'is_home' => false]);
         $response->headers->set('X-Robots-Tag', 'noindex');
 
         return $response;

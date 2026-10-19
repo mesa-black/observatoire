@@ -104,11 +104,6 @@ final class ReleveRepository
             throw new \UnexpectedValueException("$file: published must be \"YYYY-MM-DD HH:MM\" (Paris time)");
         }
 
-        $page = (string) ($meta['page'] ?? Releve::MEASUREMENTS);
-        if (!\in_array($page, [Releve::MEASUREMENTS, Releve::COURSE], true)) {
-            throw new \UnexpectedValueException("$file: page must be \"mesures\" or \"cours\"");
-        }
-
         return new Releve(
             $number,
             $date,
@@ -117,7 +112,6 @@ final class ReleveRepository
             (string) ($meta['intro'] ?? ''),
             $dir,
             true === ($meta['draft'] ?? false),
-            $page,
         );
     }
 }

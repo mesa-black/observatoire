@@ -14,7 +14,7 @@ final class PageController extends AbstractController
         return $this->render('page/privacy.html.twig');
     }
 
-    /** The course for good: the same chapters as relevé 5, without its date. */
+    /** The course: what every relevé's words mean, linked from the top of each. */
     #[Route('/comprendre', name: 'course', methods: ['GET', 'HEAD'])]
     public function course(): Response
     {

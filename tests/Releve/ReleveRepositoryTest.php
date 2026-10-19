@@ -23,19 +23,6 @@ final class ReleveRepositoryTest extends TestCase
         $this->assertTrue((new Releve(3, '2026-10-16', $now->modify('+1 day'), 'T', '', '/x'))->isScheduledAt($now));
     }
 
-    public function testAReleveIsMeasurementsOrTheCourseAndNothingElse(): void
-    {
-        $releves = new ReleveRepository(self::DIR, new MockClock('2026-10-16 12:00:00', 'UTC'));
-        $this->assertFalse($releves->find(1)?->isCourse());
-        $this->assertTrue($releves->find(4)?->isCourse());
-
-        $dir = sys_get_temp_dir().'/releves-'.bin2hex(random_bytes(4));
-        mkdir($dir.'/7', 0o777, true);
-        file_put_contents($dir.'/7/meta.json', '{"number": 7, "date": "2020-01-01", "published": "2020-01-15 07:00", "page": "video"}');
-        $this->expectException(\UnexpectedValueException::class);
-        (new ReleveRepository($dir, new MockClock()))->all();
-    }
-
     public function testOnlyRelevesWhoseTimeHasComeArePublished(): void
     {
         $releves = new ReleveRepository(self::DIR, new MockClock('2026-10-16 12:00:00', 'UTC'));
@@ -64,10 +51,7 @@ final class ReleveRepositoryTest extends TestCase
         $this->assertNotEmpty($releves->all());
         foreach ($releves->all() as $n => $releve) {
             $this->assertSame($n, $releve->number);
-            // The course (relevé 5) has no measurements; every other relevé has its files.
-            if (!$releve->isCourse()) {
-                $this->assertFileExists($releve->dir.'/'.$releve->date.'.jsonl');
-            }
+            $this->assertFileExists($releve->dir.'/'.$releve->date.'.jsonl');
         }
     }
 }
