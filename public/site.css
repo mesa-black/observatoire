@@ -11,10 +11,11 @@
 .lettre p { margin: 0 0 .8rem; font-size: .9rem; color: var(--doux); }
 .lettre-form label { display: block; margin-bottom: .4rem; font-size: .9rem; font-weight: 600; }
 .lettre-ligne { display: flex; gap: .6rem; flex-wrap: wrap; }
+/* As light as the button beside it: same height, same pill. */
 .lettre-ligne input {
-    flex: 1 1 14rem; min-width: 0; padding: .65rem .8rem;
-    font: inherit; color: var(--encre); background: var(--papier);
-    border: 1px solid var(--filet); border-radius: 4px;
+    flex: 1 1 14rem; min-width: 0; padding: .4rem .9rem;
+    font: inherit; font-size: .9rem; color: var(--encre); background: var(--papier);
+    border: 1px solid var(--filet); border-radius: 999px;
 }
 .lettre-ligne input:focus { outline: 2px solid var(--lien); outline-offset: 1px; }
 .lettre .lettre-note { margin-top: .8rem; font-size: .82rem; }
