@@ -34,10 +34,14 @@
     </div>
     <aside class="encart-cours">
         <p class="sur">Les pots de peinture</p>
-        <figure class="pots" aria-label="Deux mélanges passent en public, la teinte finale reste secrète">
-            <span class="pot jaune">public</span><span class="signe">+</span><span class="pot a">secret A</span><span class="signe">→</span><span class="pot ja">mélange envoyé</span>
-            <span class="pot jaune">public</span><span class="signe">+</span><span class="pot b">secret B</span><span class="signe">→</span><span class="pot jb">mélange envoyé</span>
-            <figcaption>Chacun ajoute son secret au mélange de l'autre : même teinte des deux côtés, jamais envoyée.</figcaption>
+        <figure class="pots" aria-label="Chacun envoie un mélange en public, puis y ajoute son secret : même teinte des deux côtés">
+            <p class="pots-etape">1. Envoyé en public</p>
+            <p class="pots-ligne"><span class="pot jaune">public</span><span class="signe">+</span><span class="pot a">secret A</span><span class="signe">=</span><span class="pot ja">mélange A</span></p>
+            <p class="pots-ligne"><span class="pot jaune">public</span><span class="signe">+</span><span class="pot b">secret B</span><span class="signe">=</span><span class="pot jb">mélange B</span></p>
+            <p class="pots-etape">2. Mélangé chez soi, jamais envoyé</p>
+            <p class="pots-ligne"><span class="pot jb">mélange B</span><span class="signe">+</span><span class="pot a">secret A</span><span class="signe">=</span><span class="pot fin">même teinte</span></p>
+            <p class="pots-ligne"><span class="pot ja">mélange A</span><span class="signe">+</span><span class="pot b">secret B</span><span class="signe">=</span><span class="pot fin">même teinte</span></p>
+            <figcaption>L'espion a vu passer les deux mélanges, jamais les secrets : il ne peut pas refaire la teinte.</figcaption>
         </figure>
     </aside>
 </section>

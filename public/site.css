@@ -88,13 +88,18 @@
 .decortique th, .decortique td { padding: .5rem .6rem .5rem 0; border-bottom: 1px solid rgba(90, 60, 20, .3); text-align: left; vertical-align: top; white-space: normal; text-transform: none; letter-spacing: 0; }
 .decortique th code { font-size: 1rem; }
 .decortique td { font-size: .9rem; color: #2b1a08; }
-.pots { display: grid; grid-template-columns: repeat(5, auto); justify-content: start; align-items: center; gap: .5rem .35rem; margin: .4rem 0 0; }
-.pot { display: inline-block; padding: .3rem .6rem; border-radius: 999px; font-size: .75rem; font-weight: 600; color: #1f2326; }
+/* The paint pots, in two steps: what goes out in public, then what each side
+   mixes at home. Pills never break inside a word. */
+.pots { margin: .2rem 0 0; }
+.pots-etape { margin: .8rem 0 .35rem !important; font: 500 .68rem var(--mono) !important; letter-spacing: .06em; text-transform: uppercase; color: #5b3b16 !important; }
+.pots-ligne { display: flex; align-items: center; gap: .3rem; margin: .3rem 0 0 !important; }
+.pot { display: inline-block; white-space: nowrap; padding: .28rem .6rem; border-radius: 999px; font-size: .74rem; font-weight: 600; color: #1f2326; }
 .pot.jaune { background: #f2d36b; }
 .pot.a { background: #e58f73; } .pot.b { background: #7fb2d9; }
 .pot.ja { background: #eda46c; } .pot.jb { background: #b5c7a0; }
-.pots .signe { color: #5b3b16; }
-.pots figcaption { grid-column: 1 / -1; margin-top: .4rem; font-size: .85rem; color: #3b2610; }
+.pot.fin { background: #9b7a55; color: #fff; }
+.pots .signe { color: #5b3b16; font-weight: 700; }
+.pots figcaption { margin-top: .7rem; font-size: .85rem; color: #3b2610; }
 .glossaire { display: grid; grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); gap: 1rem 2rem; margin: 0; }
 .glossaire dt { font-weight: 700; }
 .glossaire dd { margin: .15rem 0 0; color: var(--doux); }
