@@ -1,26 +1,65 @@
 {% extends 'layout.html.twig' %}
 {% block title %}Confidentialité{% endblock %}
+{# As wide as /comprendre: each part its text and, beside it, a kraft encart
+   with what to remember. The wording itself is unchanged. #}
+{% block main_class %}cours sans-numero{% endblock %}
 {% block body %}
     <h1>Confidentialité</h1>
 
-    <h2>La page</h2>
-    <p>Consulter l'Observatoire ne dépose aucun cookie et ne déclenche aucune mesure d'audience. Polices et scripts sont servis depuis ce site. Le serveur ne tient pas de journal des visites.</p>
-    <p>Chaque page interroge aussi <code>handshake.mesa.black</code>, notre propre serveur, pour vous dire quel échange de clés votre navigateur vient de négocier. Il ne reçoit que la connexion elle-même, ne dépose rien et ne garde aucune trace : ni journal, ni adresse IP.</p>
-    <p>Une exception : le relevé n° 2 propose une musique, chargée depuis archive.org seulement si vous la lancez (premier clic sur la page). archive.org reçoit alors votre adresse IP, comme pour toute page qui en vient.</p>
+    <section class="chapitre" id="page" aria-labelledby="page-titre">
+        <div class="chapitre-texte">
+            <h2 id="page-titre">La page</h2>
+            <p>Consulter l'Observatoire ne dépose aucun cookie et ne déclenche aucune mesure d'audience. Polices et scripts sont servis depuis ce site. Le serveur ne tient pas de journal des visites.</p>
+        <p>Chaque page interroge aussi <code>handshake.mesa.black</code>, notre propre serveur, pour vous dire quel échange de clés votre navigateur vient de négocier. Il ne reçoit que la connexion elle-même, ne dépose rien et ne garde aucune trace : ni journal, ni adresse IP.</p>
+        <p>Une exception : le relevé n° 2 propose une musique, chargée depuis archive.org seulement si vous la lancez (premier clic sur la page). archive.org reçoit alors votre adresse IP, comme pour toute page qui en vient.</p>
+        </div>
+        <aside class="encart-cours">
+            <p class="sur">En bref</p>
+            <b class="gros">Aucun cookie, <em>aucun journal.</em></b>
+            <p>Polices et scripts viennent d'ici. Seule exception : la musique du relevé 2, si vous la lancez.</p>
+        </aside>
+    </section>
 
     {% if newsletter_enabled %}
     {# The wording subscribers agreed to: bump Subscriptions::CONSENT_VERSION with it. #}
-    <h2>La lettre d'information</h2>
-    <p>Si vous vous inscrivez, nous conservons votre adresse électronique, la date de votre demande, la date de votre confirmation et la version du texte d'inscription que vous avez accepté. Rien d'autre : ni nom, ni adresse IP, ni suivi des ouvertures ou des clics.</p>
-    <p><b>Finalité</b> : vous envoyer un message à chaque nouveau relevé. <b>Base légale</b> : votre consentement, recueilli en deux temps (le formulaire, puis le lien envoyé à l'adresse indiquée).</p>
-    <p><b>Durée</b> : une demande non confirmée est effacée au bout de sept jours. Une adresse confirmée est conservée jusqu'à votre désinscription, qui l'efface immédiatement et entièrement.</p>
-    <p><b>Destinataires</b> : les messages sont envoyés par Brevo (Sendinblue SAS, France), qui traite l'adresse pour notre compte, le temps de l'envoi.</p>
-    <p><b>Vos droits</b> : accès, rectification, effacement, retrait du consentement à tout moment, par le lien présent dans chaque message ou en écrivant à <a href="mailto:{{ admin_email }}">{{ admin_email }}</a>. Vous pouvez aussi saisir la CNIL.</p>
+    <section class="chapitre" id="lettre" aria-labelledby="lettre-titre">
+        <div class="chapitre-texte">
+            <h2 id="lettre-titre">La lettre d'information</h2>
+            <p>Si vous vous inscrivez, nous conservons votre adresse électronique, la date de votre demande, la date de votre confirmation et la version du texte d'inscription que vous avez accepté. Rien d'autre : ni nom, ni adresse IP, ni suivi des ouvertures ou des clics.</p>
+        <p><b>Finalité</b> : vous envoyer un message à chaque nouveau relevé. <b>Base légale</b> : votre consentement, recueilli en deux temps (le formulaire, puis le lien envoyé à l'adresse indiquée).</p>
+        <p><b>Durée</b> : une demande non confirmée est effacée au bout de sept jours. Une adresse confirmée est conservée jusqu'à votre désinscription, qui l'efface immédiatement et entièrement.</p>
+        <p><b>Destinataires</b> : les messages sont envoyés par Brevo (Sendinblue SAS, France), qui traite l'adresse pour notre compte, le temps de l'envoi.</p>
+        <p><b>Vos droits</b> : accès, rectification, effacement, retrait du consentement à tout moment, par le lien présent dans chaque message ou en écrivant à <a href="mailto:{{ admin_email }}">{{ admin_email }}</a>. Vous pouvez aussi saisir la CNIL.</p>
+        </div>
+        <aside class="encart-cours">
+            <p class="sur">Si vous vous inscrivez</p>
+            <b class="gros">Votre adresse, <em>rien d'autre.</em></b>
+            <p>Effacée d'un clic depuis n'importe quel message. Envoyée par Brevo, en France.</p>
+        </aside>
+    </section>
     {% else %}
-    <h2>Aucune donnée personnelle</h2>
-    <p>Il n'y a pas de lettre d'information pour l'instant : l'Observatoire ne recueille aucune adresse, ni aucune autre donnée personnelle.</p>
+    <section class="chapitre" id="aucune" aria-labelledby="aucune-titre">
+        <div class="chapitre-texte">
+            <h2 id="aucune-titre">Aucune donnée personnelle</h2>
+            <p>Il n'y a pas de lettre d'information pour l'instant : l'Observatoire ne recueille aucune adresse, ni aucune autre donnée personnelle.</p>
+        </div>
+        <aside class="encart-cours">
+            <p class="sur">Pour l'instant</p>
+            <b class="gros">Aucune donnée <em>personnelle.</em></b>
+            <p>Pas de lettre d'information, donc aucune adresse recueillie.</p>
+        </aside>
+    </section>
     {% endif %}
 
-    <h2>Responsable</h2>
-    <p>Jérôme Nadaud, BlackMesa. Pour toute question : <a href="mailto:{{ admin_email }}">{{ admin_email }}</a>.</p>
+    <section class="chapitre" id="responsable" aria-labelledby="responsable-titre">
+        <div class="chapitre-texte">
+            <h2 id="responsable-titre">Responsable</h2>
+            <p>Jérôme Nadaud, BlackMesa. Pour toute question : <a href="mailto:{{ admin_email }}">{{ admin_email }}</a>.</p>
+        </div>
+        <aside class="encart-cours">
+            <p class="sur">Responsable du traitement</p>
+            <b class="gros">Jérôme Nadaud</b>
+            <p>BlackMesa.</p>
+        </aside>
+    </section>
 {% endblock %}

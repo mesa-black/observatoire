@@ -60,6 +60,7 @@
 .chapitre-texte { max-width: 42rem; }
 .chapitre h2 { margin: 0 0 .8rem; font: 400 clamp(1.8rem, 4vw, 2.3rem)/1.1 var(--serif); }
 .chapitre h2::before { content: counter(chapitre) ". "; color: var(--vif); }
+.sans-numero .chapitre h2::before { content: none; }
 .chapitre p, .chapitre li { line-height: 1.65; }
 .encart-cours {
     overflow-wrap: anywhere;
