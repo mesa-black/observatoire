@@ -107,3 +107,11 @@
 @media (max-width: 52rem) {
     .cours-tete, .chapitre { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Justified, with French hyphenation (the page says lang="fr"), from a
+   tablet's width up: the chapters' running text and the chapô only. Phones,
+   encarts, lists and tables stay aligned left: in narrow columns justified
+   text opens gaps. On trial on /comprendre. */
+@media (min-width: 48rem) {
+    .chapitre-texte p, .chapo-cours { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+}
