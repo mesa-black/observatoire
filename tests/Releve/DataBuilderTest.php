@@ -100,6 +100,25 @@ final class DataBuilderTest extends TestCase
         $this->assertContains('rencontres', $groups);
     }
 
+    /**
+     * Relevé 6 joins the third parties each home page loads (tiers.sh) on the
+     * same measurement; the prototype builds it as a variant (build.sh
+     * 2026-10-19 r6).
+     */
+    public function testSameDataAsBuildShForReleve6(): void
+    {
+        $js = (string) file_get_contents(__DIR__.'/../fixtures/data-2026-10-19-r6.js');
+        $expected = json_decode(substr(rtrim($js, ";\n"), \strlen('window.OBSERVATOIRE = ')), false, 512, \JSON_THROW_ON_ERROR);
+
+        $releve = new Releve(6, '2026-10-19', new \DateTimeImmutable(), 'Relevé n° 6', '', \dirname(__DIR__, 2).'/releves/6');
+        $built = (new DataBuilder())->build($releve);
+        $this->assertSame('oeufs', $built->meta->focus);
+
+        $this->assertSame($this->encode($expected), $this->encode($built));
+        $tiers = array_merge(...array_map(fn ($g) => array_map(fn ($e) => \count($e->tiers ?? []), $g->entries), $built->groups));
+        $this->assertGreaterThan(0, array_sum($tiers), 'some pages load third parties');
+    }
+
     public function testPartialCostLinesAreSkippedAndUnknownHostsUnreachable(): void
     {
         $releve = new Releve(1, '2020-01-01', new \DateTimeImmutable(), 'T', '', __DIR__.'/../fixtures/releves/1');
