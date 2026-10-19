@@ -17,8 +17,10 @@
 </main>
 <footer class="wrap pied">
     <p>Un projet BlackMesa. Pas de cookie, pas de traceur, rien qui vienne d'ailleurs.</p>
-    {# No link to the page one is on. #}
-    <p>{% if not app.request or app.request.attributes.get('_route') != 'course' %}<a href="{{ path('course') }}">Comprendre</a> · {% endif %}<a href="{{ path('privacy') }}">Confidentialité</a></p>
+    {# No link to the page one is on (the error page renders without a request). #}
+    {% set here = app.request ? app.request.attributes.get('_route') : null %}
+    {% set links = {course: 'Comprendre', privacy: 'Confidentialité'}|filter((label, route) => route != here) %}
+    <p>{% for route, label in links %}{% if not loop.first %} · {% endif %}<a href="{{ path(route) }}">{{ label }}</a>{% endfor %}</p>
 </footer>
 </body>
 </html>

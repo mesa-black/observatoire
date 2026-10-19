@@ -27,6 +27,7 @@ final class CourseTest extends WebTestCase
         $this->assertSelectorNotExists('.pied a[href="/comprendre"]');
         $client->request('GET', '/confidentialite');
         $this->assertSelectorExists('.pied a[href="/comprendre"]');
+        $this->assertSelectorNotExists('.pied a[href="/confidentialite"]');
 
         $client->request('GET', '/sitemap.xml');
         $this->assertStringContainsString('/comprendre</loc>', (string) $client->getResponse()->getContent());
