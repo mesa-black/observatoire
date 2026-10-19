@@ -107,11 +107,12 @@
 }
 
 /* Justified, with French hyphenation (the page says lang="fr"), from a
-   tablet's width up: the chapters' running text and the chapô only. Phones,
+   tablet's width up: the course's running text and chapô, and the small pages'
+   paragraphs (privacy, the newsletter's confirmations). Phones,
    encarts, lists and tables stay aligned left: in narrow columns justified
    text opens gaps. On trial on /comprendre. */
 @media (min-width: 48rem) {
-    .chapitre-texte p, .chapo-cours { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+    .chapitre-texte p, .chapo-cours, .court p { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
 }
 
 /* « Envoyer sur Threema » and « S'inscrire », outlined and light like
