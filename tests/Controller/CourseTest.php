@@ -23,6 +23,10 @@ final class CourseTest extends WebTestCase
         $this->assertSelectorExists('#porte .encart-cours [data-handshake-encart][hidden] [data-groupe]');
         $this->assertSelectorCount(9, 'section.chapitre aside.encart-cours');
         $this->assertSelectorNotExists('meta[name="robots"]');
+        // No link to itself in its footer; the other small pages keep it.
+        $this->assertSelectorNotExists('.pied a[href="/comprendre"]');
+        $client->request('GET', '/confidentialite');
+        $this->assertSelectorExists('.pied a[href="/comprendre"]');
 
         $client->request('GET', '/sitemap.xml');
         $this->assertStringContainsString('/comprendre</loc>', (string) $client->getResponse()->getContent());

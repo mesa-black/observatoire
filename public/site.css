@@ -83,7 +83,9 @@
 .decortique { margin: .4rem 0 0; border-collapse: collapse; width: 100%; table-layout: fixed; }
 .decortique th { width: 6.6rem; }
 .decortique caption { text-align: left; font-size: .8rem; color: #5b3b16; padding-bottom: .4rem; }
-.decortique th, .decortique td { padding: .5rem .6rem; border-bottom: 1px solid rgba(90, 60, 20, .3); text-align: left; vertical-align: top; }
+/* The relevés' tables never wrap (style.css: th, td nowrap); this one is
+   narrow and must. */
+.decortique th, .decortique td { padding: .5rem .6rem .5rem 0; border-bottom: 1px solid rgba(90, 60, 20, .3); text-align: left; vertical-align: top; white-space: normal; text-transform: none; letter-spacing: 0; }
 .decortique th code { font-size: 1rem; }
 .decortique td { font-size: .9rem; color: #2b1a08; }
 .pots { display: grid; grid-template-columns: repeat(5, auto); justify-content: start; align-items: center; gap: .5rem .35rem; margin: .4rem 0 0; }
