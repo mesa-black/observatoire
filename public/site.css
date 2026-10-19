@@ -17,7 +17,6 @@
     border: 1px solid var(--filet); border-radius: 4px;
 }
 .lettre-ligne input:focus { outline: 2px solid var(--lien); outline-offset: 1px; }
-.lettre-ligne .bouton { border: 0; cursor: pointer; font: inherit; }
 .lettre .lettre-note { margin-top: .8rem; font-size: .82rem; }
 .lettre-note a, .pied a, .court a { color: var(--lien); }
 /* The honeypot: out of sight and out of reach, but still in the form. */
@@ -40,8 +39,6 @@
 /* Sharing, above the newsletter form: one link, no third-party script. */
 .partage { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: 4.5rem; }
 .partage .sur { margin: 0; }
-/* Same weight as the newsletter's « S'inscrire ». */
-.partage .bouton { font: inherit; }
 .partage + .lettre { margin-top: 2rem; }
 
 /* The course (/comprendre): as wide as a relevé. Each chapter is its text and,
@@ -115,3 +112,13 @@
 @media (min-width: 48rem) {
     .chapitre-texte p, .chapo-cours { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
 }
+
+/* « Envoyer sur Threema » and « S'inscrire », outlined and light like
+   « Sablier sur GitHub »: the theme's ink, filled on hover. */
+.partage .bouton, .lettre-ligne .bouton {
+    padding: .4rem .95rem; border: 0; cursor: pointer; background: transparent;
+    box-shadow: inset 0 0 0 1px currentColor; color: var(--encre) !important;
+    font: 500 .8rem/1.2 var(--mono); letter-spacing: .03em;
+}
+.partage .bouton:hover, .lettre-ligne .bouton:hover, .partage .bouton:focus-visible, .lettre-ligne .bouton:focus-visible { background: var(--encre); color: var(--creme) !important; }
+.lettre-ligne { align-items: center; }
