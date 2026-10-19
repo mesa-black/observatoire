@@ -80,6 +80,26 @@ final class DataBuilderTest extends TestCase
         $this->assertNotContains(null, $kinds, 'every door has a holder');
     }
 
+    /**
+     * Relevé 5 adds a group of its own (« rencontres », the dating apps) to
+     * the same files; the prototype builds it as a variant (build.sh
+     * 2026-10-19 r5). The meta aside, same data.
+     */
+    public function testSameDataAsBuildShForReleve5(): void
+    {
+        $js = (string) file_get_contents(__DIR__.'/../fixtures/data-2026-10-19-r5.js');
+        $expected = json_decode(substr(rtrim($js, ";\n"), \strlen('window.OBSERVATOIRE = ')), false, 512, \JSON_THROW_ON_ERROR);
+
+        $releve = new Releve(5, '2026-10-19', new \DateTimeImmutable(), 'Relevé n° 5', '', \dirname(__DIR__, 2).'/releves/5');
+        $built = (new DataBuilder())->build($releve);
+        $this->assertSame('rencontres', $built->meta->focus);
+        $expected->meta = $built->meta;
+
+        $this->assertSame($this->encode($expected), $this->encode($built));
+        $groups = array_map(fn ($g) => $g->key, $built->groups);
+        $this->assertContains('rencontres', $groups);
+    }
+
     public function testPartialCostLinesAreSkippedAndUnknownHostsUnreachable(): void
     {
         $releve = new Releve(1, '2020-01-01', new \DateTimeImmutable(), 'T', '', __DIR__.'/../fixtures/releves/1');
