@@ -12,14 +12,16 @@ final class CourseTest extends WebTestCase
         $client->request('GET', '/comprendre');
 
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorCount(9, 'section.chapitre');
+        $this->assertSelectorCount(10, 'section.chapitre');
         $this->assertSelectorExists('#glossaire dt#g-x25519mlkem768');
         // The live test: its script carries this response's nonce, and its
         // paragraphs are hidden until the service answers.
         $nonce = (string) $client->getCrawler()->filter('script[src^="/cours.js"]')->attr('nonce');
         $this->assertNotSame('', $nonce);
         $this->assertStringContainsString("'nonce-$nonce'", (string) $client->getResponse()->headers->get('Content-Security-Policy'));
-        $this->assertSelectorCount(2, 'p.a-essayer[data-handshake][hidden]');
+        $this->assertSelectorCount(1, 'p.a-essayer[data-handshake][hidden]');
+        $this->assertSelectorExists('#porte .encart-cours [data-handshake-encart][hidden] [data-groupe]');
+        $this->assertSelectorCount(9, 'section.chapitre aside.encart-cours');
         $this->assertSelectorNotExists('meta[name="robots"]');
 
         $client->request('GET', '/sitemap.xml');

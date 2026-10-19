@@ -3,14 +3,32 @@
 {# Unlike the other small pages, this one is meant to be found. #}
 {% block robots %}{% endblock %}
 {% block head %}
-<meta name="description" content="TLS, échange de clés, Q-Day, ML-KEM, hybride X25519MLKEM768 : ce que mesure l'Observatoire post-quantique, expliqué en neuf étapes, sans être ingénieur.">
+<meta name="description" content="TLS, échange de clés, Q-Day, ML-KEM, hybride X25519MLKEM768 : ce que mesure l'Observatoire post-quantique, expliqué en dix étapes, sans être ingénieur.">
 <link rel="canonical" href="{{ site_url ~ path('course') }}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <script src="{{ versioned('/cours.js') }}" nonce="{{ csp_nonce() }}" defer></script>
 {% endblock %}
 {% block main_class %}cours{% endblock %}
 {% block body %}
-    <h1>Comprendre <em>le Q-Day</em>, en neuf étapes</h1>
-    <p class="chapo-cours">Les relevés parlent de TLS, de X25519MLKEM768, d'hybride et de Q-Day comme si c'était évident. Ça ne l'est pas. Voici ce qu'ils mesurent, expliqué pas à pas : si vous savez ce qu'est un cadenas, vous avez tout ce qu'il faut.</p>
+    <div class="cours-tete">
+        <div>
+            <h1>Comprendre <em>le Q-Day</em>, en dix étapes</h1>
+            <p class="chapo-cours">Les relevés parlent de TLS, de X25519MLKEM768, d'hybride et de Q-Day comme si c'était évident. Ça ne l'est pas. Voici ce qu'ils mesurent, expliqué pas à pas : si vous savez ce qu'est un cadenas, vous avez tout ce qu'il faut.</p>
+        </div>
+    <nav class="sommaire" aria-label="Les chapitres">
+        <ol>
+            <li><a href="#porte">La porte d'entrée</a></li>
+            <li><a href="#secret">Un secret, devant tout le monde</a></li>
+            <li><a href="#q-day">Le Q-Day</a></li>
+            <li><a href="#ml-kem">Une nouvelle recette : ML-KEM</a></li>
+            <li><a href="#hybride">L'hybride</a></li>
+            <li><a href="#signatures">Ce qui peut attendre</a></li>
+            <li><a href="#cle">Qui tient la clé</a></li>
+            <li><a href="#verifier">Vérifiez vous-même</a></li>
+            <li><a href="#courrier">Le courrier : lettre ou carte postale ?</a></li>
+            <li><a href="#glossaire">Le glossaire</a></li>
+        </ol>
+    </nav>
+    </div>
     {{ include('cours/_chapitres.html.twig') }}
 {% endblock %}

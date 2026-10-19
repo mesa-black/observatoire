@@ -1,4 +1,4 @@
-// The course's live test (chapters 1 and 8): which key exchange this browser
+// The course's live test (chapter 1's encart, chapter 8): which key exchange this browser
 // just negotiated, asked of handshake.mesa.black (devops/handshake). The
 // sentences are built node by node: the page's policy forbids HTML sinks.
 // Without an answer, the paragraphs stay hidden and the text reads as is.
@@ -23,6 +23,15 @@
                 el.replaceChildren(b, 'Votre navigateur vient de faire une poignée de main avec nous. Elle a utilisé ', group, verdict);
                 el.classList.add(t.hybrid ? 'hybride' : 'classique');
                 el.hidden = false;
+            }
+            // Chapter 1's encart: the group, big, and one line under it.
+            for (const box of document.querySelectorAll('[data-handshake-encart]')) {
+                box.querySelector('[data-groupe]').textContent = t.group;
+                box.querySelector('[data-verdict]').textContent = t.hybrid
+                    ? 'Votre navigateur vient de négocier l\u2019hybride avec nous\u00a0: votre connexion est scellée.'
+                    : `Votre navigateur vient de négocier un échange classique${tls12 ? ', en TLS 1.2' : ''}\u00a0: il ne parle pas encore l\u2019hybride.`;
+                box.classList.add(t.hybrid ? 'hybride' : 'classique');
+                box.hidden = false;
             }
         })
         .catch(() => {});
