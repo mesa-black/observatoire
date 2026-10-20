@@ -11,7 +11,7 @@
 # Postgres client. Nothing is fetched at run time.
 
 # Tag for the reader, digest for the machine (the index, so every architecture).
-FROM docker.io/dunglas/frankenphp:1.12.7-php8.4-alpine@sha256:1f774f8abc9784fbf9a8ee8444bf93fd7203b983ddaf5ecd56edbc59505ec22c AS frankenphp_upstream
+FROM docker.io/dunglas/frankenphp:1.13.1-php8.5-alpine@sha256:16d4703cd476758d5cf54b558bfc7458b933b6fe2b9db0a6a4a9b0f11d2ff3cc AS frankenphp_upstream
 FROM docker.io/library/composer:2.8.12 AS composer_upstream
 
 # ------------------------------------------------------------------ base

@@ -2,7 +2,7 @@
 
 The production side of the [prototype](../observatoire-pq): the monthly relevés
 served at `https://observatoire.mesa.black`, a newsletter with double opt-in, and
-a small admin. Symfony 7.4 on FrankenPHP 1.12 (PHP 8.4), one container image,
+a small admin. Symfony 7.4 on FrankenPHP 1.13 (PHP 8.5), one container image,
 deployed by Argo CD on the k3s spoke like the blog.
 
 What to provide or decide before it goes live: [SETUP.md](SETUP.md).
