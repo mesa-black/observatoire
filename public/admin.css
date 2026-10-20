@@ -145,6 +145,15 @@ button.envoi { background: var(--vif); }
 .actions { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; }
 .actions form { margin: 0; }
 .carte .actions { margin-top: 1.2rem; }
+/* The dashboard's coming relevés: one per item, a rule between them. */
+.a-venir { list-style: none; margin: .4rem 0 0; padding: 0; }
+.a-venir > li { padding: 1.1rem 0; }
+.a-venir > li + li { border-top: 1px solid var(--filet); }
+.a-venir > li:last-child { padding-bottom: 0; }
+.a-venir p { margin: 0; }
+.a-venir .discret { margin-top: .25rem; }
+.carte .a-venir .actions { margin-top: .8rem; }
+.a-venir-titre { font-weight: 700; }
 .ligne { display: flex; gap: .6rem; flex-wrap: wrap; align-items: stretch; margin-top: 1rem; }
 .ligne input[type=text] { flex: 1 1 14rem; width: auto; }
 

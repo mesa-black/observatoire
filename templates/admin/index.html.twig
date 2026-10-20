@@ -10,47 +10,54 @@
     <a href="{{ path('admin_newsletter_index') }}" class="stat"><span class="pastille">{{ ui.ico('envoi') }}</span><div><b>{{ sent }}</b><span>lettre{{ sent > 1 ? 's' }} envoyée{{ sent > 1 ? 's' }}</span></div></a>
 </div>
 
-<div class="deux">
-    <section class="carte">
-        <h2>{{ ui.ico('releve') }} Relevés à venir <a href="{{ path('admin_releves') }}">Tous les relevés</a></h2>
+<section class="carte">
+    <h2>{{ ui.ico('releve') }} Relevés à venir <a href="{{ path('admin_releves') }}">Tous les relevés</a></h2>
+    {% if upcoming or drafts %}
+    {# One item per relevé, set apart: the titles already carry their number. #}
+    <ul class="a-venir">
         {% for r in upcoming %}
-            <p><b>N° {{ r.number }} · {{ r.title }}</b></p>
+        <li>
+            <p class="a-venir-titre">{{ r.title }}</p>
             <p class="discret">Publication le {{ r.publishedAt|date('d/m/Y \\à H:i') }} (Paris)</p>
             <div class="actions">
                 <a href="{{ path('admin_releve_preview', {number: r.number}) }}" class="bouton second">{{ ui.ico('oeil') }} Aperçu</a>
                 <a href="{{ path('admin_newsletter_new') }}" class="bouton second">{{ ui.ico('lettre') }} Lettre pour ce relevé</a>
             </div>
+        </li>
         {% endfor %}
         {% for d in drafts %}
-            <p><b>N° {{ d.number }} · {{ d.title }}</b> <span class="badge draft">brouillon</span></p>
+        <li>
+            <p class="a-venir-titre">{{ d.title }} <span class="badge draft">brouillon</span></p>
+            <p class="discret">Prévu le {{ d.publishedAt|date('d/m/Y') }}, une fois relu</p>
             <div class="actions">
                 <a href="{{ path('admin_releve_preview', {number: d.number}) }}" class="bouton second">{{ ui.ico('oeil') }} Aperçu</a>
             </div>
+        </li>
         {% endfor %}
-        {% if not upcoming and not drafts %}
-            <div class="vide">{{ ui.ico('releve') }}<p>Aucun relevé à venir.</p><p class="discret">Un relevé se prépare à la main : <code>make releve</code>, relecture, commit.</p></div>
-        {% endif %}
-    </section>
+    </ul>
+    {% else %}
+        <div class="vide">{{ ui.ico('releve') }}<p>Aucun relevé à venir.</p><p class="discret">Un relevé se prépare à la main : <code>make releve</code>, relecture, commit.</p></div>
+    {% endif %}
+</section>
 
-    <section class="carte serree">
-        <h2>{{ ui.ico('lettre') }} Dernières lettres <a href="{{ path('admin_newsletter_index') }}">Toutes</a></h2>
-        {% if newsletters %}
-        <div class="table"><table>
-            <tbody>
-            {% for n in newsletters|slice(0, 5) %}
-                <tr>
-                    <td><a href="{{ path('admin_newsletter_show', {id: n.id}) }}">{{ n.subject }}</a></td>
-                    <td>{{ ui.statut(n.status) }}</td>
-                    <td class="fin discret">{{ n.sentAt ? n.sentAt|date('d/m H:i') : (n.scheduledAt ? n.scheduledAt|date('d/m H:i') : '') }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table></div>
-        {% else %}
-            <div class="vide">{{ ui.ico('lettre') }}<p>Aucune lettre pour l'instant.</p><a href="{{ path('admin_newsletter_new') }}" class="bouton">{{ ui.ico('plus') }} Écrire la première</a></div>
-        {% endif %}
-    </section>
-</div>
+<section class="carte serree">
+    <h2>{{ ui.ico('lettre') }} Dernières lettres <a href="{{ path('admin_newsletter_index') }}">Toutes</a></h2>
+    {% if newsletters %}
+    <div class="table"><table>
+        <tbody>
+        {% for n in newsletters|slice(0, 5) %}
+            <tr>
+                <td><a href="{{ path('admin_newsletter_show', {id: n.id}) }}">{{ n.subject }}</a></td>
+                <td>{{ ui.statut(n.status) }}</td>
+                <td class="fin discret">{{ n.sentAt ? n.sentAt|date('d/m H:i') : (n.scheduledAt ? n.scheduledAt|date('d/m H:i') : '') }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table></div>
+    {% else %}
+        <div class="vide">{{ ui.ico('lettre') }}<p>Aucune lettre pour l'instant.</p><a href="{{ path('admin_newsletter_new') }}" class="bouton">{{ ui.ico('plus') }} Écrire la première</a></div>
+    {% endif %}
+</section>
 
 {% if not passkeys %}
 <section class="carte">

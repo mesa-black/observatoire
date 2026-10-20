@@ -99,7 +99,7 @@ final class NewsletterAdminTest extends WebTestCase
     {
         $client = $this->freshClient();
         $client->request('GET', '/admin');
-        $this->assertSelectorTextContains('.carte', 'N° 2');
+        $this->assertSelectorTextContains('.a-venir', 'Relevé n° 2');
         $this->assertSelectorTextContains('.carte .badge.draft', 'brouillon');
         $this->assertSelectorExists('a[href="/admin/releve/3"]');
         // Each figure opens the page it counts.
