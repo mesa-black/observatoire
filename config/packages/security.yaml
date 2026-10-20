@@ -36,9 +36,12 @@ security:
                 secure: true
                 httponly: true
                 samesite: strict
+            # The link carries a token (logout_path() in the layout): another
+            # site cannot log the admin out.
             logout:
                 path: admin_logout
                 target: admin_login
+                enable_csrf: true
             two_factor:
                 auth_form_path: 2fa_login
                 check_path: 2fa_login_check

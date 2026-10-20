@@ -4,6 +4,9 @@ framework:
     handle_all_throwables: true
     trusted_proxies: '%env(TRUSTED_PROXIES)%'
     trusted_headers: ['x-forwarded-for', 'x-forwarded-proto', 'x-forwarded-host', 'x-forwarded-port']
+    # Any other Host header is refused (400): links built from the request
+    # (mails, passkey origin) can only name this site.
+    trusted_hosts: '%env(TRUSTED_HOSTS)%'
     # Absolute URLs (mails, consumer process) point here, whatever the request.
     router:
         default_uri: '%env(SITE_URL)%'
@@ -15,7 +18,10 @@ framework:
         cookie_secure: auto
         cookie_samesite: strict
         name: observatoire_admin
-    csrf_protection: true
+    # The login form's token is stateless (checked against the Origin of the
+    # request): showing the login page must not open a session.
+    csrf_protection:
+        stateless_token_ids: ['authenticate']
     php_errors:
         log: true
 

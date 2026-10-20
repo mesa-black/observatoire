@@ -4,6 +4,7 @@ namespace App\Newsletter;
 
 use App\Entity\Subscriber;
 use App\Repository\SubscriberRepository;
+use App\Security\ClientKey;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Mailer\MailerInterface;
@@ -28,6 +29,9 @@ final readonly class Subscriptions
         private ClockInterface $clock,
         private RateLimiterFactoryInterface $subscribeIpLimiter,
         private RateLimiterFactoryInterface $subscribeEmailLimiter,
+        private RateLimiterFactoryInterface $subscribeAllLimiter,
+        private ClientKey $clientKey,
+        private MailDomains $mailDomains,
     ) {
     }
 
@@ -39,15 +43,40 @@ final readonly class Subscriptions
     }
 
     /**
-     * @throws TooManyRequests when this client or this address asked too often
+     * The mailbox an address reaches, for counting requests per inbox only:
+     * "jane+1@" and "jane+2@" land in the same one, and so do "j.ane@gmail.com"
+     * and "jane@googlemail.com". The address kept is the one given.
+     */
+    public static function mailbox(string $email): string
+    {
+        [$local, $domain] = explode('@', $email, 2) + [1 => ''];
+        $local = explode('+', $local, 2)[0];
+        if (\in_array($domain, ['gmail.com', 'googlemail.com'], true)) {
+            [$local, $domain] = [str_replace('.', '', $local), 'gmail.com'];
+        }
+
+        return $local.'@'.$domain;
+    }
+
+    /**
+     * @throws TooManyRequests      when this client, this inbox, or everyone together asked too often
+     * @throws UndeliverableAddress when the address's domain takes no mail
      */
     public function request(string $email, ?string $clientIp): void
     {
-        // The address of origin lives in the limiter's cache only, for the
-        // length of its window; it is never written next to the subscriber.
-        if (!$this->subscribeIpLimiter->create($clientIp ?? 'unknown')->consume()->isAccepted()
-            || !$this->subscribeEmailLimiter->create(hash('sha256', $email))->consume()->isAccepted()) {
+        // Counted by a keyed hash of the client (see ClientKey) and of the
+        // inbox: neither is written in clear, and neither next to the
+        // subscriber. The last limit caps what the form can make us send in a
+        // day, whatever the number of clients.
+        if (!$this->subscribeIpLimiter->create($this->clientKey->of($clientIp))->consume()->isAccepted()
+            || !$this->subscribeEmailLimiter->create(hash('sha256', self::mailbox($email)))->consume()->isAccepted()
+            || !$this->subscribeAllLimiter->create('all')->consume()->isAccepted()) {
             throw new TooManyRequests();
+        }
+        // After the limits, so that the form cannot be used to make us query
+        // DNS without bound.
+        if (false === $this->mailDomains->receivesMail(substr($email, (int) strrpos($email, '@') + 1))) {
+            throw new UndeliverableAddress();
         }
 
         $now = $this->clock->now();

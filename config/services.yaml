@@ -32,6 +32,9 @@ when@test:
     parameters:
         app.releves_dir: '%kernel.project_dir%/tests/fixtures/releves'
     services:
+        # No test queries real DNS.
+        App\Newsletter\Dns:
+            class: App\Tests\Newsletter\FakeDns
         # Read back by the tests to type the mailed code.
         App\Security\AdminCodeStore:
             autowire: true

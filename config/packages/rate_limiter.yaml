@@ -11,3 +11,23 @@ framework:
             policy: fixed_window
             limit: 3
             interval: '1 day'
+        # Whatever the number of clients, the form makes us send at most this
+        # many confirmation mails a day: far above a real day, far below what
+        # would hurt the sender's reputation.
+        subscribe_all:
+            policy: fixed_window
+            limit: 200
+            interval: '1 day'
+        # The passkey login asks for options before anyone is logged in, and
+        # each request keeps a challenge in a session: a few per minute is
+        # plenty for a person.
+        # The second factor's codes (TOTP or mailed): as many tries as the
+        # password gets (login_throttling), counted apart.
+        second_factor:
+            policy: sliding_window
+            limit: 5
+            interval: '15 minutes'
+        passkey_options:
+            policy: sliding_window
+            limit: 20
+            interval: '15 minutes'

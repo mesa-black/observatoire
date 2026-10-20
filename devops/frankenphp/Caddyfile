@@ -73,6 +73,8 @@
 	}
 
 	# No access log: nothing here needs visitors' IP addresses, and a log that
-	# is not written cannot leak (the rate limiter keeps them in memory, for
-	# an hour at most).
+	# is not written cannot leak. The rate limiters count clients by a keyed
+	# hash of their address (App\Security\ClientKey), never the address, and
+	# forget it when their window closes. Traefik, in front, must not log them
+	# either (k3s-stack, spoke/platform/traefik).
 }

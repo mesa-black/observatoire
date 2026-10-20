@@ -128,6 +128,22 @@ final class NewsletterFlowTest extends WebTestCase
         }
         $this->client->request('POST', '/newsletter', ['email' => 'cible@example.org']);
         $this->assertResponseStatusCodeSame(429);
+        // The same inbox under another spelling counts as the same inbox.
+        $this->client->request('POST', '/newsletter', ['email' => 'cible+autre@example.org']);
+        $this->assertResponseStatusCodeSame(429);
+    }
+
+    public function testADomainThatTakesNoMailGetsNoMail(): void
+    {
+        $this->client->request('POST', '/newsletter', ['email' => 'lecteur@no-mail.test']);
+        $this->assertResponseStatusCodeSame(422);
+        $this->assertSelectorTextContains('h1', 'Adresse injoignable');
+        $this->assertEmailCount(0);
+
+        // When DNS cannot tell, the reader is not turned away.
+        $this->client->request('POST', '/newsletter', ['email' => 'lecteur@dns-down.test']);
+        $this->assertResponseIsSuccessful();
+        $this->assertEmailCount(1);
     }
 
     public function testAForgedUnsubscribeLinkRemovesNobody(): void

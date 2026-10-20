@@ -30,6 +30,9 @@ func report(origin string) http.HandlerFunc {
 		w.Header().Set("Cache-Control", "no-store")
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("X-Content-Type-Options", "nosniff")
+		// Traefik passes the TLS through untouched, so the headers it adds to
+		// the other sites never reach this one: HSTS is set here.
+		w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
 		cs := r.TLS
 		if cs == nil {
 			http.Error(w, "TLS only", http.StatusBadRequest)

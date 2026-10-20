@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Subscriber;
 use App\Newsletter\Subscriptions;
 use App\Newsletter\TooManyRequests;
+use App\Newsletter\UndeliverableAddress;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
@@ -56,6 +57,8 @@ final class NewsletterController extends AbstractController
             $this->subscriptions->request($email, $request->getClientIp());
         } catch (TooManyRequests) {
             return $this->message('Trop de demandes', 'Trop de demandes en peu de temps. Réessayez plus tard.', Response::HTTP_TOO_MANY_REQUESTS);
+        } catch (UndeliverableAddress) {
+            return $this->message('Adresse injoignable', 'Ce domaine ne reçoit pas de courrier. Vérifiez l\'orthographe de l\'adresse, puis revenez à la page pour la corriger.', Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return $this->requested();

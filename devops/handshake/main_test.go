@@ -45,7 +45,8 @@ func TestItNamesTheGroupTheClientNegotiated(t *testing.T) {
 		if got.Group != c.group || got.Hybrid != c.hybrid {
 			t.Errorf("offered %v: got %+v, want %s (hybrid %v)", c.curves, got, c.group, c.hybrid)
 		}
-		if res.Header.Get("Access-Control-Allow-Origin") != "https://observatoire.mesa.black" || res.Header.Get("Cache-Control") != "no-store" {
+		if res.Header.Get("Access-Control-Allow-Origin") != "https://observatoire.mesa.black" || res.Header.Get("Cache-Control") != "no-store" ||
+			res.Header.Get("Strict-Transport-Security") == "" || res.Header.Get("X-Content-Type-Options") != "nosniff" {
 			t.Errorf("headers: %v", res.Header)
 		}
 	}

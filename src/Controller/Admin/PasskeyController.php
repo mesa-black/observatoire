@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Passkey;
+use App\Security\ClientKey;
 use App\Security\Passkey\PasskeyAuthenticator;
 use App\Security\Passkey\PasskeyException;
 use App\Security\Passkey\PasskeyManager;
@@ -11,13 +12,17 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 /** The admin's passkeys: add one (logged in), remove one; and the login options. */
 final class PasskeyController extends AbstractController
 {
-    public function __construct(private readonly PasskeyManager $passkeys)
-    {
+    public function __construct(
+        private readonly PasskeyManager $passkeys,
+        private readonly RateLimiterFactoryInterface $passkeyOptionsLimiter,
+        private readonly ClientKey $clientKey,
+    ) {
     }
 
     #[Route('/admin/cle/options', name: 'admin_passkey_options', methods: ['POST'])]
@@ -64,6 +69,11 @@ final class PasskeyController extends AbstractController
     public function loginOptions(Request $request): JsonResponse
     {
         $this->sameOrigin($request);
+        // Each answer keeps a challenge in a new session: counted per client,
+        // so nobody can fill the sessions' disk from here.
+        if (!$this->passkeyOptionsLimiter->create($this->clientKey->of($request->getClientIp()))->consume()->isAccepted()) {
+            return new JsonResponse(['error' => 'Trop de demandes. Réessayez plus tard.'], Response::HTTP_TOO_MANY_REQUESTS);
+        }
 
         return new JsonResponse($this->passkeys->requestOptions($request));
     }
