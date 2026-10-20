@@ -73,6 +73,10 @@ jobs:
     permissions:
       contents: read
       packages: write
+    # The digests of what was pushed: deploy pins them next to the tag.
+    outputs:
+      observatoire: ${{ steps.observatoire.outputs.digest }}
+      handshake: ${{ steps.handshake.outputs.digest }}
     steps:
       -
         name: Checkout
@@ -97,6 +101,7 @@ jobs:
         # Tagged with the full commit SHA, never `latest`: the deployment
         # repository names exactly which build runs, and going back is a revert.
         name: Build and push
+        id: observatoire
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -115,6 +120,7 @@ jobs:
         # exchange its connection negotiated, for the course. Its own image,
         # same commit tag; its tests run inside the build.
         name: Build and push handshake
+        id: handshake
         uses: docker/build-push-action@v6
         with:
           context: devops/handshake
@@ -149,13 +155,21 @@ jobs:
           ssh-key: ${{ secrets.K3S_STACK_DEPLOY_KEY }}
           path: k3s-stack
       -
+        # The tag names the commit, the digest the bytes: an image pushed again
+        # under the same tag never reaches a node.
         name: Point the Observatoire at this build
         working-directory: k3s-stack
+        env:
+          OBSERVATOIRE_DIGEST: ${{ needs.image.outputs.observatoire }}
+          HANDSHAKE_DIGEST: ${{ needs.image.outputs.handshake }}
         run: |
-          for image in observatoire handshake; do
-            yq -i "(.images[] | select(.name == \"ghcr.io/mesa-black/$image\")).newTag = \"${{ github.sha }}\"" \
+          pin() {
+            case "$2" in sha256:*) ;; *) echo "no digest for $1" >&2; exit 1 ;; esac
+            yq -i "(.images[] | select(.name == \"ghcr.io/mesa-black/$1\")) |= (.newTag = \"${{ github.sha }}\" | .digest = \"$2\")" \
               spoke/apps/observatoire/kustomization.yaml
-          done
+          }
+          pin observatoire "$OBSERVATOIRE_DIGEST"
+          pin handshake "$HANDSHAKE_DIGEST"
           git diff --stat
       -
         name: Commit and push
