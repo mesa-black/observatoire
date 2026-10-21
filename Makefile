@@ -18,7 +18,9 @@ PHP = podman run --rm -i -v "$(CURDIR):/app" -w /app -e COMPOSER_HOME=/app/var/c
 dev-image:
 	podman build --target frankenphp_dev -t $(DEV_IMAGE) .
 
+# .env.dev is never committed: each checkout gets its own dev secret, in a gitignored file.
 install:
+	test -f .env.dev.local || echo "APP_SECRET=$$(openssl rand -hex 16)" > .env.dev.local
 	$(PHP) composer install --no-interaction --no-progress
 
 test:

@@ -28,7 +28,7 @@ What to provide or decide before it goes live: [SETUP.md](SETUP.md).
 Only podman is needed: PHP, Composer, PHPUnit and PHPStan run in the dev image.
 
     make dev-image      # once
-    make install
+    make install        # also writes a dev APP_SECRET to .env.dev.local (gitignored)
     make test           # PHPUnit
     make stan           # PHPStan, level 8
     make image          # the production image
