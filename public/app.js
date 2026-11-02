@@ -1567,11 +1567,16 @@
         }
         const il = byLaw.get('IL') || [];
         $('droit-note').append(
-            il.length ? h('span', null, names(il), ` passent par Radware, société israélienne. `) : '',
-            `« Souveraine » veut dire ici : maison mère française et réseau annoncé en France. `,
-            `En France, la qualification SecNumCloud de l'ANSSI exige que le prestataire échappe aux lois extra-européennes ; vue de l'extérieur, rien ne dit si un site l'utilise. `,
+            il.length ? h('span', null, names(il), ` passent par Radware, société israélienne : leur porte relève d'un droit hors de l'Union, comme celles qui passent par un réseau américain. `) : '',
+            `« Souveraine » veut dire ici une chose qu'on peut constater de l'extérieur : maison mère française et réseau annoncé en France. `,
+            `Ce n'est pas la souveraineté juridique. Celle-là, c'est ce que vérifie la qualification SecNumCloud de l'ANSSI : un prestataire, européen et pas forcément français, qui échappe aux lois extra-européennes par son actionnariat et ses contrats. Aucune mesure réseau ne montre si un site l'utilise. `,
             `On rattache chaque porte à la maison mère de l'entreprise qui répond à son adresse : c'est une lecture de la façade, pas un audit des contrats.`,
         );
+        // The note was rewritten after the first releases went out. Said on
+        // those, so a reader comparing with a saved copy knows why it differs;
+        // a release recorded after the rewrite never had the old text.
+        if (D.date < '2026-11-02') $('droit-note').append(' ', h('span', { class: 'corrige' },
+            `Note corrigée le 2 novembre 2026 : la version précédente mettait notre définition à côté de SecNumCloud sans dire qu'elles ne mesurent pas la même chose. Les mesures n'ont pas changé.`));
         const asnsOf = list => [...new Set(list.map(e => operator(e)?.asn).filter(Boolean))].sort((a, b) => a - b);
         sources($('droit-note'),
             `pour chacune des ${measured.length} organisations, l'adresse IP de sa porte, résolue le ${dateFr} ; le réseau qui annonce cette adresse sur Internet (annonce BGP) et le nom sous lequel il est enregistré, lus dans la base publique de Team Cymru ; la maison mère de ce réseau, rattachée par nous : `,
