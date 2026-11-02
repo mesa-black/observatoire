@@ -1,7 +1,8 @@
 {# The course's nine chapters, for /comprendre. Written for a
    general audience: every term is explained where it first appears and kept
    in the glossary, whose anchors (#g-…) other pages may link to. Figures come
-   from the 16 October 2026 measurements. The live test (data-handshake,
+   from the latest published relevé (n° 2, measured 2 November 2026): update
+   them with each relevé, and never quote one that is not out yet. The live test (data-handshake,
    data-handshake-encart) stays hidden unless cours.js gets an answer from
    handshake.mesa.black. Each chapter: its text, and beside it a kraft encart
    with what to remember. #}
@@ -82,7 +83,7 @@
         <p>La solution retenue partout : <b>les deux à la fois</b>. La poignée de main fait un échange X25519 <i>et</i> un échange ML-KEM, et combine les deux secrets pour fabriquer la clé finale. Pour lire la conversation, un attaquant devrait casser <b>les deux</b>. Si ML-KEM a un défaut caché, X25519 tient encore aujourd'hui ; au Q-Day, X25519 tombe mais ML-KEM tient. C'est un échange <b>hybride</b>, celui que l'ANSSI recommande explicitement.</p>
         <p>Le nom qui revient dans tous les relevés se lit donc en trois morceaux, décortiqués dans l'encart.</p>
         <p><b>X25519MLKEM768</b>, c'est l'hybride. Quand un relevé dit qu'une porte est <b>scellée</b>, c'est qu'elle l'accepte.</p>
-        <p>Combien ça coûte ? Les messages sont un peu plus gros, d'environ un kilo-octet, et sur les portes que nous avons mesurées en octobre 2026, la poignée de main hybride prenait en médiane <b>1,8 milliseconde</b> de plus que la classique. Imperceptible.</p>
+        <p>Combien ça coûte ? Les messages sont un peu plus gros, d'environ un kilo-octet, et sur les portes que nous avons mesurées en novembre 2026, la poignée de main hybride prenait en médiane <b>1,9 milliseconde</b> de plus que la classique. Imperceptible.</p>
     </div>
     <aside class="encart-cours">
         <p class="sur">Le nom, décortiqué</p>
@@ -102,12 +103,12 @@
         <h2 id="signatures-titre">Ce qui peut attendre : les signatures</h2>
         <p>La poignée de main fait deux choses : elle fabrique la clé secrète (l'échange de clés, des chapitres précédents) et elle prouve l'identité du serveur, grâce à un <b>certificat</b> signé par une autorité de confiance.</p>
         <p>Cette signature-là n'a pas la même urgence. Pour se faire passer pour votre banque, un attaquant doit falsifier une signature <b>au moment</b> où vous vous connectez. Il ne peut pas enregistrer une signature aujourd'hui pour en profiter dans dix ans : la connexion sera finie depuis longtemps. Il n'y a pas d'« enregistrer maintenant » pour les signatures.</p>
-        <p>Les signatures post-quantiques existent (ML-DSA, normalisée elle aussi en 2024), et les certificats changeront. Mais sans urgence pour vos données : un certificat se remplace tous les trois mois, sans rien déménager. C'est pour ça que l'Observatoire juge les portes sur leur <b>échange de clés</b>, et pas sur leur certificat.</p>
+        <p>Les signatures post-quantiques existent (ML-DSA, normalisée elle aussi en 2024), et les certificats changeront. Mais sans urgence pour vos données : un certificat se remplace souvent (au plus tard tous les 200 jours depuis mars 2026, et de plus en plus souvent), sans rien déménager. C'est pour ça que l'Observatoire juge les portes sur leur <b>échange de clés</b>, et pas sur leur certificat.</p>
     </div>
     <aside class="encart-cours">
         <p class="sur">Pourquoi ça peut attendre</p>
         <b class="gros">Rien à <em>enregistrer.</em></b>
-        <p>Une signature se falsifie au moment de la connexion, ou jamais. Un certificat se remplace tous les trois mois.</p>
+        <p>Une signature se falsifie au moment de la connexion, ou jamais. Un certificat se remplace en quelques mois.</p>
     </aside>
 </section>
 
@@ -115,13 +116,13 @@
     <div class="chapitre-texte">
         <h2 id="cle-titre">Qui tient la clé</h2>
         <p>Une précision qui change la lecture de tous les relevés : la porte d'entrée d'une organisation n'est pas forcément chez elle. Très souvent, c'est un <b>CDN</b> (<i>Content Delivery Network</i>), comme Cloudflare, Akamai ou CloudFront d'Amazon, qui répond à sa place : un réseau mondial de serveurs qui accélère et protège des milliers de sites à la fois.</p>
-        <p>Le CDN fait la poignée de main, donc il <b>tient la clé</b> : il déchiffre le trafic à l'entrée, puis le transmet au serveur de l'organisation. Et quand un CDN active l'hybride, il le fait pour <b>tous</b> ses clients d'un coup. En octobre 2026, 67 des 80 portes scellées l'étaient grâce à leur CDN, sans que l'organisation ait rien eu à décider. Sur les 13 organisations qui gardent leur clé sur leur propre réseau, 2 seulement avaient l'hybride.</p>
-        <p>Une dernière condition : l'hybride n'existe que dans <b>TLS 1.3</b>, la version actuelle du protocole. Une porte restée en TLS 1.2 ne peut pas le proposer, quoi qu'il arrive. En octobre 2026, c'était encore le cas du CIC, du Crédit Agricole, du ministère des Armées, de Mon espace santé et de Renault.</p>
+        <p>Le CDN fait la poignée de main, donc il <b>tient la clé</b> : il déchiffre le trafic à l'entrée, puis le transmet au serveur de l'organisation. Et quand un CDN active l'hybride, il le fait pour <b>tous</b> ses clients d'un coup. En novembre 2026, 75 des 87 portes scellées l'étaient grâce à leur CDN, sans que l'organisation ait rien eu à décider. Sur les 39 portes que les organisations servent elles-mêmes, 12 seulement avaient l'hybride.</p>
+        <p>Une dernière condition : l'hybride n'existe que dans <b>TLS 1.3</b>, la version actuelle du protocole. Une porte restée en TLS 1.2 ne peut pas le proposer, quoi qu'il arrive. En novembre 2026, c'était encore le cas de 8 portes, dont celles du CIC, du Crédit Mutuel, du Crédit Agricole, du ministère des Armées, de Mon espace santé et de Renault.</p>
     </div>
     <aside class="encart-cours">
-        <p class="sur">Octobre 2026</p>
-        <b class="gros">67 <em>sur 80.</em></b>
-        <p>Des 80 portes scellées, 67 le sont par leur CDN. Les organisations qui gardent leur clé chez elles : 2 sur 13.</p>
+        <p class="sur">Novembre 2026</p>
+        <b class="gros">75 <em>sur 87.</em></b>
+        <p>Des 87 portes scellées, 75 le sont par leur CDN. Les portes que les organisations servent elles-mêmes : 12 sur 39.</p>
     </aside>
 </section>
 
@@ -132,7 +133,7 @@
         <ul>
             <li><b>Dans votre navigateur</b> : dans Chrome ou Edge, touche F12, onglet <i>Sécurité</i> (<i>Security</i>). La ligne <i>Key exchange</i> indique <code>X25519MLKEM768</code> quand la connexion est hybride.</li>
             <li><b>En ligne de commande</b>, avec OpenSSL 3.5 ou plus récent : <code>openssl s_client -connect www.exemple.fr:443 -groups X25519MLKEM768</code>. Si la poignée de main réussit, la porte est scellée.</li>
-            <li><b>Avec notre outil</b> : Sablier, l'outil open source qui fait ces mesures, vérifie la même chose sur vos propres serveurs, avec <code>sablier probe votre-site.fr</code>.</li>
+            <li><b>Avec notre outil</b> : Sablier, notre outil open source, vérifie la même chose sur vos propres serveurs, avec <code>sablier probe votre-site.fr</code>. Les prochains relevés passeront par lui.</li>
         </ul>
         <p>Et votre navigateur à vous ? Les versions récentes de Chrome, Edge, Firefox et Safari parlent toutes l'hybride.</p>
         <p class="a-essayer" data-handshake hidden></p>
@@ -150,12 +151,12 @@
         <p>Un courriel ne va pas directement de votre ordinateur à votre correspondant : il passe de serveur en serveur. L'étape la plus exposée est celle entre le serveur qui envoie et celui qui reçoit le courrier de l'organisation, son <b>MX</b> (pour <i>Mail eXchanger</i>), dont l'adresse est publiée dans l'annuaire d'Internet, le DNS.</p>
         <p>Ces serveurs savent chiffrer entre eux (avec <b>STARTTLS</b>), mais par défaut ils le <i>proposent</i> sans l'<i>exiger</i>. Si quelqu'un placé sur le trajet fait croire que le chiffrement n'est pas disponible, le message part en clair. C'est une <b>carte postale</b> : lisible par quiconque la tient en main, et pas besoin d'ordinateur quantique pour ça.</p>
         <p>Pour en faire une <b>lettre cachetée</b>, l'organisation doit exiger le chiffrement. Deux moyens : <b>MTA-STS</b>, une règle publiée sur son site ; en mode « enforce », les serveurs qui la lisent refusent d'envoyer en clair ; en mode « testing », ils signalent le problème mais envoient quand même, d'où la lettre « entrouverte ». Ou <b>DANE</b> : l'empreinte du certificat du serveur, publiée dans un DNS signé (DNSSEC), que l'expéditeur vérifie avant d'envoyer.</p>
-        <p>Et le Q-Day ? Même cachetée, une lettre voyage en TLS : pour qu'elle reste illisible ce jour-là, il faut en plus que les serveurs de courrier parlent l'<b>hybride</b>. En octobre 2026, c'était le cas de 31 serveurs de courrier sur les 109 que nous avons pu mesurer.</p>
+        <p>Et le Q-Day ? Même cachetée, une lettre voyage en TLS : pour qu'elle reste illisible ce jour-là, il faut en plus que les serveurs de courrier parlent l'<b>hybride</b>. Le relevé n° 3 comptera combien le font.</p>
     </div>
     <aside class="encart-cours">
-        <p class="sur">Relevé 3 · octobre 2026</p>
-        <b class="gros">3 lettres cachetées, <em>108 cartes postales.</em></b>
-        <p>Sur 111 organisations qui reçoivent du courrier, 3 exigent qu'il arrive chiffré. Les autres le proposent sans l'exiger.</p>
+        <p class="sur">Lettre ou carte postale</p>
+        <b class="gros">Proposé <em>n'est pas exigé.</em></b>
+        <p>Sans MTA-STS en mode « enforce » ni DANE, un serveur de courrier accepte de recevoir en clair. Le relevé n° 3 dira combien d'organisations l'exigent.</p>
     </aside>
 </section>
 
@@ -164,13 +165,18 @@
     <dl class="glossaire">
         <div><dt id="g-cdn">CDN</dt><dd>Réseau de serveurs qui répond à la place d'un site pour l'accélérer et le protéger. Il tient la clé de la porte d'entrée.</dd></div>
         <div><dt id="g-certificat">Certificat</dt><dd>Pièce d'identité d'un site, signée par une autorité de confiance. Prouve qu'on parle au bon serveur.</dd></div>
+        <div><dt id="g-cloud-act">CLOUD Act</dt><dd>Loi américaine de 2018 : les autorités des États-Unis peuvent exiger d'une entreprise américaine les données qu'elle contrôle, où qu'elles soient stockées.</dd></div>
         <div><dt id="g-courbe">Courbe elliptique</dt><dd>Famille de calculs mathématiques utilisée par la cryptographie actuelle (X25519). Cassée par un ordinateur quantique.</dd></div>
+        <div><dt id="g-csp">CSP</dt><dd><i>Content-Security-Policy</i> : la règle qu'un site envoie au navigateur pour dire quels scripts ont le droit de s'exécuter dans sa page. Stricte, elle bloque un script injecté ; absente, elle laisse tout passer.</dd></div>
         <div><dt id="g-dane">DANE</dt><dd>Empreinte du certificat d'un serveur de courrier, publiée dans un DNS signé (DNSSEC) : l'expéditeur la vérifie et refuse d'envoyer si elle ne correspond pas.</dd></div>
+        <div><dt id="g-dns">DNS</dt><dd>L'annuaire d'Internet : il traduit un nom (exemple.fr) en adresse de serveur, et publie d'autres informations sur le domaine. <b>DNSSEC</b> le signe, pour qu'on ne puisse pas falsifier ses réponses.</dd></div>
         <div><dt id="g-echange">Échange de clés</dt><dd>Moment de la poignée de main où les deux côtés fabriquent un secret commun sans jamais l'envoyer.</dd></div>
+        <div><dt id="g-partie">En partie</dt><dd>Dans nos relevés : une porte dont certains serveurs acceptent l'hybride et d'autres non. Selon le serveur qui répond, la connexion est hybride ou classique.</dd></div>
         <div><dt id="g-harvest">Enregistrer maintenant, déchiffrer plus tard</dt><dd><i>Harvest now, decrypt later</i> : stocker aujourd'hui du trafic chiffré pour le lire au Q-Day.</dd></div>
+        <div><dt id="g-hsts">HSTS</dt><dd><i>HTTP Strict Transport Security</i> : un en-tête par lequel un site demande au navigateur de ne plus l'ouvrir qu'en HTTPS. Sans lui, une adresse tapée sans « https:// » part d'abord en clair et peut être détournée. <b>Préchargé</b>, le site est inscrit dans les navigateurs eux-mêmes, et même la toute première visite est protégée.</dd></div>
         <div><dt id="g-https">HTTPS</dt><dd>Le web chiffré : HTTP transporté dans TLS.</dd></div>
         <div><dt id="g-hybride">Hybride</dt><dd>Échange de clés qui combine une recette classique et une recette post-quantique : il faut casser les deux.</dd></div>
-        <div><dt id="g-ml-dsa">ML-DSA</dt><dd>Son équivalent pour les signatures (FIPS 204).</dd></div>
+        <div><dt id="g-ml-dsa">ML-DSA</dt><dd>L'équivalent de ML-KEM pour les signatures, normalisé en 2024 (FIPS 204).</dd></div>
         <div><dt id="g-ml-kem">ML-KEM</dt><dd>La recette post-quantique d'échange de clés, normalisée en 2024 (FIPS 203).</dd></div>
         <div><dt id="g-mta-sts">MTA-STS</dt><dd>Règle publiée par une organisation pour exiger que son courrier arrive chiffré. En mode « enforce », elle est appliquée ; en mode « testing », elle est seulement surveillée.</dd></div>
         <div><dt id="g-mx">MX</dt><dd>Le serveur qui reçoit le courrier d'une organisation, annoncé dans le DNS.</dd></div>
@@ -179,7 +185,10 @@
         <div><dt id="g-post-quantique">Post-quantique</dt><dd>Qui résiste, autant qu'on le sache, à un ordinateur quantique.</dd></div>
         <div><dt id="g-q-day">Q-Day</dt><dd>Le jour, inconnu, où un ordinateur quantique saura casser l'échange de clés classique.</dd></div>
         <div><dt id="g-scellee">Scellée</dt><dd>Dans nos relevés : une porte qui accepte l'échange hybride X25519MLKEM768.</dd></div>
+        <div><dt id="g-secnumcloud">SecNumCloud</dt><dd>Qualification de l'ANSSI pour les prestataires de cloud : elle exige notamment qu'ils échappent aux lois extra-européennes. Elle ne se voit pas de l'extérieur.</dd></div>
+        <div><dt id="g-souveraine">Souveraine</dt><dd>Dans nos relevés : une porte tenue par une entreprise dont la maison mère est française, sur un réseau annoncé en France. Une lecture de la façade, pas un audit juridique.</dd></div>
         <div><dt id="g-starttls">STARTTLS</dt><dd>Le passage au chiffrement entre deux serveurs de courrier, proposé mais pas exigé par défaut.</dd></div>
+        <div><dt id="g-demande">Sur demande</dt><dd>Dans nos relevés : une porte qui accepte l'hybride si on le lui propose seul, mais choisit la recette classique face à un navigateur qui propose les deux.</dd></div>
         <div><dt id="g-tls">TLS</dt><dd>Le protocole qui chiffre les connexions sur Internet. Sa version 1.3 est la seule à porter l'hybride.</dd></div>
         <div><dt id="g-x25519">X25519</dt><dd>La recette classique d'échange de clés la plus répandue.</dd></div>
         <div><dt id="g-x25519mlkem768">X25519MLKEM768</dt><dd>L'hybride : X25519 et ML-KEM-768 ensemble.</dd></div>
