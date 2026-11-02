@@ -59,7 +59,13 @@ final class ReleveController extends AbstractController
 
     private function page(Releve $releve, bool $isHome): Response
     {
-        $response = $this->render('releve/show.html.twig', ['releve' => $releve, 'donnees' => $this->data->json($releve), 'is_home' => $isHome]);
+        // The relevé before, if out: the page says what moved since, and links to it.
+        $before = $this->releves->previousPublished($releve);
+        $avant = null === $before ? null : json_encode(
+            ['number' => $before->number, 'date' => $before->date, 'url' => $this->generateUrl('releve', ['number' => $before->number]), 'doors' => $this->data->doors($before)],
+            \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES | \JSON_HEX_TAG | \JSON_HEX_AMP,
+        );
+        $response = $this->render('releve/show.html.twig', ['releve' => $releve, 'donnees' => $this->data->json($releve), 'avant' => $avant, 'is_home' => $isHome, 'serie' => $this->releves->series($releve)]);
         // Short: the page that / shows changes when the next relevé's time comes.
         // Private: it carries a script nonce, which no shared cache may hand out.
         $response->setPrivate();

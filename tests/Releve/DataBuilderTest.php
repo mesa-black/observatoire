@@ -30,10 +30,10 @@ final class DataBuilderTest extends TestCase
     /** Relevé 2 adds the AI group, ai.sh, hf.sh and mail.sh: same parity. */
     public function testSameDataAsBuildShForReleve2(): void
     {
-        $js = (string) file_get_contents(__DIR__.'/../fixtures/data-2026-10-16.js');
+        $js = (string) file_get_contents(__DIR__.'/../fixtures/data-2026-11-02.js');
         $expected = json_decode(substr(rtrim($js, ";\n"), \strlen('window.OBSERVATOIRE = ')), false, 512, \JSON_THROW_ON_ERROR);
 
-        $releve = new Releve(2, '2026-10-16', new \DateTimeImmutable(), 'Relevé n° 2', '', \dirname(__DIR__, 2).'/releves/2');
+        $releve = new Releve(2, '2026-11-02', new \DateTimeImmutable(), 'Relevé n° 2', '', \dirname(__DIR__, 2).'/releves/2');
         $built = (new DataBuilder())->build($releve);
 
         $this->assertSame($this->encode($expected), $this->encode($built));

@@ -65,6 +65,46 @@ final class ReleveRepository
         return $latest;
     }
 
+    /**
+     * The row of plaques over a relevé: those out, the one shown (out or in
+     * preview), and the next one announced. A draft never shows, nor a later
+     * scheduled one: one date ahead is a promise, three are a calendar.
+     *
+     * @return list<array{releve: Releve, state: 'publie'|'courant'|'avenir'}>
+     */
+    public function series(Releve $current): array
+    {
+        $now = $this->clock->now();
+        $row = [];
+        foreach ($this->all() as $releve) {
+            if ($releve->number === $current->number) {
+                $row[] = ['releve' => $releve, 'state' => 'courant'];
+            } elseif ($releve->isPublishedAt($now)) {
+                $row[] = ['releve' => $releve, 'state' => 'publie'];
+            }
+        }
+        $next = $this->nextScheduled();
+        if (null !== $next && $next->number > $current->number) {
+            $row[] = ['releve' => $next, 'state' => 'avenir'];
+        }
+
+        return $row;
+    }
+
+    /** The last relevé out before this one, if any: what this one is compared with. */
+    public function previousPublished(Releve $current): ?Releve
+    {
+        $now = $this->clock->now();
+        $before = null;
+        foreach ($this->all() as $releve) {
+            if ($releve->number < $current->number && $releve->isPublishedAt($now)) {
+                $before = $releve;
+            }
+        }
+
+        return $before;
+    }
+
     /** The first relevé whose time has not come, if any: what the waiting page announces. */
     public function nextScheduled(): ?Releve
     {

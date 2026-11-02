@@ -1,12 +1,12 @@
 {"host":"group.accor.com","hf":[]}
-{"host":"www.airliquide.com","hf":[{"name":"airliquide","fullname":"Air Liquide","models":0,"datasets":0,"spaces":0,"followers":26}]}
+{"host":"www.airliquide.com","hf":[{"name":"airliquide","fullname":"Air Liquide","models":0,"datasets":0,"spaces":0,"followers":27}]}
 {"host":"www.airbus.com","hf":[{"name":"airbus-ai","fullname":"Airbus","models":0,"datasets":0,"spaces":0,"followers":90}]}
 {"host":"corporate.arcelormittal.com","hf":[]}
-{"host":"www.axa.com","hf":[{"name":"axach","fullname":"AXA Versicherungen AG","models":0,"datasets":0,"spaces":0,"followers":13},{"name":"AXA-Belgium-AIAS","fullname":"AXA Belgium - AIAS Team","models":0,"datasets":0,"spaces":0,"followers":9},{"name":"axa-de","fullname":"AXA Konzern AG","models":0,"datasets":0,"spaces":1,"followers":6},{"name":"axaim","fullname":"AXA Investment Managers","models":0,"datasets":0,"spaces":0,"followers":3}]}
+{"host":"www.axa.com","hf":[{"name":"axach","fullname":"AXA Versicherungen AG","models":0,"datasets":0,"spaces":0,"followers":14},{"name":"AXA-Belgium-AIAS","fullname":"AXA Belgium - AIAS Team","models":0,"datasets":0,"spaces":0,"followers":9},{"name":"axa-de","fullname":"AXA Konzern AG","models":0,"datasets":0,"spaces":1,"followers":6},{"name":"axaim","fullname":"AXA Investment Managers","models":0,"datasets":0,"spaces":0,"followers":3}]}
 {"host":"group.bnpparibas","hf":[{"name":"bnpparibas","fullname":"BNP Paribas","models":0,"datasets":0,"spaces":0,"followers":1}]}
 {"host":"www.bouygues.com","hf":[{"name":"BouyguesTelecom","fullname":"Bouygues Telecom","models":0,"datasets":0,"spaces":0,"followers":3}]}
 {"host":"group.bureauveritas.com","hf":[]}
-{"host":"www.capgemini.com","hf":[{"name":"Capgemini","fullname":"Capgemini","models":0,"datasets":0,"spaces":1,"followers":1174}]}
+{"host":"www.capgemini.com","hf":[{"name":"Capgemini","fullname":"Capgemini","models":0,"datasets":0,"spaces":1,"followers":1183}]}
 {"host":"www.carrefour.com","hf":[{"name":"Carrefour","fullname":"Carrefour","models":0,"datasets":0,"spaces":0,"followers":8}]}
 {"host":"www.credit-agricole.com","hf":[{"name":"credit-agricole-sa","fullname":"Credit Agricole","models":0,"datasets":0,"spaces":0,"followers":3}]}
 {"host":"www.danone.com","hf":[]}
@@ -22,18 +22,18 @@
 {"host":"www.legrandgroup.com","hf":[]}
 {"host":"www.lvmh.com","hf":[{"name":"LVMHR","fullname":"LVMH Recherche","models":0,"datasets":0,"spaces":0,"followers":3}]}
 {"host":"www.michelin.com","hf":[]}
-{"host":"www.orange.com","hf":[{"name":"Orange","fullname":"Orange","models":12,"datasets":13,"spaces":1,"followers":418}]}
+{"host":"www.orange.com","hf":[{"name":"Orange","fullname":"Orange","models":12,"datasets":13,"spaces":1,"followers":419}]}
 {"host":"www.pernod-ricard.com","hf":[]}
 {"host":"www.publicisgroupe.com","hf":[{"name":"PublicisGroupeAI","fullname":"Publicis Groupe","models":0,"datasets":0,"spaces":0,"followers":21},{"name":"publicisgroupe","fullname":"Publicis Groupe","models":0,"datasets":0,"spaces":0,"followers":4}]}
 {"host":"www.renaultgroup.com","hf":[{"name":"Renault","fullname":"Renault Group","models":0,"datasets":0,"spaces":0,"followers":55}]}
-{"host":"www.safran-group.com","hf":[{"name":"SafranGroup","fullname":"Safran","models":0,"datasets":0,"spaces":0,"followers":17}]}
+{"host":"www.safran-group.com","hf":[{"name":"SafranGroup","fullname":"Safran","models":0,"datasets":0,"spaces":0,"followers":18}]}
 {"host":"www.saint-gobain.com","hf":[]}
-{"host":"www.sanofi.com","hf":[{"name":"Sanofi","fullname":"Sanofi","models":0,"datasets":0,"spaces":0,"followers":120}]}
-{"host":"www.se.com","hf":[{"name":"SchneiderElectric","fullname":"Schneider Electric","models":0,"datasets":0,"spaces":0,"followers":70}]}
+{"host":"www.sanofi.com","hf":[{"name":"Sanofi","fullname":"Sanofi","models":0,"datasets":0,"spaces":0,"followers":122}]}
+{"host":"www.se.com","hf":[{"name":"SchneiderElectric","fullname":"Schneider Electric","models":0,"datasets":0,"spaces":0,"followers":73}]}
 {"host":"www.societegenerale.com","hf":[]}
 {"host":"www.stellantis.com","hf":[{"name":"Stellantis","fullname":"Stellantis","models":0,"datasets":0,"spaces":0,"followers":45}]}
-{"host":"www.st.com","hf":[{"name":"STMicroelectronics","fullname":"STMicroelectronics","models":65,"datasets":0,"spaces":2,"followers":117}]}
-{"host":"www.thalesgroup.com","hf":[{"name":"thalesgroup","fullname":"Thales","models":0,"datasets":0,"spaces":0,"followers":107}]}
+{"host":"www.st.com","hf":[{"name":"STMicroelectronics","fullname":"STMicroelectronics","models":65,"datasets":0,"spaces":2,"followers":120}]}
+{"host":"www.thalesgroup.com","hf":[{"name":"thalesgroup","fullname":"Thales","models":0,"datasets":1,"spaces":0,"followers":111}]}
 {"host":"totalenergies.com","hf":[]}
 {"host":"www.urw.com","hf":[]}
 {"host":"www.veolia.com","hf":[{"name":"VeoliaDigital","fullname":"Veolia","models":0,"datasets":0,"spaces":0,"followers":10}]}
@@ -54,7 +54,7 @@
 {"host":"www.lydia-app.com","hf":[]}
 {"host":"www.manomano.fr","hf":[]}
 {"host":"www.mirakl.com","hf":[]}
-{"host":"mistral.ai","hf":[{"name":"mistralai","fullname":"Mistral AI_","models":81,"datasets":4,"spaces":6,"followers":20072}]}
+{"host":"mistral.ai","hf":[]}
 {"host":"morpho.org","hf":[]}
 {"host":"www.nw-groupe.com","hf":[]}
 {"host":"www.pasqal.com","hf":[]}
@@ -98,7 +98,7 @@
 {"host":"www.lcl.fr","hf":[]}
 {"host":"www.caisse-epargne.fr","hf":[]}
 {"host":"www.banquepopulaire.fr","hf":[]}
-{"host":"www.creditmutuel.fr","hf":[{"name":"cmarkea","fullname":"Credit Mutuel Arkea","models":35,"datasets":4,"spaces":0,"followers":67}]}
+{"host":"www.creditmutuel.fr","hf":[]}
 {"host":"www.cic.fr","hf":[]}
 {"host":"www.boursobank.com","hf":[]}
 {"host":"www.fortuneo.fr","hf":[]}

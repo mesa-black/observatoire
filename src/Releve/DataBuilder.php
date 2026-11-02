@@ -104,6 +104,23 @@ final class DataBuilder
     }
 
     /**
+     * Each door's verdict in a relevé, by host: what the next one compares
+     * itself with. Kept apart from build(), which must stay byte for byte what
+     * build.sh makes.
+     *
+     * @return array<string, array{pq: string|null, as: string|null}|null> host => verdict and network, null when unreachable
+     */
+    public function doors(Releve $releve): array
+    {
+        $doors = [];
+        foreach ($this->slurp($releve->dir.'/'.$releve->date.'.jsonl') as $r) {
+            $doors[$r->host] = ($r->reachable ?? false) ? ['pq' => $r->pq ?? null, 'as' => $r->net->as ?? null] : null;
+        }
+
+        return $doors;
+    }
+
+    /**
      * jq's --slurpfile on a file of one JSON value per line.
      *
      * @return list<\stdClass>

@@ -8,7 +8,8 @@
 }
 @media (max-width: 48rem) { .lettre { grid-template-columns: 1fr; } }
 .lettre h2 { margin: .5rem 0 .8rem; font: 400 1.9rem/1.1 var(--serif); }
-.lettre p { margin: 0 0 .8rem; font-size: .9rem; color: var(--doux); }
+/* Not the kicker: it keeps the size of every other one on the page. */
+.lettre p:not(.sur) { margin: 0 0 .8rem; font-size: .9rem; color: var(--doux); }
 .lettre-form label { display: block; margin-bottom: .4rem; font-size: .9rem; font-weight: 600; }
 .lettre-ligne { display: flex; gap: .6rem; flex-wrap: wrap; }
 /* As light as the button beside it: same height, same pill. */
@@ -125,3 +126,20 @@
 }
 .partage .bouton:hover, .lettre-ligne .bouton:hover, .partage .bouton:focus-visible, .lettre-ligne .bouton:focus-visible { background: var(--encre); color: var(--creme) !important; }
 .lettre-ligne { align-items: center; }
+
+/* The row of relevés over the sign: small enamel plaques, the one shown lit,
+   the next one announced in outline. A collection, not an archive. */
+.serie { padding-top: 1.2rem; }
+.serie ol { display: flex; flex-wrap: wrap; gap: .6rem; margin: 0; padding: 0; list-style: none; }
+.serie .mini {
+    display: inline-flex; align-items: baseline; gap: .5rem;
+    padding: .45rem .8rem; border-radius: 7px; text-decoration: none;
+    box-shadow: inset 0 0 0 2px var(--p-scelle), inset 0 0 0 3px var(--liseret);
+    font: 500 .72rem/1 var(--mono); letter-spacing: .04em;
+}
+.serie .mini b { font: 400 1rem/1 var(--serif); letter-spacing: 0; }
+.serie-publie .mini { background: var(--papier); color: var(--p-scelle) !important; box-shadow: inset 0 0 0 1px var(--p-scelle); }
+.serie-publie .mini:hover { background: var(--p-scelle); color: var(--sur-scelle) !important; }
+.serie-avenir .mini { background: transparent; color: var(--doux); box-shadow: inset 0 0 0 1px var(--filet); }
+.depuis { margin: .9rem 0 0; max-width: 40rem; font-size: .92rem; color: var(--doux); }
+.depuis a { white-space: nowrap; }

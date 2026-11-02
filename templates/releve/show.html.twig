@@ -13,10 +13,34 @@
 <link rel="stylesheet" href="{{ versioned('/style.css') }}">
 <link rel="stylesheet" href="{{ versioned('/site.css') }}">
 <script type="application/json" id="donnees">{{ donnees|raw }}</script>
+{% if avant|default(null) %}<script type="application/json" id="avant">{{ avant|raw }}</script>{% endif %}
 <script src="{{ versioned('/app.js') }}" nonce="{{ csp_nonce() }}" defer></script>
 {{ include('releve/_head.html.twig') }}
 </head>
 <body>
+
+{# The other relevés, as a row of small plaques: not an archive page. The next
+   one is announced with its date and no link. Absent while there is only one. #}
+{% if serie|default([])|length > 1 %}
+<nav class="wrap serie" aria-label="Les relevés">
+    <ol>
+        {% for s in serie %}
+            {% set r = s.releve %}
+            {% set sujet = r.title|replace({('Relevé n° ' ~ r.number ~ ' · '): ''}) %}
+            {% set jour = r.publishedAt|date('j') ~ ' ' ~ ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'][r.publishedAt|date('n') - 1] %}
+            <li class="serie-{{ s.state }}">
+                {% if s.state == 'publie' %}
+                    <a class="plaque mini" href="{{ path('releve', {number: r.number}) }}" title="{{ sujet }}"><b>N° {{ r.number }}</b><span>{{ jour }}</span></a>
+                {% elseif s.state == 'courant' %}
+                    <span class="plaque mini" aria-current="page" title="{{ sujet }}"><b>N° {{ r.number }}</b><span>{{ jour }}</span></span>
+                {% else %}
+                    <span class="plaque mini" title="Prochain relevé"><b>N° {{ r.number }}</b><span>{{ jour }} · à venir</span></span>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ol>
+</nav>
+{% endif %}
 
 <header class="wrap tete">
     <div class="plaque enseigne" role="img" aria-label="Observatoire post-quantique, relevé du mois">

@@ -276,7 +276,7 @@
             keys.map(k => `${PROVIDERS[k].label} ${usersOf(k).length}`).join(', '), '. ',
             sealedP.length ? `Le chemin vers ${sealedP.map(k => PROVIDERS[k].label).join(', ')} est déjà hybride. ` : '',
             openP.length ? h('span', null, ...openP.map(k => h('span', null, 'Celui vers ', h('strong', null, PROVIDERS[k].label),
-                ` ne l'est pas : ${PROVIDERS[k].whatMany || 'ce qui y part'} chez ${usersOf(k).length} d'entre elles, dont `, names(usersOf(k), 4), `, s'échange en classique. `))) : '',
+                ` ne l'est pas : chez ${usersOf(k).length} d'entre elles, dont `, names(usersOf(k), 4), `, ${PROVIDERS[k].whatMany || 'ce qui y part'}, s'il y passe, s'échange en classique. `))) : '',
             `Combien de temps cela reste-t-il secret ? Faites avancer le Q-Day.`,
         );
         sources($('chapo'), `les enregistrements DNS publics de chaque organisation (`, h('code', null, 'openai-domain-verification'), `, `,
@@ -336,6 +336,30 @@
             h('strong', null, sealed.length), ` sont déjà scellées par l'hybride post-quantique. Faites avancer le temps pour voir ce que les autres laisseront lire.`,
         );
     }
+    // Since the relevé before, when it is out: which doors gained or lost the
+    // hybrid, and a link to it. Relevé 4 says it its own way (keyMoves).
+    const avantEl = document.getElementById('avant');
+    if (avantEl && !M.depuis) {
+        const A = JSON.parse(avantEl.textContent);
+        // Compared raw, as keyMoves does: the « on demand » downgrade has no twin before.
+        const now = e => (e.onDemand ? 'full' : e.pq);
+        const both = measured.filter(e => A.doors[e.host] != null);
+        const was = e => A.doors[e.host];
+        const gained = both.filter(e => was(e).pq !== 'full' && now(e) === 'full');
+        const lost = both.filter(e => was(e).pq === 'full' && now(e) !== 'full');
+        // Another company answering at the address: told by the network's name,
+        // first word only, so Cloudflare London and Cloudflare, Inc. stay one.
+        const firm = as => (operator({ net: { as } })?.name || '').split(/[\s,]+/)[0].toLowerCase();
+        const hands = both.filter(e => was(e).as && e.net?.as && firm(was(e).as) !== firm(e.net.as));
+        const whenA = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long' }).format(new Date(A.date));
+        $('chapo').after(h('p', { class: 'depuis' },
+            h('b', null, `Depuis le relevé n° ${A.number} `), `(mesuré le ${whenA}) : `,
+            gained.length ? [plural(gained.length, 'porte a gagné', 'portes ont gagné'), ` l'hybride (`, ...names(gained, 8), ')'] : `aucune porte n'a gagné l'hybride`,
+            lost.length ? [', ', plural(lost.length, "l'a perdu", "l'ont perdu"), ' (', ...names(lost, 8), ')'] : `, aucune ne l'a perdu`,
+            hands.length ? ['. ', plural(hands.length, 'porte a changé', 'portes ont changé'), ' de mains : ',
+                ...hands.flatMap((e, i) => [i ? ', ' : '', ...names([e]), ` (${operator({ net: { as: was(e).as } }).name} → ${operator(e).name})`])] : '',
+            '. ', h('a', { href: A.url }, `Voir le relevé n° ${A.number} →`)));
+    }
     // A relevé that leaves its usual day (the 16th) says so, under its headline.
     if (M.exception) $('chapo').after(h('p', { class: 'exception' }, M.exception));
 
@@ -367,6 +391,7 @@
     // What was wrong on the day and has been fixed since: the line above stays
     // the measurement, this one says where it stands now.
     if (s.hsts && !/preload/i.test(s.hsts)) $('nous').append(' ', h('b', null, 'Corrigé le 16 octobre 2026 : '),
+        (s.protocols || []).includes('tls1_2') ? `TLS 1.2 n'est plus accepté ; ` : '',
         `notre HSTS demande le préchargement, et mesa.black figure désormais sur la liste des domaines que les navigateurs n'ouvrent qu'en HTTPS (`,
         h('a', { href: 'https://hstspreload.org/?domain=mesa.black', rel: 'noopener' }, 'hstspreload.org'), `).`);
     // And the reader: handshake.mesa.black (devops/handshake in the
@@ -632,7 +657,11 @@
             el.classList.toggle('zero', !n);
         }
         $('expose').textContent = exposed;
-        $('expose-quoi').textContent = `exposées en ${Y}`;
+        // The stamp counts organisations; on the AI relevé, the providers'
+        // doors that would read too are said beside it rather than left out.
+        $('expose-quoi').textContent = M.focus === 'ia'
+            ? `organisations exposées en ${Y}, et ${plural(perGroup.ia || 0, "porte d'IA", "portes d'IA")}`
+            : `exposées en ${Y}`;
     }
     {
         // Say up front how little the year can move, and why: it is the finding.
@@ -1456,7 +1485,7 @@
         const CDN_COMPANY = { cloudfront: 'Amazon', azure: 'Microsoft', google: 'Google', cloudflare: 'Cloudflare', akamai: 'Akamai', fastly: 'Fastly', imperva: 'Imperva' };
         const split = measured.filter(e => e.frontBy === 'en-têtes' && CDN_COMPANY[e.front] && CDN_COMPANY[e.front] !== atlasBy.porte(e));
         sources($('atlas-texte'),
-            `le réseau qui annonce l'adresse de chaque porte (Team Cymru, relevé du ${dateFr}), regroupé par entreprise ; pour les certificats, l'émetteur lu dans le certificat servi.${reachable.length > measured.length ? ` Les ${reachable.length - measured.length} fournisseurs d'IA du relevé ne sont pas comptés.` : ''}`,
+            `le réseau qui annonce l'adresse de chaque porte (Team Cymru, relevé du ${dateFr}), regroupé par entreprise ; pour les certificats, l'émetteur lu dans le certificat servi.${reachable.length > measured.length ? ` Les ${reachable.length - measured.length} portes de fournisseurs d'IA du relevé ne sont pas comptées.` : ''}`,
             split.length ? [' Pour ', ...names(split, 99), `, les en-têtes nomment un autre CDN que le réseau qui annonce l'adresse : la carte suit le réseau, la plaque les en-têtes.`] : '');
         $('atlas-titre').append(`Cinq entreprises tiennent `, h('em', null, `${held} portes sur ${measured.length}`), '.');
         $('atlas-texte').append(
@@ -1576,6 +1605,7 @@
         }
         // Group by group: where the question bites hardest.
         for (const g of D.groups) {
+            if (APART.has(g.key)) continue;
             const m = measured.filter(e => e.g === g.key);
             const u = m.filter(e => lawOf(e) === 'US');
             $('droit-groupes').append(h('li', null,
@@ -1713,8 +1743,8 @@
                 `Meilleur de dix handshakes de chaque sorte, alternés, un serveur à la fois ; aller-retour réseau médian ${String(median(rtts)).replace('.', ',')} ms.`),
             fig(noTls13.length, `portes sans TLS 1.3, donc sans hybride possible`, ...names(noTls13, 8), '.'),
             fig(oldTls.length, 'acceptent encore TLS 1.0 ou 1.1, retirés en 2021', ...names(oldTls, 8), '.'),
-            prefClassic.length && fig(prefClassic.length, `${prefClassic.length > 1 ? 'acceptent' : 'accepte'} l'hybride mais ${prefClassic.length > 1 ? 'servent' : 'sert'} du classique aux navigateurs`, ...names(prefClassic, 8), '.'),
-            fig(`${partial.filter(e => /GOOGLE/.test(operator(e)?.key || '')).length} / ${partial.length}`, 'des portes « en partie » passent par Google Cloud', ...names(partial, 8), '.'),
+            prefClassic.length ? fig(prefClassic.length, `${prefClassic.length > 1 ? 'acceptent' : 'accepte'} l'hybride mais ${prefClassic.length > 1 ? 'servent' : 'sert'} du classique aux navigateurs`, ...names(prefClassic, 8), '.') : '',
+            partial.length ? fig(`${partial.filter(e => /GOOGLE/.test(operator(e)?.key || '')).length} / ${partial.length}`, 'des portes « en partie » passent par Google Cloud', ...names(partial, 8), '.') : '',
             // Sovereignty and the hybrid pull apart: the French-held doors are
             // the least sealed. Same rule as the jurisdiction block above.
             fig(`${frSealed.length} / ${frLaw.length}`, 'portes scellées parmi celles tenues par une entreprise française',
@@ -1722,7 +1752,7 @@
             fig(`0 / ${certs.length}`, 'certificats post-quantiques',
                 `${rsa} RSA, ${certs.length - rsa} ECDSA. L'enregistrement d'aujourd'hui ne permet pas de forger une signature demain : ce chantier-là a son propre calendrier.`),
             fig(noHsts.length, 'sites sans HSTS : une première visite peut partir en clair', ...names(noHsts, 5), '.',
-                hstsBlind.length ? [' ', ...names(hstsBlind, 99), ` ${hstsBlind.length > 1 ? 'ont' : 'a'} refusé la sonde et ne ${hstsBlind.length > 1 ? 'sont' : 'est'} pas compté${hstsBlind.length > 1 ? 's' : ''}.`] : '',
+                hstsBlind.length ? [' ', ...names(hstsBlind, 99), ` ${hstsBlind.length > 1 ? 'ont refusé la sonde et ne sont pas comptés' : "a refusé la sonde et n'est pas compté"}.`] : '',
                 outBefore('2026-11-02') && hstsBlind.length ? h('span', { class: 'corrige' }, ` Corrigé le 2 novembre 2026 : ${hstsBlind.length > 1 ? 'ils étaient comptés' : 'il était compté'} sans HSTS, ce que la sonde refusée ne permettait pas de dire. ${noHsts.length + hstsBlind.length} auparavant.`) : ''),
         );
     }
