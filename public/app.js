@@ -1596,7 +1596,13 @@
         const of = k => read.filter(([, p]) => k.includes(p.kind)).map(([e]) => e);
         const strict = of(['aucun', 'stricte']);
         $('csp-titre').append(`Seuls `, h('em', null, `${strict.length} sites sur ${read.length}`), ` décident vraiment quel code s'exécute dans leur page.`);
+        // The count is of pages read, not of doors: say so at the count, not
+        // at the foot of the section, or 111 reads as a mistake against 115.
+        const unread = measured.length - read.length;
         $('csp-texte').append(
+            unread ? h('span', null, `${read.length} pages d'accueil lues sur ${measured.length} portes`,
+                blocked.length ? [' : ', ...[names(blocked, 99)].flat(), ` ${blocked.length > 1 ? 'ont' : 'a'} refusé la sonde (protection anti-robot), on ne sait pas ce qu'${blocked.length > 1 ? 'elles autorisent' : 'elle autorise'}`] : '',
+                '. ') : '',
             `Le chiffrement, hybride ou non, s'arrête au navigateur. Ensuite, c'est la Content-Security-Policy qui dit quels scripts ont le droit de s'exécuter, et donc de lire ce qu'on tape : identifiant, IBAN, dossier. `,
             h('b', null, `Un script tiers est une porte de plus, tenue par quelqu'un d'autre, qui lit en clair.`),
             ` Les scripts tiers sont la voie d'attaque classique quand le chiffrement tient.`,
@@ -1645,9 +1651,12 @@
         const tt = read.filter(([, p]) => p.flags && p.flags.trustedTypes).length;
         $('csp-note').append(
             `${tt} site${tt > 1 ? 's' : ''} sur ${read.length} impose${tt > 1 ? 'nt' : ''} les Trusted Types ; ${eval_} autorisent encore 'unsafe-eval'. `,
-            `Seul le HTML servi est lu : les scripts que d'autres scripts ajoutent ensuite ne se voient pas, et ces comptes sont des minimums. `,
-            blocked.length ? h('span', null, names(blocked), ` ont refusé la sonde (protection anti-robot) et ne sont pas comptés.`) : '',
+            `Seul le HTML servi est lu : les scripts que d'autres scripts ajoutent ensuite ne se voient pas, et ces comptes sont des minimums.`,
         );
+        // Same reason as the sovereignty note: the earlier releases said this
+        // only here, at the foot.
+        if (D.date < '2026-11-02' && unread) $('csp-note').append(' ', h('span', { class: 'corrige' },
+            `Précision ajoutée le 2 novembre 2026 : les pages non lues étaient signalées ici seulement, et le ${read.length} du titre semblait contredire les ${measured.length} portes du relevé. Les mesures n'ont pas changé.`));
     }
 
     // ------------------------------------------------------------ fixed or moving
