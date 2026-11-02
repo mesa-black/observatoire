@@ -127,19 +127,34 @@
 .partage .bouton:hover, .lettre-ligne .bouton:hover, .partage .bouton:focus-visible, .lettre-ligne .bouton:focus-visible { background: var(--encre); color: var(--creme) !important; }
 .lettre-ligne { align-items: center; }
 
-/* The row of relevés over the sign: small enamel plaques, the one shown lit,
-   the next one announced in outline. A collection, not an archive. */
+/* The row of relevés over the sign: small enamel tags, the one shown lit,
+   the others in outline, the next one announced and dimmed. A collection, not
+   an archive. Its own classes: the organisations' .plaque carries rules of
+   its own that do not belong here. */
 .serie { padding-top: 1.2rem; }
-.serie ol { display: flex; flex-wrap: wrap; gap: .6rem; margin: 0; padding: 0; list-style: none; }
-.serie .mini {
-    display: inline-flex; align-items: baseline; gap: .5rem;
-    padding: .45rem .8rem; border-radius: 7px; text-decoration: none;
-    box-shadow: inset 0 0 0 2px var(--p-scelle), inset 0 0 0 3px var(--liseret);
-    font: 500 .72rem/1 var(--mono); letter-spacing: .04em;
+.serie ol { display: flex; flex-wrap: wrap; gap: .5rem; margin: 0; padding: 0; list-style: none; }
+.serie li { flex: none; }
+.serie-plaque {
+    display: inline-flex; align-items: baseline; gap: .55rem; white-space: nowrap;
+    padding: .38rem .8rem .42rem; border-radius: 6px; text-decoration: none;
+    font: 500 .7rem/1 var(--mono); letter-spacing: .04em; text-transform: uppercase;
+    color: var(--p-scelle); background: var(--papier);
+    box-shadow: inset 0 0 0 1px var(--p-scelle);
+    transition: background .15s, color .15s;
 }
-.serie .mini b { font: 400 1rem/1 var(--serif); letter-spacing: 0; }
-.serie-publie .mini { background: var(--papier); color: var(--p-scelle) !important; box-shadow: inset 0 0 0 1px var(--p-scelle); }
-.serie-publie .mini:hover { background: var(--p-scelle); color: var(--sur-scelle) !important; }
-.serie-avenir .mini { background: transparent; color: var(--doux); box-shadow: inset 0 0 0 1px var(--filet); }
+.serie-plaque b { font: 400 1.05rem/1 var(--serif); letter-spacing: 0; text-transform: none; }
+a.serie-plaque:hover { background: var(--p-scelle); color: var(--sur-scelle); }
+.serie-courant .serie-plaque { background: var(--p-scelle); color: var(--sur-scelle); box-shadow: inset 0 0 0 2px var(--p-scelle), inset 0 0 0 3px var(--liseret); }
+.serie-avenir .serie-plaque { background: transparent; color: var(--doux); box-shadow: inset 0 0 0 1px var(--filet); }
 .depuis { margin: .9rem 0 0; max-width: 40rem; font-size: .92rem; color: var(--doux); }
 .depuis a { white-space: nowrap; }
+
+/* Relevé 2's sound switch: pinned over the page, top right, so the music can
+   be cut from anywhere, not only from the readout it starts with. */
+.scan-son.son-fixe {
+    position: fixed; top: .75rem; right: .75rem; z-index: 60;
+    background: rgba(11, 6, 6, .88); color: #ff8a80; border-color: #ff3b30;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .25);
+    -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+}
+.scan-son.son-fixe[aria-pressed="true"] { background: #ff3b30; color: #0b0606; }

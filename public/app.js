@@ -470,14 +470,16 @@
         const scan = $('scan');
         const log = h('ol', { class: 'scan-log', 'aria-live': 'off' });
         const tally = h('p', { class: 'scan-bilan' });
-        const sound = h('button', { type: 'button', class: 'scan-son', 'aria-pressed': 'false' }, 'Activer le son');
+        // Pinned to the viewport, outside the readout: the music plays on while
+        // the visitor scrolls, the switch stays within reach.
+        const sound = h('button', { type: 'button', class: 'scan-son son-fixe', 'aria-pressed': 'false' }, 'Activer le son');
         scan.hidden = false;
+        document.body.append(sound);
         scan.append(
             h('div', { class: 'scan-ecran' },
                 h('div', { class: 'scan-tete' },
                     h('span', { class: 'scan-oeil', 'aria-hidden': 'true' }),
                     h('h2', { id: 'scan-titre' }, 'Qui confie quoi à quelle IA'),
-                    sound,
                 ),
                 log, tally,
                 h('div', { class: 'scan-balayage', 'aria-hidden': 'true' }),
@@ -520,16 +522,16 @@
             if (muted) return;
             if (!audio) { audio = new Audio(MUSIC); audio.loop = true; audio.volume = .7; }
             audio.play().then(() => {
-                sound.setAttribute('aria-pressed', 'true'); sound.textContent = 'Couper le son';
+                sound.setAttribute('aria-pressed', 'true'); sound.textContent = '♪ Couper le son';
                 for (const t of ['pointerdown', 'keydown']) removeEventListener(t, first, true);
             }).catch(() => {});
         };
         const stop = () => {
             if (audio) audio.pause();
-            sound.setAttribute('aria-pressed', 'false'); sound.textContent = 'Remettre le son';
+            sound.setAttribute('aria-pressed', 'false'); sound.textContent = '♪ Remettre le son';
         };
         const tick = () => {};
-        sound.textContent = 'Son au premier clic · couper';
+        sound.textContent = '♪ Son au premier clic · couper';
         sound.addEventListener('click', ev => {
             ev.stopPropagation();
             if (audio && !audio.paused) { muted = true; stop(); } else { muted = false; start(); }

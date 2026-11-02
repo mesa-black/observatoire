@@ -30,11 +30,11 @@
             {% set jour = r.publishedAt|date('j') ~ ' ' ~ ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'][r.publishedAt|date('n') - 1] %}
             <li class="serie-{{ s.state }}">
                 {% if s.state == 'publie' %}
-                    <a class="plaque mini" href="{{ path('releve', {number: r.number}) }}" title="{{ sujet }}"><b>N° {{ r.number }}</b><span>{{ jour }}</span></a>
+                    <a class="serie-plaque" href="{{ path('releve', {number: r.number}) }}" title="{{ sujet }}"><b>N° {{ r.number }}</b><span>{{ jour }}</span></a>
                 {% elseif s.state == 'courant' %}
-                    <span class="plaque mini" aria-current="page" title="{{ sujet }}"><b>N° {{ r.number }}</b><span>{{ jour }}</span></span>
+                    <span class="serie-plaque" aria-current="page" title="{{ sujet }}"><b>N° {{ r.number }}</b><span>{{ jour }}</span></span>
                 {% else %}
-                    <span class="plaque mini" title="Prochain relevé"><b>N° {{ r.number }}</b><span>{{ jour }} · à venir</span></span>
+                    <span class="serie-plaque" title="Prochain relevé"><b>N° {{ r.number }}</b><span>{{ jour }} · à venir</span></span>
                 {% endif %}
             </li>
         {% endfor %}
