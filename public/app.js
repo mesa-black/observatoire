@@ -75,8 +75,11 @@
     const M = D.meta || {};
     // The sign carries the day the relevé came out; the measures keep their own
     // date (dateFr) wherever figures are quoted.
+    // A correction is mentioned on the relevés that went out with the old
+    // text, and only there: one published later never showed it.
+    const outBefore = day => (M.published || D.date) < day;
     const pubFr = M.published ? new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(M.published)) : dateFr;
-    $('releve').textContent = `Relevé n° ${M.number || 1} · ${pubFr}`;
+    $('releve').textContent = `Relevé n° ${M.number || 1} · ${M.published && M.published !== D.date ? 'publié le ' : ''}${pubFr}`;
     // A relevé may carry its own headline; the figures under it are always computed.
     if (M.kicker) document.querySelector('.tete .sur').textContent = M.kicker;
     if (M.title) document.querySelector('.tete h1').replaceChildren(M.title[0], h('br'), h('em', null, M.title[1]));
@@ -330,7 +333,7 @@
         $('chapo').append(
             `Qui enregistre aujourd'hui le trafic chiffré vers un site pourra le lire le jour où un ordinateur quantique cassera l'échange de clés classique. Sur `,
             h('strong', null, measured.length), ` portes d'entrée françaises, `,
-            h('strong', null, sealed.length), ` parlent déjà l'hybride post-quantique. Faites avancer le temps pour voir ce que les autres laisseront lire.`,
+            h('strong', null, sealed.length), ` sont déjà scellées par l'hybride post-quantique. Faites avancer le temps pour voir ce que les autres laisseront lire.`,
         );
     }
     // A relevé that leaves its usual day (the 16th) says so, under its headline.
@@ -633,7 +636,8 @@
             `Le Q-Day règle la vision machine ci-dessous : lancez le temps, et regardez ce qui se lit l'année où il tombe. `
             + `Ce qui part vers une IA est supposé sensible ${LIFE.ia.years} ans au moins, plus si l'organisation garde des données plus longtemps.`;
         else $('curseur-note').textContent =
-            `${fixed} portes sur ${measured.length} acceptent l'hybride, en tout ou en partie : aucune année ne change leur couleur. `
+            `${sealed.length} portes sur ${measured.length} sont scellées : aucune année ne change leur couleur. `
+            + (fixed > sealed.length ? `${fixed - sealed.length} acceptent l'hybride en partie ou sur demande : une partie de leurs échanges reste classique, et elles comptent parmi les exposées tant que leurs données sont sensibles. ` : '')
             + `Les ${measured.length - fixed} autres affichent leurs années et basculent quand le Q-Day dépasse la durée de vie de leurs données. `
             + `Tout le reste de la page est mesuré le jour du relevé.`;
     }
@@ -689,7 +693,10 @@
         const out = [];
         shown.forEach((o, i) => {
             if (i) out.push(i === shown.length - 1 && list.length <= max ? ' et ' : ', ');
-            out.push(h('a', { href: `#${o.host}` }, o.name || nameOf.get(o.host)));
+            const name = o.name || nameOf.get(o.host);
+            // Two doors of one organisation on the page: told apart by their host.
+            const twin = all.some(x => x.host !== o.host && (x.name || nameOf.get(x.host)) === name);
+            out.push(h('a', { href: `#${o.host}` }, twin ? `${name} (${o.host})` : name));
         });
         if (list.length > max) out.push(list.length - max > 1 ? ` et ${list.length - max} autres` : ' et 1 autre')
         return out;
@@ -707,7 +714,7 @@
         [/(^|\.)cookielaw\.org$|(^|\.)onetrust\.com$/, 'OneTrust', 'US'],
         [/(^|\.)(cloudflareinsights\.com|cdnjs\.cloudflare\.com)$/, 'Cloudflare', 'US'],
         [/(^|\.)unpkg\.com$/, 'unpkg', 'US'],
-        [/(^|\.)jsdelivr\.net$/, 'jsDelivr', '?'],
+        [/(^|\.)jsdelivr\.net$/, 'jsDelivr', 'PL'],
         [/(^|\.)(twitter\.com|twimg\.com|x\.com)$/, 'X', 'US'],
         [/(^|\.)vimeo(cdn)?\.com$/, 'Vimeo', 'US'],
         [/(^|\.)hotjar\.(com|io)$/, 'Hotjar', 'MT'],
@@ -728,6 +735,7 @@
     const thirdOf = host => { const t = THIRD.find(([re]) => re.test(host)); return t ? { company: t[1], cc: t[2] } : null; };
 
     /** The policy that governs scripts, read the way a browser reads it. */
+    const hstsUnknown = e => !e.hsts && cspOf(e)?.kind === 'bloque';
     function cspOf(e) {
         const pg = e.page;
         if (!pg) return null;
@@ -912,7 +920,7 @@
             else add(p.kind === 'rapport' ? 'Une CSP qui ne fait qu\'observer.' : 'Pas de CSP.',
                 p.kind === 'rapport' ? `Elle signale les écarts sans rien bloquer.` : `Rien ne limite les scripts qui s'exécutent dans la page.`, loadedTxt);
         }
-        if (!e.hsts) {
+        if (!e.hsts && !hstsUnknown(e)) {
             add('Pas de HSTS.', 'Une adresse tapée sans https:// part d\'abord en clair.');
         }
         return F;
@@ -1176,7 +1184,7 @@
                         (e.ai || []).length && e.g !== 'ia' && row('Fournisseurs d\'IA', e.ai.map(k => `${PROVIDERS[k].label}${providerSealed(k) ? '' : ' (classique)'}`).join(', ')),
                         cspOf(e) && row('CSP', CSP_LABEL[cspOf(e).kind] + (cspOf(e).meta ? ' (balise meta)' : '')),
                         (e.tiers || []).length && row('Scripts tiers', e.tiers.map(t => `${t.host}${t.pq === 'full' ? '' : ' (classique)'}`).join(', ')),
-                        row('HSTS', maxAge ? `${Math.round(maxAge[1] / 86400)} jours${/includesubdomains/.test(e.hsts) ? ', sous-domaines compris' : ''}${/preload/.test(e.hsts) ? ', préchargé' : ''}` : 'absent'),
+                        row('HSTS', maxAge ? `${Math.round(maxAge[1] / 86400)} jours${/includesubdomains/.test(e.hsts) ? ', sous-domaines compris' : ''}${/preload/.test(e.hsts) ? ', préchargé' : ''}` : hstsUnknown(e) ? 'inconnu (sonde refusée)' : 'absent'),
                         row('Hypothèse', `${life.what} : sensible ${life.years} ans`),
                         row('Relevé', e.at ? `${dateTimeFr.format(new Date(e.at))} UTC` : dateFr),
                     ),
@@ -1408,7 +1416,7 @@
             for (const d of x.dots) {
                 const o = d.e;
                 g.append(s_('a', { href: `#${o.host}` },
-                    s_('title', null, `${o.name} · ${o.host} · ${o.pq === 'full' ? 'scellé' : o.pq === 'partial' ? 'en partie' : 'classique'}`),
+                    s_('title', null, `${o.name} · ${o.host} · ${o.pq === 'full' ? 'scellé' : o.onDemand ? 'sur demande' : o.pq === 'partial' ? 'en partie' : 'classique'}`),
                     s_('circle', { cx: x.x + d.dx, cy: x.y + d.dy, r: DOT, class: `point ${stateClass(o)}` })));
             }
             if (x.big) {
@@ -1437,8 +1445,14 @@
         const rest = measured.length - held;
         const restSealed = sealed.length - topSealed;
         const google = hubs.find(x => x.name === 'Google');
+        // The map groups by network; a plaque names the CDN its headers name.
+        // Where the two differ, say so, or a door is Imperva here and
+        // CloudFront on its plaque without a word.
+        const CDN_COMPANY = { cloudfront: 'Amazon', azure: 'Microsoft', google: 'Google', cloudflare: 'Cloudflare', akamai: 'Akamai', fastly: 'Fastly', imperva: 'Imperva' };
+        const split = measured.filter(e => e.frontBy === 'en-têtes' && CDN_COMPANY[e.front] && CDN_COMPANY[e.front] !== atlasBy.porte(e));
         sources($('atlas-texte'),
-            `le réseau qui annonce l'adresse de chaque porte (Team Cymru, relevé du ${dateFr}), regroupé par entreprise ; pour les certificats, l'émetteur lu dans le certificat servi. Les ${reachable.length - measured.length} fournisseurs d'IA du relevé ne sont pas comptés.`);
+            `le réseau qui annonce l'adresse de chaque porte (Team Cymru, relevé du ${dateFr}), regroupé par entreprise ; pour les certificats, l'émetteur lu dans le certificat servi.${reachable.length > measured.length ? ` Les ${reachable.length - measured.length} fournisseurs d'IA du relevé ne sont pas comptés.` : ''}`,
+            split.length ? [' Pour ', ...names(split, 99), `, les en-têtes nomment un autre CDN que le réseau qui annonce l'adresse : la carte suit le réseau, la plaque les en-têtes.`] : '');
         $('atlas-titre').append(`Cinq entreprises tiennent `, h('em', null, `${held} portes sur ${measured.length}`), '.');
         $('atlas-texte').append(
             top.map(x => `${x.name} ${x.list.length}`).join(', '), `. Derrière elles, ${pct(topSealed, held)} % des portes sont scellées ; chez tous les autres réunis, ${pct(restSealed, rest)} %. `,
@@ -1476,7 +1490,7 @@
         Anthropic: 'US', Meta: 'US', 'GitHub (Microsoft)': 'US', Alibaba: 'CN',
     };
     const COUNTRY_MAIL = { US: 'États-Unis', GB: 'Royaume-Uni', FR: 'France', JP: 'Japon', CH: 'Suisse', DE: 'Allemagne' };
-    const COUNTRY = { US: 'États-Unis', FR: 'France', IL: 'Israël', DE: 'Allemagne', DK: 'Danemark', MT: 'Malte', GB: 'Royaume-Uni', CN: 'Chine', SG: 'Singapour' };
+    const COUNTRY = { US: 'États-Unis', FR: 'France', IL: 'Israël', PL: 'Pologne', DE: 'Allemagne', DK: 'Danemark', MT: 'Malte', GB: 'Royaume-Uni', CN: 'Chine', SG: 'Singapour' };
     const lawOf = e => {
         const company = atlasBy.porte(e);
         if (PARENT[company]) return PARENT[company];
@@ -1572,10 +1586,9 @@
             `Ce n'est pas la souveraineté juridique. Celle-là, c'est ce que vérifie la qualification SecNumCloud de l'ANSSI : un prestataire, européen et pas forcément français, qui échappe aux lois extra-européennes par son actionnariat et ses contrats. Aucune mesure réseau ne montre si un site l'utilise. `,
             `On rattache chaque porte à la maison mère de l'entreprise qui répond à son adresse : c'est une lecture de la façade, pas un audit des contrats.`,
         );
-        // The note was rewritten after the first releases went out. Said on
-        // those, so a reader comparing with a saved copy knows why it differs;
-        // a release recorded after the rewrite never had the old text.
-        if (D.date < '2026-11-02') $('droit-note').append(' ', h('span', { class: 'corrige' },
+        // The note was rewritten after the first relevé went out. Said on that
+        // one, so a reader comparing with a saved copy knows why it differs.
+        if (outBefore('2026-11-02')) $('droit-note').append(' ', h('span', { class: 'corrige' },
             `Note corrigée le 2 novembre 2026 : la version précédente mettait notre définition à côté de SecNumCloud sans dire qu'elles ne mesurent pas la même chose. Les mesures n'ont pas changé.`));
         const asnsOf = list => [...new Set(list.map(e => operator(e)?.asn).filter(Boolean))].sort((a, b) => a - b);
         sources($('droit-note'),
@@ -1653,9 +1666,9 @@
             `${tt} site${tt > 1 ? 's' : ''} sur ${read.length} impose${tt > 1 ? 'nt' : ''} les Trusted Types ; ${eval_} autorisent encore 'unsafe-eval'. `,
             `Seul le HTML servi est lu : les scripts que d'autres scripts ajoutent ensuite ne se voient pas, et ces comptes sont des minimums.`,
         );
-        // Same reason as the sovereignty note: the earlier releases said this
-        // only here, at the foot.
-        if (D.date < '2026-11-02' && unread) $('csp-note').append(' ', h('span', { class: 'corrige' },
+        // Same reason as the sovereignty note: the relevés already out said
+        // this only here, at the foot.
+        if (outBefore('2026-11-02') && unread) $('csp-note').append(' ', h('span', { class: 'corrige' },
             `Précision ajoutée le 2 novembre 2026 : les pages non lues étaient signalées ici seulement, et le ${read.length} du titre semblait contredire les ${measured.length} portes du relevé. Les mesures n'ont pas changé.`));
     }
 
@@ -1670,6 +1683,7 @@
     // ------------------------------------------------------------ figures
     // What the run says beyond hybrid or not, each figure with the names behind it.
     {
+        const accepting = measured.filter(e => e.pq !== 'none').length;
         const costs = measured.filter(e => e.cost).map(e => e.cost.hybrid - e.cost.classical).sort((a, b) => a - b);
         const rtts = measured.filter(e => e.cost && e.cost.rtt != null).map(e => e.cost.rtt).sort((a, b) => a - b);
         const median = l => l[Math.floor(l.length / 2)];
@@ -1683,11 +1697,14 @@
         const usSealedN = measured.filter(e => lawOf(e) === 'US' && e.pq === 'full').length;
         const certs = measured.map(certOf).filter(Boolean);
         const rsa = certs.filter(c => c.key === 'rsaEncryption').length;
-        const noHsts = measured.filter(e => !e.hsts);
+        // A door that refused the probe sent back its bot wall, not its
+        // headers: no HSTS there is not an answer. Not counted, as for the CSP.
+        const noHsts = measured.filter(e => !e.hsts && !hstsUnknown(e));
+        const hstsBlind = measured.filter(hstsUnknown);
         const fig = (n, label, ...rest) => h('li', { class: 'chiffre' }, h('span', { class: 'n' }, n), h('span', { class: 'lib' }, label), rest.length ? h('span', { class: 'noms' }, ...rest) : null);
         const sign = d => `${d > 0 ? '+' : ''}${String(Math.round(d * 10) / 10).replace('.', ',')}`;
         $('chiffres').append(
-            fig(`${sign(median(costs))} ms`, `Le prix médian de l'hybride sur un handshake TLS, mesuré sur ${costs.length} serveurs qui l'acceptent`,
+            fig(`${sign(median(costs))} ms`, `Le prix médian de l'hybride sur un handshake TLS, mesuré sur ${costs.length === accepting ? costs.length : `${costs.length} des ${accepting}`} serveurs qui l'acceptent`,
                 `Meilleur de dix handshakes de chaque sorte, alternés, un serveur à la fois ; aller-retour réseau médian ${String(median(rtts)).replace('.', ',')} ms.`),
             fig(noTls13.length, `portes sans TLS 1.3, donc sans hybride possible`, ...names(noTls13, 8), '.'),
             fig(oldTls.length, 'acceptent encore TLS 1.0 ou 1.1, retirés en 2021', ...names(oldTls, 8), '.'),
@@ -1699,7 +1716,9 @@
                 frSealed.length ? ['Seules ', ...names(frSealed, 8), `. Sous droit américain : ${usSealedN} sur ${usLawN}.`] : 'Aucune.'),
             fig(`0 / ${certs.length}`, 'certificats post-quantiques',
                 `${rsa} RSA, ${certs.length - rsa} ECDSA. L'enregistrement d'aujourd'hui ne permet pas de forger une signature demain : ce chantier-là a son propre calendrier.`),
-            fig(noHsts.length, 'sites sans HSTS : une première visite peut partir en clair', ...names(noHsts, 5), '.'),
+            fig(noHsts.length, 'sites sans HSTS : une première visite peut partir en clair', ...names(noHsts, 5), '.',
+                hstsBlind.length ? [' ', ...names(hstsBlind, 99), ` ${hstsBlind.length > 1 ? 'ont' : 'a'} refusé la sonde et ne ${hstsBlind.length > 1 ? 'sont' : 'est'} pas compté${hstsBlind.length > 1 ? 's' : ''}.`] : '',
+                outBefore('2026-11-02') && hstsBlind.length ? h('span', { class: 'corrige' }, ` Corrigé le 2 novembre 2026 : ${hstsBlind.length > 1 ? 'ils étaient comptés' : 'il était compté'} sans HSTS, ce que la sonde refusée ne permettait pas de dire. ${noHsts.length + hstsBlind.length} auparavant.`) : ''),
         );
     }
 
@@ -1718,7 +1737,7 @@
             h('td', null, certOf(e)?.kind || '—'),
             h('td', null, operator(e) ? `AS${operator(e).asn} ${operator(e).name}` : '—'),
             h('td', null, CDN[e.front] || 'propre'),
-            h('td', null, e.hsts ? 'oui' : 'non'),
+            h('td', null, e.hsts ? 'oui' : hstsUnknown(e) ? '?' : 'non'),
             h('td', null, cspOf(e) ? cspOf(e).kind : '—'),
         ))),
     );

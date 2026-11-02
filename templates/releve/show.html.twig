@@ -136,7 +136,7 @@
 
     <section class="plaque sablier" aria-labelledby="sablier-titre">
         <div>
-            <p class="sur">Mesuré avec Sablier</p>
+            <p class="sur">Avec Sablier</p>
             <h2 id="sablier-titre">Faites le relevé chez vous.</h2>
             <p>Sablier est l'outil libre de BlackMesa qui inventorie la cryptographie d'un projet et dit combien de temps elle tient. Il sait aussi demander à un serveur ce qu'il négocie réellement, y compris l'hybride post-quantique.</p>
             <p id="sablier-sonde">Ce premier relevé a été fait avec une sonde OpenSSL 3.5 écrite pour l'occasion ; les suivants passeront par Sablier.</p>
@@ -157,7 +157,7 @@ make probe HOST=votre-site.fr</code></pre>
                 <h3>Le relevé</h3>
                 <p>Pour chaque nom, un client <code>OpenSSL 3.5.9</code> ouvre une connexion TLS 1.3 en ne proposant que le groupe hybride <code>X25519MLKEM768</code>, cinq fois de suite. Cinq réussites : scellé. Aucune : non. Entre les deux : une flotte de serveurs à moitié migrée.</p>
                 <p>Une connexion avec les réglages par défaut du client, qui propose l'hybride et X25519 comme un navigateur, relève ce qu'obtient vraiment un visiteur. Puis une connexion par version de TLS, une par groupe d'échange proposé seul, le certificat, l'en-tête HSTS, et, à part, un serveur à la fois, dix handshakes hybrides et dix classiques, alternés, pour en mesurer le prix.</p>
-                <p>L'opérateur réseau vient de l'annonce BGP de l'adresse (base DNS de Team Cymru) : c'est le pays où ce système autonome est enregistré, pas celui du serveur.</p>
+                <p>L'opérateur réseau vient de l'annonce BGP de l'adresse (base DNS de Team Cymru), rattaché à sa maison mère : Akamai International B.V., enregistrée aux Pays-Bas, compte comme américaine. C'est le pays de l'entreprise qui tient le réseau, pas celui du serveur.</p>
             </div>
             <div>
                 <h3>Ce qu'on ne voit pas</h3>
