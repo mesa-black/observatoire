@@ -464,8 +464,8 @@
 
     // ------------------------------------------------------------ the scan
     // Relevé 2 only: the AI doors read out one by one, as a machine would read
-    // them. Original typography and sound, nothing borrowed: the mood of the
-    // films, none of their material.
+    // them. Original typography; the music is the film's, and credited as such
+    // under the readout.
     if (M.focus === 'ia') {
         const scan = $('scan');
         const log = h('ol', { class: 'scan-log', 'aria-live': 'off' });
@@ -484,6 +484,10 @@
                 log, tally,
                 h('div', { class: 'scan-balayage', 'aria-hidden': 'true' }),
             ),
+            h('p', { class: 'sources' },
+                h('b', null, 'Musique\u00a0: '),
+                'thème de ', h('i', null, 'The Terminator'), ' (1984), composé par Brad Fiedel pour le film de James Cameron. ',
+                'Merci à eux, et à archive.org qui le conserve. Aucun d\u2019eux n\u2019est associé à ce relevé.'),
         );
         const pad = (t, n) => t.length >= n ? t.slice(0, n - 1) + '…' : t + ' ' + '.'.repeat(n - t.length - 1);
         // One line per organisation and provider; the classical ones last, so
