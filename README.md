@@ -84,6 +84,34 @@ published, not announced by the waiting page, not offered as a moment for a
 letter, shown as « brouillon » in the admin, which can still preview it.
 Remove the flag (and check `published`) to schedule it.
 
+### Sealed relevés
+
+A relevé's files are sealed by [Sablier](https://github.com/mesa-black/sablier)
+(`sablier seal`, from 0.14.0), on the machine that holds the key, then
+committed with the relevé:
+
+```
+make seal N=4     # releves/4/seal.sig, seal.tsr, seal.2.tsr, seal.3.tsr, seal.ots
+make anchor       # a few hours later: completes the Bitcoin proofs
+```
+
+`seal.sig` lists every file of `releves/4/` with its size and SHA-256 and signs
+that list with the key whose public halves are in `sablier.json` (Ed25519 +
+ML-DSA-65). The three authorities of the audit date it, and so does the
+OpenTimestamps anchoring. Any file edited afterwards, `meta.json` included,
+breaks the seal: run `make seal` again. An unchanged relevé keeps its seal and
+its first date.
+
+The image carries Sablier at the release the Dockerfile pins, and only checks
+the seals, using the public keys. No private key reaches the cluster. The admin's relevés page
+shows, for each one, *Scellé le* (the signature, the attested date, the
+block) and *Vérifié le* (when Sablier last checked, and what it said), with a
+button to check again. The consumer checks a new seal the day it appears and
+every seal weekly (`VerifySeals`). Each check runs on a copy of the relevé in
+`/tmp`, so a proof the calendars completed since the commit is completed and
+checked there (the admin then says to `make anchor`). Sablier's own JSON
+(`verify --json`) is kept in `var/data/seals/N.json`.
+
 ## The newsletter
 
 - **Subscribe**: email only, on every relevé. The answer is the same whether the

@@ -2,6 +2,10 @@ parameters:
     app.releves_dir: '%kernel.project_dir%/releves'
     # Optional monthly probe (k3s-stack, spoke/apps/observatoire/probe-cronjob.yaml) writes here.
     app.probes_dir: '%kernel.project_dir%/var/data/probes'
+    # Sablier, from the release the image pins (Dockerfile), and where the
+    # result of each check of a relevé's seal is kept.
+    env(SABLIER_BIN): '/opt/sablier/bin/sablier'
+    app.seals_dir: '%kernel.project_dir%/var/data/seals'
 
 services:
     _defaults:
@@ -25,12 +29,22 @@ services:
             $passwordHash: '%env(ADMIN_PASSWORD_HASH)%'
             $totpSecret: '%env(ADMIN_TOTP_SECRET)%'
 
+    App\Releve\SealVerifier:
+        arguments:
+            $sablierBin: '%env(SABLIER_BIN)%'
+            $sealsDir: '%app.seals_dir%'
+            # The public keys the seals are checked against: the declaration's.
+            $declaration: '%kernel.project_dir%/sablier.json'
+
     App\Doctrine\SqliteMiddleware:
         tags: [doctrine.middleware]
 
 when@test:
     parameters:
         app.releves_dir: '%kernel.project_dir%/tests/fixtures/releves'
+        # A stand-in that answers as Sablier would: the tests run without it.
+        env(SABLIER_BIN): '%kernel.project_dir%/tests/fixtures/fake-sablier'
+        app.seals_dir: '%kernel.project_dir%/var/test/seals'
     services:
         # No test queries real DNS.
         App\Newsletter\Dns:

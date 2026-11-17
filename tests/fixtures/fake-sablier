@@ -1,0 +1,28 @@
+#!/bin/sh
+# Answers `sablier verify <dir>/seal.sig --json=FILE` as Sablier would, so the
+# tests run without Sablier and still cover what the admin does with both
+# answers. FAKE_SABLIER_BROKEN in the environment makes the check fail.
+sig=$2
+json=
+for arg in "$@"; do
+	case "$arg" in --json=*) json=${arg#--json=} ;; esac
+done
+if [ -n "${FAKE_SABLIER_BROKEN:-}" ]; then valid=false; state=differs; modified='"broken"'; else valid=true; state=match; modified=; fi
+cat > "$json" <<JSON
+{
+    "checked_at": "2026-10-16T12:00:00+00:00",
+    "sablier": "0.14.0",
+    "covers": "files",
+    "digest": "0e8d82385ec97c4df04998c0628f83532b3332c4943c97115d533b4248ce0a9d",
+    "signed_at": "2026-10-15T08:00:00+00:00",
+    "previous": "",
+    "signature": {"valid": true, "reason": "verify.valid.hybrid", "algorithm": "Ed25519", "hybrid": "valid", "hybrid_algorithm": "ML-DSA-65", "fingerprint": "", "ephemeral": false},
+    "timestamps": [{"file": "seal.tsr", "state": "valid", "time": "2026-10-15T08:00:01+00:00", "authority": "DigiCert", "algorithm": "RSA-4096"}],
+    "anchors": [{"state": "valid", "height": 976246, "time": "2026-10-15T08:31:00+00:00", "source": "blockstream.info + mempool.space"}],
+    "pending": [],
+    "files": {"state": "$state", "count": 7, "bytes": 1234, "modified": [$modified], "missing": [], "added": []},
+    "valid": $valid
+}
+JSON
+echo "  signature valide, Ed25519 et post-quantique"
+[ "$valid" = true ]

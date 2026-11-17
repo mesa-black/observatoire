@@ -200,3 +200,10 @@ button.envoi { background: var(--vif); }
 .ou::before, .ou::after { content: ""; flex: 1; border-top: 1px solid var(--filet); }
 .case { display: flex; gap: .5rem; align-items: center; font-size: .9rem; margin-top: 1rem; }
 .seul .retour { margin-top: 1rem; text-align: center; font-size: .85rem; }
+
+/* The seal column of the relevés: what Sablier said, compact. */
+.badge.echec { background: var(--vif-fond); color: var(--vif); }
+td.sceau { min-width: 16rem; }
+td.sceau p { margin: .2rem 0; }
+td.sceau ul { margin: .3rem 0 0; padding-left: 1.1rem; }
+td.sceau pre { white-space: pre-wrap; font-size: .75rem; max-width: 40rem; }

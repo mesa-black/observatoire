@@ -1,26 +1,88 @@
 {% extends 'admin/layout.html.twig' %}
 {% import 'admin/_ui.html.twig' as ui %}
 {% block title %}Relevés{% endblock %}
+
+{# What Sablier said of one relevé's seal, the last time it was asked. #}
+{% macro sceau(r, s) %}
+    {% if not s.sealed %}
+        <span class="badge draft">non scellé</span>
+        <p class="discret">Sur le poste qui détient la clé : <code>make seal N={{ r.number }}</code>, puis commit.</p>
+    {% elseif s.last is null %}
+        <span class="badge a-venir">scellé, jamais vérifié</span>
+    {% else %}
+        {% set v = s.last %}
+        {% set valid = v.valid ?? false %}
+        <p>{% if valid %}<span class="badge publie">conforme</span>{% else %}<span class="badge echec">échec</span>{% endif %}</p>
+        {% if v.signed_at ?? '' %}<p><b>Scellé le</b> {{ v.signed_at|date }}{% if (v.signature.hybrid ?? '') == 'valid' %} · Ed25519 + {{ v.signature.hybrid_algorithm }}{% endif %}</p>{% endif %}
+        {% set attested = (v.timestamps ?? [])|filter(t => t.state in ['valid', 'untrusted']) %}
+        {% if attested|length %}
+            <p class="discret">Date attestée le {{ (attested|first).time|date }} par {{ attested|map(t => t.authority ?: t.file)|join(', ') }}</p>
+        {% endif %}
+        {% set anchored = (v.anchors ?? [])|filter(a => a.state == 'valid') %}
+        {% if anchored|length %}
+            <p class="discret">Ancré au bloc {{ (anchored|first).height }} ({{ (anchored|first).time|date }}){% if v.completed_here ?? false %} — preuve complétée à la vérification, à reporter dans le dépôt : <code>make anchor</code>{% endif %}</p>
+        {% elseif (v.pending ?? [])|length %}
+            <p class="discret">Ancrage Bitcoin en attente ({{ v.pending|length }} calendrier{{ v.pending|length > 1 ? 's' }})</p>
+        {% endif %}
+        <p class="discret"><b>Vérifié le</b> {{ v.checked_at|date }}{% if v.sablier ?? '' %} par Sablier {{ v.sablier }}{% endif %}</p>
+        {% if not valid %}
+            <ul class="discret">
+                {% if v.error ?? '' %}<li>{{ v.error }}</li>{% endif %}
+                {% if not (v.signature.valid ?? true) %}<li>Signature : {{ v.signature.reason }}</li>{% endif %}
+                {% for f in v.files.modified ?? [] %}<li><code>{{ f }}</code> modifié depuis le scellé</li>{% endfor %}
+                {% for f in v.files.missing ?? [] %}<li><code>{{ f }}</code> scellé, et absent</li>{% endfor %}
+                {% for f in v.files.added ?? [] %}<li><code>{{ f }}</code> présent, et absent du sceau</li>{% endfor %}
+                {% for t in (v.timestamps ?? [])|filter(t => t.state in ['invalid', 'unreadable']) %}<li>Jeton <code>{{ t.file }}</code> : {{ t.state }}</li>{% endfor %}
+                {% for a in (v.anchors ?? [])|filter(a => a.state != 'valid' and a.state != 'unchecked') %}<li>Ancrage : {{ a.state }}</li>{% endfor %}
+            </ul>
+        {% endif %}
+        {% if v.output ?? '' %}<details><summary class="discret">Ce que Sablier a répondu</summary><pre>{{ v.output }}</pre></details>{% endif %}
+    {% endif %}
+{% endmacro %}
+
 {% block body %}
 <section class="carte serree">
     <h2>{{ ui.ico('releve') }} {{ releves|length }} relevé{{ releves|length > 1 ? 's' }}</h2>
     <div class="table"><table>
-        <thead><tr><th>N°</th><th>Titre</th><th>Mesuré le</th><th>Publication (Paris)</th><th>État</th><th></th></tr></thead>
+        <thead><tr><th>N°</th><th>Titre</th><th>Mesuré le</th><th>Publication (Paris)</th><th>État</th><th>Sceau</th><th></th></tr></thead>
         <tbody>
         {% for r in releves %}
-            <tr>
+            {% set s = sceaux[r.number] %}
+            <tr id="releve-{{ r.number }}">
                 <td>{{ r.number }}</td>
                 <td>{{ r.title }}</td>
                 <td>{{ r.date }}</td>
                 <td>{{ r.publishedAt|date }}</td>
                 <td>{% if r.isPublishedAt(now) %}<span class="badge publie">publié</span>{% elseif r.draft %}<span class="badge draft">brouillon</span>{% else %}<span class="badge a-venir">à venir</span>{% endif %}</td>
-                <td class="fin">{% if r.isPublishedAt(now) %}<a href="{{ path('releve', {number: r.number}) }}" class="bouton second">{{ ui.ico('site') }} Voir</a>{% else %}<a href="{{ path('admin_releve_preview', {number: r.number}) }}" class="bouton second">{{ ui.ico('oeil') }} Aperçu</a>{% endif %}</td>
+                <td class="sceau">{{ _self.sceau(r, s) }}</td>
+                <td class="fin">
+                    <div class="actions">
+                        {% if r.isPublishedAt(now) %}<a href="{{ path('releve', {number: r.number}) }}" class="bouton second">{{ ui.ico('site') }} Voir</a>{% else %}<a href="{{ path('admin_releve_preview', {number: r.number}) }}" class="bouton second">{{ ui.ico('oeil') }} Aperçu</a>{% endif %}
+                        {% if s.sealed %}
+                            <form method="post" action="{{ path('admin_releve_verify', {number: r.number}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('verifier-sceau') }}">
+                                <button type="submit" class="second">{{ ui.ico('bouclier') }} Vérifier</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </td>
             </tr>
         {% else %}
-            <tr><td colspan="6">Aucun relevé.</td></tr>
+            <tr><td colspan="7">Aucun relevé.</td></tr>
         {% endfor %}
         </tbody>
     </table></div>
+</section>
+
+<section class="carte">
+    <h2>{{ ui.ico('bouclier') }} Sceaux</h2>
+    <p class="discret">Chaque relevé est scellé par Sablier sur le poste qui détient la clé (<code>make seal N=…</code>) : la liste de ses fichiers, signée en Ed25519 et ML-DSA-65, datée par des autorités d'horodatage et ancrée dans la chaîne Bitcoin. Ici, Sablier ne fait que vérifier, avec les clés publiques de <code>sablier.json</code> : le jour même pour un sceau nouveau, chaque semaine ensuite, et quand vous le demandez. Modifier un fichier d'un relevé, y compris son <code>meta.json</code>, demande de le resceller.</p>
+    {% if sceaux|filter(s => s.sealed)|length %}
+        <form method="post" action="{{ path('admin_releve_verify') }}" class="actions">
+            <input type="hidden" name="_token" value="{{ csrf_token('verifier-sceau') }}">
+            <button type="submit">{{ ui.ico('bouclier') }} Tout vérifier maintenant</button>
+        </form>
+    {% endif %}
 </section>
 
 {% if probes %}
