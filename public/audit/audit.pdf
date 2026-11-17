@@ -15,7 +15,7 @@ BT 0 g /F2 15.0 Tf 56.00 769.89 Td (Rapport d'audit — Observatoire post-quantiqu
 0.85 G 0.4 w 56.00 745.19 m 539.28 745.19 l S
 BT 0 g /F1 9.5 Tf 56.00 739.19 Td (Rapport d'audit) Tj ET
 BT 0 g /F2 11.5 Tf 56.00 710.08 Td (Observatoire post-quantique) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 690.21 Td (Exposition cryptographique et durées de confidentialité · 17/11/2026 07:25 UTC) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 690.21 Td (Exposition cryptographique et durées de confidentialité · 17/11/2026 12:50 UTC) Tj ET
 BT 0 g /F2 11.5 Tf 56.00 661.10 Td (Sommaire) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 641.23 Td (-) Tj ET
 BT 0 g /F1 9.5 Tf 70.00 641.23 Td (Objet et périmètre) Tj ET
@@ -51,9 +51,9 @@ BT 0 g /F1 9.5 Tf 206.00 388.82 Td ([à compléter]) Tj ET
 BT 0 g /F2 9.5 Tf 56.00 373.71 Td (Périmètre analysé) Tj ET
 BT 0 g /F1 9.5 Tf 206.00 373.71 Td (.) Tj ET
 BT 0 g /F2 9.5 Tf 56.00 358.60 Td (Date de l'analyse) Tj ET
-BT 0 g /F1 9.5 Tf 206.00 358.60 Td (17/11/2026 07:25 UTC) Tj ET
+BT 0 g /F1 9.5 Tf 206.00 358.60 Td (17/11/2026 12:50 UTC) Tj ET
 BT 0 g /F2 9.5 Tf 56.00 343.49 Td (Volume examiné) Tj ET
-BT 0 g /F1 9.5 Tf 206.00 343.49 Td (268 fichiers lus) Tj ET
+BT 0 g /F1 9.5 Tf 206.00 343.49 Td (282 fichiers lus) Tj ET
 BT 0 g /F2 9.5 Tf 56.00 328.38 Td (Outil) Tj ET
 BT 0 g /F1 9.5 Tf 206.00 328.38 Td (Sablier 0.13.2) Tj ET
 BT 0 g /F2 9.5 Tf 56.00 313.27 Td (Commande exécutée) Tj ET
@@ -130,7 +130,7 @@ BT 0 g /F2 10.0 Tf 56.00 289.61 Td (Ce qu'il a cherché et n'a pas trouvé) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 271.81 Td (Chaque ligne est un résultat, pas un silence : un détecteur a ouvert ces fichiers et n'en a rien tiré. Le nombre est là) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 258.70 Td (pour que vous puissiez juger la portée de la phrase plutôt que la croire.) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 240.59 Td (-) Tj ET
-BT 0 g /F1 9.5 Tf 70.00 240.59 Td (268 fichier\(s\) lu\(s\) : aucune clé privée, aucun certificat, aucun magasin de clés dans l'arborescence versionnée.) Tj ET
+BT 0 g /F1 9.5 Tf 70.00 240.59 Td (282 fichier\(s\) lu\(s\) : aucune clé privée, aucun certificat, aucun magasin de clés dans l'arborescence versionnée.) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 224.48 Td (-) Tj ET
 BT 0 g /F1 9.5 Tf 70.00 224.48 Td (10 fichier\(s\) binaire\(s\) examiné\(s\) : aucun ne porte de bloc de clé, d'octets après la fin de l'image, ni) Tj ET
 BT 0 g /F1 9.5 Tf 70.00 211.37 Td (d'extension qui mente sur son contenu.) Tj ET
@@ -599,35 +599,36 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 19 0 R /F2 20 0 R /F3 21 0 R >> >> /Contents 18 0 R >>
 endobj
 18 0 obj
-<< /Length 3479 >>
+<< /Length 3732 >>
 stream
 BT 0 g /F1 9.5 Tf 56.00 785.89 Td (de la machine qui a signé. Sa limite : le jeton est signé en RSA-4096, que ce rapport classe lui-même comme) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 772.78 Td (vulnérable au quantique — c'est une preuve pour un litige dans les prochaines années, pas pour 2040.) Tj ET
 BT 0 g /F2 9.5 Tf 56.00 754.67 Td (ancrage Bitcoin) Tj ET
-BT 0 g /F1 9.5 Tf 206.00 754.67 Td (en attente · soumis à alice.btc.calendar.opentimestamps.org,) Tj ET
-BT 0 g /F1 9.5 Tf 206.00 741.56 Td (bob.btc.calendar.opentimestamps.org, finney.calendar.eternitywall.com,) Tj ET
-BT 0 g /F1 9.5 Tf 206.00 728.45 Td (btc.calendar.catallaxy.com le 17/11/2026 07:25 UTC, complet d'ici quelques) Tj ET
-BT 0 g /F1 9.5 Tf 206.00 715.34 Td (heures) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 696.23 Td (Ce que l'ancrage établira : que l'empreinte ci-dessus existait au plus tard à un bloc de la chaîne Bitcoin, sans) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 683.12 Td (autorité à croire. Tant que la transaction des calendriers n'est pas dans un bloc, le fichier dit seulement quels) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 670.01 Td (calendriers interroger ; sablier verify le complète alors, et à partir de là la preuve n'a plus besoin d'eux.) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 651.90 Td (Se vérifie sans aucune autorité, avec la preuve déposée à côté du rapport : ots verify -d) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 638.79 Td (e66108e5650d3f69b4808a35577e93287e53432422c0a6699a6be05a2eaebbda report.html.ots) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 620.68 Td (Le client officiel \(pip install opentimestamps-client\) prend l'en-tête du bloc auprès d'un nœud Bitcoin à vous. sablier) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 607.57 Td (verify le prend auprès de deux explorateurs publics qui doivent concorder, et vérifie lui-même la preuve de travail) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 594.46 Td (de l'en-tête plutôt que de les croire ; sur une machine sans réseau, l'en-tête se passe à la main avec) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 581.35 Td (--block-header.) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 563.24 Td (Ce rapport porte deux signatures : Ed25519, vérifiable partout, et ML-DSA-65, qui résiste aux algorithmes) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 550.13 Td (quantiques connus. Aucune ne remplace l'autre — c'est l'hybridation que l'ANSSI demande, appliquée ici au) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 537.02 Td (document lui-même.) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 518.91 Td (Vérification par un tiers : sablier verify report.html.sig --declare=sablier.json) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 500.80 Td (Ce document a sa propre signature, dans le fichier audit.html.page.sig déposé à côté de lui. Elle est calculée sur) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 487.69 Td (une empreinte du fichier — changez un seul caractère et l'empreinte change complètement —, si bien que si un seul) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 474.58 Td (caractère de ce document est modifié, la vérification échoue. Le PDF, quand il y en a un, a la sienne à côté de lui,) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 461.47 Td (de la même façon. Pour la vérifier : sablier verify audit.html.page.sig --declare=sablier.json) Tj ET
-BT 0 g /F2 10.0 Tf 56.00 432.36 Td (Déclaration de l'auditeur) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 414.56 Td (Aucune déclaration de l'auditeur n'a été fournie. Elle doit être rédigée, datée et signée avant que ce document soit) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 401.45 Td (produit devant un tiers.) Tj ET
+BT 0 g /F1 9.5 Tf 206.00 754.67 Td (bloc 976246 · 17/11/2026 07:56 UTC) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 735.56 Td (Ce que l'ancrage établit : l'empreinte ci-dessus existait au plus tard à ce bloc de la chaîne Bitcoin, que des milliers) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 722.45 Td (de machines indépendantes détiennent. Personne n'a à être cru : la preuve est une suite d'opérations SHA-256) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 709.34 Td (qui mène de l'empreinte à la racine de Merkle du bloc, vérifiée sans cet outil et sans aucun certificat. Ses limites :) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 696.23 Td (elle prouve quand, pas qui — c'est le rôle de la signature. Face à un ordinateur quantique, la preuve elle-même) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 683.12 Td (n'est faite que d'empreintes \(SHA-256, parfois RIPEMD-160\), que l'algorithme de Grover affaiblit sans les casser :) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 670.01 Td (elle n'expire pas comme le RSA des jetons ; que la chaîne Bitcoin garde son consensus à travers cette transition) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 656.90 Td (est hors de ce que la preuve peut dire.) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 638.79 Td (Se vérifie sans aucune autorité, avec la preuve déposée à côté du rapport : ots verify -d) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 625.68 Td (e66108e5650d3f69b4808a35577e93287e53432422c0a6699a6be05a2eaebbda report.html.ots) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 607.57 Td (Le client officiel \(pip install opentimestamps-client\) prend l'en-tête du bloc auprès d'un nœud Bitcoin à vous. sablier) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 594.46 Td (verify le prend auprès de deux explorateurs publics qui doivent concorder, et vérifie lui-même la preuve de travail) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 581.35 Td (de l'en-tête plutôt que de les croire ; sur une machine sans réseau, l'en-tête se passe à la main avec) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 568.24 Td (--block-header.) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 550.13 Td (Ce rapport porte deux signatures : Ed25519, vérifiable partout, et ML-DSA-65, qui résiste aux algorithmes) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 537.02 Td (quantiques connus. Aucune ne remplace l'autre — c'est l'hybridation que l'ANSSI demande, appliquée ici au) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 523.91 Td (document lui-même.) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 505.80 Td (Vérification par un tiers : sablier verify report.html.sig --declare=sablier.json) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 487.69 Td (Ce document a sa propre signature, dans le fichier audit.html.page.sig déposé à côté de lui. Elle est calculée sur) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 474.58 Td (une empreinte du fichier — changez un seul caractère et l'empreinte change complètement —, si bien que si un seul) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 461.47 Td (caractère de ce document est modifié, la vérification échoue. Le PDF, quand il y en a un, a la sienne à côté de lui,) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 448.36 Td (de la même façon. Pour la vérifier : sablier verify audit.html.page.sig --declare=sablier.json) Tj ET
+BT 0 g /F2 10.0 Tf 56.00 419.25 Td (Déclaration de l'auditeur) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 401.45 Td (Aucune déclaration de l'auditeur n'a été fournie. Elle doit être rédigée, datée et signée avant que ce document soit) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 388.34 Td (produit devant un tiers.) Tj ET
 BT 0.45 g /F1 7.5 Tf 56.00 38.00 Td (Rapport d'audit · Observatoire post-quantique · Sablier 0.13.2 · 8/8) Tj ET
 
 endstream
@@ -642,7 +643,7 @@ endobj
 << /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
 endobj
 22 0 obj
-<< /Title (Rapport d'audit — Observatoire post-quantique) /Producer (Sablier 0.13.2) /CreationDate (D:20261117072551) >>
+<< /Title (Rapport d'audit — Observatoire post-quantique) /Producer (Sablier 0.13.2) /CreationDate (D:20261117125032) >>
 endobj
 xref
 0 23
@@ -665,12 +666,12 @@ xref
 0000036183 00000 n 
 0000042110 00000 n 
 0000042267 00000 n 
-0000045798 00000 n 
-0000045896 00000 n 
-0000045999 00000 n 
-0000046095 00000 n 
+0000046051 00000 n 
+0000046149 00000 n 
+0000046252 00000 n 
+0000046348 00000 n 
 trailer
 << /Size 23 /Root 1 0 R /Info 22 0 R >>
 startxref
-46232
+46485
 %%EOF
