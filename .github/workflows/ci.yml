@@ -22,7 +22,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       -
         name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -50,7 +50,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       -
         name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -80,7 +80,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       -
         name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -117,19 +117,19 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       -
         # The heavy stage (composer, cache warmup) runs on the runner's own
         # platform; only the base stage's small RUN (setcap) runs per
         # architecture, hence emulation for arm64.
         name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
       -
         name: Set up Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
       -
         name: Log in to ghcr.io
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -139,7 +139,7 @@ jobs:
         # repository names exactly which build runs, and going back is a revert.
         name: Build and push
         id: observatoire
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           target: frankenphp_prod
@@ -158,7 +158,7 @@ jobs:
         # same commit tag; its tests run inside the build.
         name: Build and push handshake
         id: handshake
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: devops/handshake
           platforms: linux/amd64,linux/arm64
@@ -174,7 +174,7 @@ jobs:
   # GitOps, exactly as the blog: one line changed in k3s-stack, Argo CD does
   # the rest. Rollback = git revert of that commit.
   deploy:
-    name: Deploy (commit to k3s-stack)
+    name: Deploy via Argo CD
     needs: image
     runs-on: ubuntu-24.04
     concurrency:
@@ -186,7 +186,7 @@ jobs:
         # key ("observatoire CI"), not the blog's, so that either can be
         # revoked alone. Same secret name as in the blog's repository.
         name: Checkout the deployment repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: mesa-black/k3s-stack
           ssh-key: ${{ secrets.K3S_STACK_DEPLOY_KEY }}
