@@ -9,5 +9,39 @@
         "handshake.mesa.black"
     ],
     "default_lifetime_years": 3,
-    "domains": {}
+    "domains": {
+        "acces techniques": {
+            "paths": [
+                "src/Releve/*"
+            ],
+            "lifetime_years": 0,
+            "note": "Les liens d'aperçu ne servent que jusqu'à la publication du relevé ; ensuite, tout est public.",
+            "declared_by": "Jérôme Nadaud",
+            "declared_on": "2026-11-17"
+        },
+        "abonnés à la lettre": {
+            "paths": [
+                "src/Newsletter/*",
+                "src/Entity/Subscriber.php",
+                "templates/newsletter/*",
+                "templates/email/*"
+            ],
+            "lifetime_years": 3,
+            "note": "Adresses e-mail des abonnés, et rien d'autre : ni nom, ni adresse IP, ni suivi d'ouverture. Conservées tant que la personne est abonnée ; effacées dès le désabonnement, par le lien de chaque lettre, le bouton du client mail ou un simple e-mail. Les inscriptions jamais confirmées sont purgées au bout de 7 jours. Trois ans, c'est la durée maximale que la CNIL retient pour des données de prospection à compter du dernier contact. Les sauvegardes nocturnes gardent jusqu'à six mois d'historique : une adresse effacée y reste jusqu'à leur rotation.",
+            "declared_by": "Jérôme Nadaud",
+            "declared_on": "2026-11-17"
+        },
+        "accès administrateur": {
+            "paths": [
+                "src/Security/*",
+                "config/packages/security.yaml",
+                "src/Entity/Passkey.php",
+                "src/Command/AdminTotpCommand.php"
+            ],
+            "lifetime_years": 1,
+            "note": "Mot de passe (Argon2), secret TOTP, passkeys et code envoyé par e-mail : de quoi entrer dans l'administration, pas des données à garder secrètes longtemps. Les secrets tournent avec create-secret.sh, et chaque rotation oublie les appareils de confiance ; les passkeys restent sur les appareils de leur titulaire.",
+            "declared_by": "Jérôme Nadaud",
+            "declared_on": "2026-11-17"
+        }
+    }
 }
