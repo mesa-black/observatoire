@@ -46,6 +46,22 @@
 		-X-Powered-By
 	}
 
+	# The signed cryptographic inventory (make audit): self-contained pages
+	# whose only style is in the page itself, and no script at all. Their own
+	# policy, set before the default above can apply: inline style and nothing
+	# else. The evidence beside them is served as what it is.
+	@audit path /audit/*
+	header @audit {
+		Content-Security-Policy "default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+		Cache-Control "no-cache"
+	}
+	@signature path *.sig
+	header @signature Content-Type "application/json; charset=utf-8"
+	@token path *.tsr
+	header @token Content-Type "application/timestamp-reply"
+	@anchor path *.ots
+	header @anchor Content-Type "application/octet-stream"
+
 	# app.js and style.css are linked with ?v=<hash of their content>
 	# (App\Twig\AssetExtension): a new version is a new URL, so the old one can
 	# be kept forever.
