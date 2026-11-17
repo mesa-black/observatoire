@@ -2,26 +2,33 @@
 
 The production side of the [prototype](../observatoire-pq): the monthly relevés
 served at `https://observatoire.mesa.black`, a newsletter with double opt-in, and
-a small admin. Symfony 7.4 on FrankenPHP 1.13 (PHP 8.5), one container image,
-deployed by Argo CD on the k3s spoke like the blog.
+a small admin. Symfony 7.4 on FrankenPHP 1.13 (PHP 8.5), one application image
+(plus `handshake`, a small Go service of its own), deployed by Argo CD on the
+k3s spoke like the blog.
 
-What to provide or decide before it goes live: [SETUP.md](SETUP.md).
+The Kubernetes manifests are not in this repository: they live in the k3s-stack
+repository (private), `spoke/apps/observatoire/`, with the Argo CD Application
+in `hub/apps/observatoire.yaml`. What was done to put it live, and what is
+still open: [SETUP.md](SETUP.md).
 
 ## What is where
 
 | Path | What |
 |---|---|
 | `releves/N/` | One relevé: `meta.json` (number, measurement date, publication time in Paris, title, intro) and the prototype's files for that date, verbatim: `DATE.jsonl`, `.self.jsonl`, `.cost.jsonl`, `.self.cost.jsonl`, `.csp.jsonl`, `.self.csp.jsonl`, `.domains.json` (the list snapshot), `.meta.json` (optional, the prototype's own: passed to the page as `meta`) |
-| `src/Releve/DataBuilder.php` | `build.sh`'s jq, in PHP. Same data, key order included: `tests/Releve/DataBuilderTest.php` compares it with the prototype's `site/data-2026-10-15.js` |
+| `src/Releve/DataBuilder.php` | `build.sh`'s jq, in PHP. Same data, key order included: `tests/Releve/DataBuilderTest.php` compares it with the prototype's output for each relevé, copied to `tests/fixtures/` (`data-2026-10-15.js` for relevé 1, `data-2026-11-02.js` for relevé 2, and the drafts') |
 | `src/Releve/ReleveRepository.php` | Publication gating: a relevé exists for the public once its time (Paris) has come, 404 before |
 | `templates/releve/show.html.twig` | **Generated** from the prototype's `index.html` by `make sync` |
 | `public/app.js`, `style.css`, `fonts/` | **Copied** from the prototype by `make sync`; `app.js` with one line changed (below) |
 | `public/site.css`, `admin.css` | This application's own styles: the newsletter form, the small pages, the admin |
 | `src/Newsletter/` | Subscriptions (double opt-in), signed links, mails, sending |
 | `src/Scheduler/` | Every minute: send the letters whose time has come. Every day: forget unconfirmed requests older than 7 days |
-| `src/Controller/Admin/` | Login (+ TOTP), dashboard, letters, preview of unpublished relevés |
+| `src/Controller/Admin/` | Login (password + second factor, or a passkey), dashboard, letters, preview of unpublished relevés |
+| `src/Releve/PreviewLinks.php` | `/apercu/N/token`: a relevé before its time for whoever holds the link (signed with `APP_SECRET`, noindex), to check its link preview |
+| `src/Command/` | `app:apercu N` prints that preview link; `app:admin:totp` generates a TOTP secret for the admin |
+| `templates/cours/` | The course's chapters, served at `/comprendre` (`templates/page/comprendre.html.twig`): what every relevé's words mean |
 | `devops/frankenphp/` | Caddyfile (security headers), PHP ini, entrypoint (migrations) |
-| `deploy/k3s/` | Manifests to copy into `k3s-stack` (`spoke/apps/observatoire/`, `hub/apps/observatoire.yaml`) |
+| `devops/handshake/` | `handshake`, in Go, its own image: tells a reader's browser which TLS key exchange its connection negotiated, for the course. Terminates TLS itself, behind a Traefik passthrough route |
 
 ## Run it locally
 
@@ -33,6 +40,7 @@ Only podman is needed: PHP, Composer, PHPUnit and PHPStan run in the dev image.
     make stan           # PHPStan, level 8
     make image          # the production image
     make run            # http://localhost:8080, read-only root, as in the pod
+    make console CMD="app:apercu 3"   # any bin/console command, in the dev image
 
 The admin (`/admin`, user `admin`) needs a hash in the environment:
 
@@ -80,9 +88,11 @@ Remove the flag (and check `published`) to schedule it.
 
 - **Subscribe**: email only, on every relevé. The answer is the same whether the
   address is new, pending or already confirmed, so the form cannot tell who
-  reads us. Rate limited per client address (5/hour) and per mailbox (3/day,
-  so nobody can flood a third party with confirmation mails). A honeypot field
-  catches naive robots. No captcha: every captcha worth the name is a third party.
+  reads us. Rate limited per client (5/hour), per mailbox (3/day, `+tags` and
+  Gmail dots counted as one inbox, so nobody can flood a third party with
+  confirmation mails), and overall (200 confirmation mails a day, whatever the
+  number of clients). A domain that takes no mail is refused before anything
+  is sent. A honeypot field catches naive robots. No captcha: every captcha worth the name is a third party.
 - **Confirm**: the mail holds a link signed with `APP_SECRET` (HMAC of id, address
   and expiry, 7 days). Opening it shows a button; the POST confirms. A GET never
   acts, because mail security scanners open every link they see.
@@ -105,9 +115,11 @@ on a known text.
 
 No IP address, not even hashed. A hash of an IPv4 address is reversible by
 brute force in minutes, so it remains personal data; and it would prove
-nothing more than the confirmation click already does. The client address is
-used for rate limiting only, held in the limiter's cache for its window (one
-hour at most), never next to the subscriber. No open or click tracking: no
+nothing more than the confirmation click already does. The rate limiters do
+not count the client address either, but a keyed hash of it (an HMAC with
+`APP_SECRET`, an IPv6 address by its /64: `src/Security/ClientKey.php`), held
+in the limiter's cache for its window (one hour at most), never next to the
+subscriber. Anonymous visitors open no session: only the admin does. No open or click tracking: no
 pixel, no rewritten links. The server keeps no access log.
 
 Retention: unconfirmed requests are deleted after 7 days; unsubscribing deletes
@@ -122,24 +134,58 @@ for the owner to validate (SETUP.md).
 One replica, a few thousand rows at most, writes measured in per day. SQLite in
 a file on the pod's volume needs no database server on a node with 1 vCPU and
 1.9 GiB that also runs k3s, the blog and Vaultwarden (which made the same
-choice). WAL mode and a busy timeout let the web and consumer containers share
-it. The messenger queue is a table in the same file (Doctrine transport).
+choice). WAL mode and a busy timeout let the web and consumer pods share it
+(same node: the volume is ReadWriteOnce). The messenger queue is a table in the same file (Doctrine transport).
 
-The cost: one pod (`strategy: Recreate`, a few seconds without a pod at each
-deploy, mostly hidden by Traefik's retry), and backups to set up (SETUP.md). If
-the Observatoire ever needs two replicas, Postgres (CloudNativePG, as the K3S
-Stack README plans) is a change of `DATABASE_URL` and a migration rerun: the
-code uses nothing SQLite-specific outside `src/Doctrine/SqliteMiddleware.php`.
+The cost: one replica, on one node. A deploy still has no gap: the web
+Deployment rolls (`RollingUpdate`, `maxUnavailable: 0`, `maxSurge: 1`), the new
+pod Ready before the old one stops, both on the same file for a few seconds —
+safe with WAL on a local filesystem. That overlap means the old code runs
+against the new schema: the new pod migrates at start while the old one still
+answers, so a migration must stay backward compatible (add a column in one
+release, drop the old one in a later one, never rename in place). A CronJob
+backs the file up every night (`sqlite3 .backup`, age-encrypted, to OVH S3, as
+vault's). If the Observatoire ever needs more replicas, Postgres is a change of
+`DATABASE_URL` and a migration rerun — CloudNativePG already runs on the
+cluster, for Show me the REX: the code uses nothing SQLite-specific outside
+`src/Doctrine/SqliteMiddleware.php`.
 
-## The worker: a second container in the pod
+## The worker: a Deployment of its own
 
-The consumer (`messenger:consume async scheduler_default`) runs as a second
-container of the same pod, same image. Not a FrankenPHP worker: those answer
-HTTP requests, and this is a loop with none. Its own container restarts on its
-own, logs on its own and has its own memory limit, while sharing the pod's
-volume — which SQLite requires, and which a separate Deployment could not do
-cleanly with a ReadWriteOnce volume and Recreate semantics. It waits for the
-web container's migrations, and exits every hour to be restarted fresh.
+The consumer (`messenger:consume async scheduler_default`) runs in its own
+Deployment, `observatoire-consumer`, same image, same volume. Not a FrankenPHP
+worker: those answer HTTP requests, and this is a loop with none. Not a second
+container of the web pod either, as it first was: the web pods now roll, and
+two consumers side by side, even for seconds, could send the same letter
+twice. So the consumer stays `Recreate` (the old one stops before the new one
+starts; meanwhile messages wait in the queue), shares the ReadWriteOnce volume
+by running on the same node, waits for the web pod's migrations
+(`doctrine:migrations:up-to-date`), and exits every hour or past 96 MB
+(`--time-limit=3600 --memory-limit=96M`) to be restarted fresh.
+
+## CI and deployment
+
+`.github/workflows/ci.yml`, GitOps as the blog: the CI never talks to the
+cluster, it changes one file in k3s-stack and Argo CD does the rest.
+
+- **Every push and pull request**: PHPUnit (the parity tests included) and
+  PHPStan; `composer validate` and `composer audit --locked`.
+- **Every day** (06:23 UTC): the dependency audit alone, since a relevé month
+  can pass without a commit.
+- **Push to `main`**, once both pass: two multi-arch images (amd64, arm64)
+  pushed to `ghcr.io`, tagged with the full commit SHA, never `latest`:
+  `ghcr.io/mesa-black/observatoire` (target `frankenphp_prod`) and
+  `ghcr.io/mesa-black/handshake` (`devops/handshake`).
+- **Deploy**: a job checks out `mesa-black/k3s-stack` with the deploy key
+  `K3S_STACK_DEPLOY_KEY` (write access to that repository only, its own key,
+  not the blog's), sets `newTag` and `digest` of both images in
+  `spoke/apps/observatoire/kustomization.yaml` with `yq` (the tag names the
+  commit, the digest the bytes), and commits `observatoire: deploy <sha7>` with
+  this commit's subject. Argo CD's Application `observatoire` syncs it
+  automatically (`selfHeal: true`, `prune: false`: a file removed by mistake
+  must never remove the database).
+
+Rollback: `git revert` of that deploy commit in k3s-stack.
 
 ## Security headers
 
@@ -172,11 +218,13 @@ Set by the Caddyfile inside the image, for every response:
 
 Public pages set no cookie. The admin has a session cookie (`SameSite=Strict`,
 `HttpOnly`, `Secure` behind TLS), CSRF tokens on every form, login throttling
-(5 attempts / 15 min) and optional TOTP.
+(5 attempts / 15 min) and a second factor (TOTP, or a code by mail), or a passkey.
 
 ## Admin
 
 `https://observatoire.mesa.black/admin`, from anywhere. A passkey (Touch ID,
 Face ID, the device's PIN) once added from the dashboard; otherwise the
-password, then the TOTP code once per device (trusted 30 days). Sessions last
+password, then a second factor once per device (trusted 30 days): the TOTP
+code, or a 6-digit code mailed to `ADMIN_EMAIL` (`src/Security/AdminUser.php`),
+each limited to 5 tries per 15 minutes. Sessions last
 30 days; 5 login attempts per 15 minutes.

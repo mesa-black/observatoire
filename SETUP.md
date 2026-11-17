@@ -1,101 +1,106 @@
 # What the owner provides or decides
 
-Nothing below has been done. Everything is prepared in this repository; the
-items are in the order they can be done.
+The Observatoire is live at `https://observatoire.mesa.black` since 2026-10-16.
+This is the checklist that got it there, ticked with the date of the commit that
+did it, and what is still open. The manifests live in the k3s-stack repository
+(private), `spoke/apps/observatoire/`; the Argo CD Application in
+`hub/apps/observatoire.yaml`.
 
-## Decisions
+## Done
 
-- [ ] **Publication time of relevé 1** — `releves/1/meta.json`, `"published"`,
-      Paris time. Currently `2026-10-15 07:00`, a **placeholder** chosen so that
-      the local check serves it: as is, relevé 1 is public from the first deploy.
-- [ ] **Relevé 2** (2026-10-16, AI services) — not copied yet: its cost
-      measurement was still running. When done: `make releve N=2 DATE=2026-10-16`,
-      then set its `"published"` (written as 2099 until then) and `"title"`.
-- [ ] **The relevé 2 soundtrack** — hotlinked from archive.org
-      (`The Terminator.mp3`, redirects to a `*.archive.org` mirror). It is the
-      site's only third-party request (visitors' IP addresses reach archive.org),
-      it contradicts the footer's "rien qui vienne d'ailleurs", and the track is
-      copyrighted. To clear before publication: rights, or self-hosting a
-      licensed file (then drop `media-src` from
-      `src/Security/ContentSecurityPolicy.php`), or no music.
-- [ ] **Organisations to warn before naming them** — list who gets a heads-up
-      (and how long before) for relevés 1 and 2, especially those shown as
-      "classique" or with third-party scripts on their home page.
-- [ ] **Admin reachable from the internet, or not** — today `/admin` is public,
-      behind password + TOTP. Vault's pattern (an Ingress on `/admin` with an
-      allow-list nobody matches, admin via `kubectl port-forward`) is possible
-      at the price of convenience.
-- [ ] **Legal notice and privacy text** — `templates/page/privacy.html.twig` is a
-      draft (controller: Jérôme Nadaud, BlackMesa; processor: Brevo; contact
-      address = `ADMIN_EMAIL`). Validate it, and add the legal notice (mentions
-      légales: publisher, host OVH) the site does not have yet.
-- [ ] **Sender address** — `MAILER_FROM` in `deploy/.../configmap.yaml`, today
-      `Observatoire post-quantique <observatoire@mesa.black>`, and
-      `ADMIN_EMAIL` (test copies, contact in the privacy page), today
-      `jerome@nadaud.io`.
-- [ ] **Backups of the SQLite file** — not prepared. The vault-backup CronJob
-      (sqlite3 `.backup`, age, rclone to OVH S3) can be copied with a prefix of
-      its own; until then, losing the node loses the subscriber list.
+### DNS
 
-## DNS
+- [x] `observatoire.mesa.black` **A → 164.132.255.21** (the mesa.black server,
+      at Gandi). No AAAA: mesa.black has none. Resolving before the Application
+      was added, so cert-manager's HTTP-01 challenge passed (2026-10-16).
 
-- [ ] `observatoire.mesa.black` **A → 164.132.255.21** (the mesa.black server, as
-      resolved on 2026-10-16; `observatoire.mesa.black` does not resolve yet).
-      No AAAA: mesa.black has none today.
-- [ ] Wait for it to resolve before adding the Argo CD Application: cert-manager's
-      HTTP-01 challenge needs it.
+### GitHub
 
-## Brevo (mail)
+- [x] Repository `mesa-black/observatoire`, CI green, first deploy commit in
+      k3s-stack on 2026-10-16.
+- [x] **Deploy key "observatoire CI"**: write access on `mesa-black/k3s-stack`,
+      private half as the secret `K3S_STACK_DEPLOY_KEY` of this repository (same
+      name as in the blog's repository, a different key so either can be
+      revoked alone).
+- [x] **GHCR**: `ghcr.io/mesa-black/observatoire` public, as `labs`: the spoke
+      pulls without credentials. `ghcr.io/mesa-black/handshake` since 2026-10-19.
 
-- [ ] A Brevo account (Show me the REX's, or a new one) and an **API key**
-      (`xkeysib-…`, not an SMTP key) for `MAILER_DSN=brevo+api://KEY@default`.
-- [ ] **Authenticate the sending domain `mesa.black`** in Brevo (Senders, domains &
-      dedicated IPs → Domains), and verify the sender address. Brevo then gives
-      the exact records; expect:
-  - the `brevo-code:…` TXT on `mesa.black` (ownership);
-  - DKIM: two CNAMEs, `brevo1._domainkey` and `brevo2._domainkey`;
-  - SPF: today `v=spf1 include:icloud.com ~all` → add Brevo's include
-    (`include:spf.brevo.com`) in the **same** record (one SPF record only);
-  - DMARC: `_dmarc.mesa.black` is `v=DMARC1; p=none; rua=mailto:labs@mesa.black`.
-    Fine to start; consider `p=quarantine` once Brevo's DKIM aligns.
-  - MX stays iCloud: replies to the sender land there.
-- [ ] Check that Brevo's transactional API keeps our `List-Unsubscribe` headers
-      as sent (send a test from the admin, look at the raw headers in Gmail).
+### k3s-stack and Argo CD
 
-## GitHub
+- [x] Manifests in `spoke/apps/observatoire/`, the Application parked in
+      `hub/pending/` (`29acd58`, 2026-10-16).
+- [x] The Secret created by hand on the spoke (`create-secret.sh`: `APP_SECRET`,
+      admin password hash, TOTP secret; shape in `secret.example.yaml`). Rotation
+      apart: `rotate-admin-password.sh`, `rotate-admin-totp.sh`.
+- [x] Application moved to `hub/apps/` (`cd7e7d0`, 2026-10-16): Synced/Healthy,
+      certificate issued (Let's Encrypt, ECDSA P-256), `/` 200, `http://` → 301.
+- [x] Deploys without a gap (`2b116f4`, 2026-10-19): web pods `RollingUpdate`
+      (`maxUnavailable: 0`, `maxSurge: 1`), the consumer in its own Deployment,
+      `Recreate`. Memory: each web pod asks 64 MiB, limit 192 MiB (two of them
+      for a few seconds at each deploy); the consumer asks 48 MiB, limit 128 MiB.
+- [x] `handshake` behind a Traefik passthrough route (`54d98f6`, 2026-10-19),
+      NetworkPolicies (`9c80da7`), images pinned by digest as well as tag
+      (`27899b7`, 2026-10-20).
 
-- [ ] Create the repository `mesa-black/observatoire` and push this one
-      (`git remote add origin git@github.com:mesa-black/observatoire.git`).
-- [ ] **Deploy key "observatoire CI"**: `ssh-keygen -t ed25519 -N '' -f
-      ~/.ssh/observatoire-ci-k3s-stack`; public half on `mesa-black/k3s-stack` →
-      Settings → Deploy keys, **write access ticked**; private half as the
-      secret `K3S_STACK_DEPLOY_KEY` of `mesa-black/observatoire` (same name as
-      in the blog's repository, a different key so either can be revoked alone).
-- [ ] **GHCR**: the first push creates `ghcr.io/mesa-black/observatoire`. Make
-      the package public (as `labs`) or give the spoke a pull secret.
-- [ ] Check the first CI run went green and committed a `newTag` in k3s-stack
-      (the file must exist there first: next section).
+### Backups
 
-## k3s-stack and Argo CD
+- [x] Nightly CronJob (`backup.yaml`, `270a962`, 2026-10-16): `sqlite3 .backup`
+      in vault-backup's image, integrity and schema checks, age-encrypted for
+      vault's public key, OVH S3 under the `observatoire.mesa.black` prefix,
+      7/4/6 retention, a report every Monday. Ran once and restored the same day.
 
-- [ ] Copy `deploy/k3s/spoke/apps/observatoire/` to
-      `k3s-stack/spoke/apps/observatoire/` and commit (the `newTag:
-      REPLACED-BY-CI` is replaced by the first CI run).
-- [ ] Create the Secret on the spoke, from the workstation:
-      `IMAGE=ghcr.io/mesa-black/observatoire:<sha> spoke/apps/observatoire/create-secret.sh`
-      (generates `APP_SECRET`, the admin password → clipboard, the TOTP secret →
-      clipboard as an `otpauth://` URI; asks for the Brevo key). Shape:
-      `secret.example.yaml`.
-- [ ] Copy `deploy/k3s/hub/apps/observatoire.yaml` to `k3s-stack/hub/apps/` and
-      commit: the root Application picks it up.
-- [ ] Check: Argo CD tile `observatoire` Synced/Healthy, certificate issued
-      (`kubectl -n observatoire get certificate`), `curl -I
-      https://observatoire.mesa.black/` shows the CSP, `/admin` logs in.
-- [ ] Memory: the pod asks 112 MiB and may use up to 320 MiB (web 192 + consumer
-      128) on a node with 1.9 GiB. Measured locally: ~67 MB for the web
-      container at rest. Watch it the first week.
+### Brevo (mail) and the newsletter
+
+- [x] Sending domain `mesa.black` authenticated in Brevo (ownership TXT, DKIM,
+      Brevo's include in the one SPF record), API key in the Secret
+      (`MAILER_DSN=brevo+api://…`), newsletter on (`73e8137`, 2026-10-16).
+- [x] Sender `Observatoire post-quantique <observatoire@mesa.black>`
+      (`MAILER_FROM`), `ADMIN_EMAIL` for test copies, login codes and the
+      privacy page's contact: both in k3s-stack's `configmap.yaml`.
+
+### Relevés
+
+- [x] **Relevé 1** published 2026-10-16 07:00 (Paris), measured 2026-10-15.
+- [x] **Relevé 2** (AI services) published 2026-11-02 07:00, measured again
+      that day.
+- [x] Relevé 3 scheduled for 2026-12-16 07:00; relevés 4, 5, 6 are drafts.
+
+### Admin
+
+- [x] `/admin` reachable from the internet (`77cd629`, 2026-10-16, the owner's
+      decision): the application defends it itself. Password, then a second
+      factor once per device (TOTP, or a 6-digit code mailed to `ADMIN_EMAIL`),
+      or a passkey (Touch ID, Face ID, the device's PIN) added from the dashboard.
+      5 tries per 15 minutes for each.
+
+## Still open
+
+- [ ] **The relevé 2 soundtrack** — still hotlinked from archive.org (the
+      Terminator theme, credited under the readout). It is the site's only
+      third-party request (visitors' IP addresses reach archive.org), it
+      contradicts the footer's "rien qui vienne d'ailleurs", and the track is
+      copyrighted. To clear: rights, or self-hosting a licensed file (then drop
+      `media-src` from `src/Security/ContentSecurityPolicy.php`), or no music.
+- [ ] **Legal notice** — the site has no mentions légales yet (publisher, host
+      OVH). The privacy text (`templates/page/privacy.html.twig`; controller
+      Jérôme Nadaud, BlackMesa; processor Brevo; contact `ADMIN_EMAIL`) is still
+      for the owner to validate.
+- [ ] **Organisations to warn before naming them** — who gets a heads-up, and
+      how long before, for the coming relevés; especially those shown as
+      "classique" or with third-party scripts on their home page. Not recorded
+      here for relevés 1 and 2.
+- [ ] **Brevo keeps our `List-Unsubscribe` headers** — send a test from the
+      admin and look at the raw headers in Gmail (not recorded as done).
+- [ ] **DMARC** — `_dmarc.mesa.black` has **two** TXT records today (2026-11-17),
+      `rua=mailto:jerome@nadaud.io` and `rua=mailto:labs@mesa.black`, both
+      `p=none`. More than one DMARC record and receivers ignore DMARC
+      altogether (RFC 7489 §6.6.3): keep one. Then consider `p=quarantine`
+      once Brevo's DKIM aligns.
 
 ## Optional: the monthly probe
+
+Not enabled. `probe-cronjob.yaml` in k3s-stack is not listed in
+`kustomization.yaml`, and its image is `ghcr.io/mesa-black/observatoire-probe:CHANGE-ME`.
 
 - [ ] Build and push the probe image from `observatoire-pq/Containerfile` as
       `ghcr.io/mesa-black/observatoire-probe:<tag>` (no CI exists for it).

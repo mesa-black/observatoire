@@ -1,6 +1,6 @@
 parameters:
     app.releves_dir: '%kernel.project_dir%/releves'
-    # Optional monthly probe (deploy/k3s/.../probe-cronjob.yaml) writes here.
+    # Optional monthly probe (k3s-stack, spoke/apps/observatoire/probe-cronjob.yaml) writes here.
     app.probes_dir: '%kernel.project_dir%/var/data/probes'
 
 services:

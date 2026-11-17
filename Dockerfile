@@ -1,8 +1,9 @@
 # syntax=docker/dockerfile:1
 #
 # The Observatoire as one image: FrankenPHP serving Symfony in worker mode, the
-# relevés baked in as files. The same image runs the messenger consumer, as a
-# second container of the pod (deploy/k3s/.../deployment.yaml says why).
+# relevés baked in as files. The same image runs the messenger consumer, in a
+# Deployment of its own (k3s-stack, spoke/apps/observatoire/consumer.yaml says
+# why).
 #
 #   podman build --target frankenphp_prod -t localhost/observatoire .
 #
