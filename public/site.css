@@ -53,9 +53,9 @@
 .cours h1 { margin: .5rem 0 1rem; font: 400 clamp(2.4rem, 6vw, 3.6rem)/1.05 var(--serif); }
 .cours h1 em { color: var(--vif); }
 .chapo-cours { margin: 0; max-width: 40rem; font-size: 1.12rem; color: var(--doux); }
-.sommaire { padding: 1rem 1.3rem; background: var(--papier); border: 1px solid var(--filet); border-radius: 12px; }
+.sommaire { padding: 1rem 1.3rem; background: var(--papier); border: 1px solid var(--filet); border-radius: 12px; font-size: .88rem; }
 .sommaire ol { margin: 0; padding-left: 1.3rem; }
-.sommaire li { margin: .2rem 0; }
+.sommaire li { margin: .15rem 0; line-height: 1.45; }
 .chapitre { display: grid; grid-template-columns: minmax(0, 1fr) 21rem; gap: 1.5rem 3rem; align-items: start; margin-top: 3.2rem; padding-top: 1.8rem; border-top: 1px solid var(--filet); counter-increment: chapitre; scroll-margin-top: 1rem; }
 .chapitre-large { grid-template-columns: minmax(0, 1fr); }
 .chapitre-texte { max-width: 42rem; }
