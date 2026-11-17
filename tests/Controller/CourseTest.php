@@ -2,6 +2,8 @@
 
 namespace App\Tests\Controller;
 
+use App\Releve\DataBuilder;
+use App\Releve\ReleveRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 final class CourseTest extends WebTestCase
@@ -22,6 +24,13 @@ final class CourseTest extends WebTestCase
         $this->assertSelectorCount(1, 'p.a-essayer[data-handshake][hidden]');
         $this->assertSelectorExists('#porte .encart-cours [data-handshake-encart][hidden] [data-groupe]');
         $this->assertSelectorCount(9, 'section.chapitre aside.encart-cours');
+        // The number of doors is the latest published relevé's, not a figure
+        // typed once and left behind.
+        $latest = static::getContainer()->get(ReleveRepository::class)->latestPublished();
+        $this->assertNotNull($latest);
+        $doors = \count(static::getContainer()->get(DataBuilder::class)->doors($latest));
+        $this->assertSelectorTextSame('#porte .encart-cours > b.gros', $doors." portes d'entrée");
+        $this->assertSelectorTextContains('#porte .chapitre-texte', "pour $doors organisations françaises");
         $this->assertSelectorNotExists('meta[name="robots"]');
         // No link to itself in its footer; the other small pages keep it.
         $this->assertSelectorNotExists('.pied a[href="/comprendre"]');

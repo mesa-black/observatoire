@@ -11,12 +11,17 @@
         <h2 id="porte-titre">La porte d'entrée</h2>
         <p>Quand vous ouvrez le site de votre banque, un petit cadenas apparaît dans la barre d'adresse. Il veut dire deux choses : personne ne peut lire ce qui passe entre vous et la banque, et c'est bien la banque qui vous répond, pas un imposteur.</p>
         <p>Ce cadenas, c'est <b>TLS</b> (<i>Transport Layer Security</i>), le protocole qui chiffre le web. Le « S » de HTTPS, c'est lui. Chaque fois que vous arrivez sur un site, votre navigateur et le serveur commencent par une <b>poignée de main</b> (<i>handshake</i>) : en quelques millisecondes, ils se mettent d'accord sur la manière de chiffrer, le serveur prouve son identité, et ils fabriquent ensemble une clé secrète que personne d'autre ne connaît.</p>
-        <p>Cette poignée de main se fait à la <b>porte d'entrée</b> du site : le premier serveur qui répond. C'est elle que l'Observatoire mesure, chaque mois, pour 115 organisations françaises. Ce qui se passe derrière la porte, on ne le voit pas d'ici, et on ne prétend pas le voir.</p>
+        <p>Cette poignée de main se fait à la <b>porte d'entrée</b> du site : le premier serveur qui répond. C'est elle que l'Observatoire mesure, chaque mois, pour {% if portes %}{{ portes }} organisations françaises{% else %}des organisations françaises{% endif %}. Ce qui se passe derrière la porte, on ne le voit pas d'ici, et on ne prétend pas le voir.</p>
     </div>
     <aside class="encart-cours">
         <p class="sur">Ce que l'Observatoire relève</p>
-        <b class="gros">115 portes d'entrée</b>
+        {# Counted in the latest published relevé (PageController::course). #}
+        {% if portes %}
+        <b class="gros">{{ portes }} portes d'entrée</b>
         <p>d'organisations françaises, une fois par mois : la poignée de main de chacune.</p>
+        {% else %}
+        <p>Les portes d'entrée d'organisations françaises, une fois par mois : la poignée de main de chacune.</p>
+        {% endif %}
         <div class="encart-direct" data-handshake-encart hidden>
             <p class="sur">À l'instant, chez vous</p>
             <b class="gros" data-groupe></b>
