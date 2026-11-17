@@ -1,0 +1,13 @@
+{
+    "project": "Observatoire post-quantique",
+    "_regime": "A public site that publishes monthly measurements, with a newsletter and an administration. No framework of its own applies to its cryptography: the general regime.",
+    "regime": "general",
+    "jurisdiction": "FR",
+    "_probe": "What the site negotiates is decided by the server, not by these files: the site itself, and the service that reports a reader's own handshake.",
+    "probe": [
+        "observatoire.mesa.black",
+        "handshake.mesa.black"
+    ],
+    "default_lifetime_years": 3,
+    "domains": {}
+}
