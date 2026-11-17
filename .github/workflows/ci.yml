@@ -64,10 +64,47 @@ jobs:
           composer validate --strict --no-check-publish
           composer audit --locked --no-interaction
 
+  # The source's cryptography against its reference (.sablier/baseline.json):
+  # what the signed inventory in public/audit/ described. New cryptography in
+  # a commit stops the image until somebody decides about it — fixed, or
+  # accepted with a reason and a date. The reference is captured from what is
+  # versioned, never from a working tree:
+  #   T=$(mktemp -d); git archive HEAD | tar -x -C "$T"
+  #   sablier scan "$T" --json=.sablier/baseline.json --no-probe
+  # No --sign here: the key is the owner's and never on a runner. CI checks
+  # the inventory; a person signs it (make audit).
+  cryptography:
+    name: Cryptography in the source
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-24.04
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v5
+      -
+        name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: sodium, openssl, json
+          coverage: none
+      -
+        # A tag, not a branch: this decides whether the build passes.
+        name: Get Sablier
+        run: git clone --depth 1 --branch v0.13.2 https://github.com/mesa-black/sablier.git "$RUNNER_TEMP/sablier"
+      -
+        name: Inventory the cryptography
+        run: |
+          php "$RUNNER_TEMP/sablier/bin/sablier" scan . \
+            --baseline=.sablier/baseline.json \
+            --out="$RUNNER_TEMP/report.html" \
+            --lang=fr \
+            --no-probe
+
   # ---------------------------------------------------------------- delivery
   image:
     name: Image
-    needs: [tests, dependencies]
+    needs: [tests, dependencies, cryptography]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     permissions:

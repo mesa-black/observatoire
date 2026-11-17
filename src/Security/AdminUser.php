@@ -88,9 +88,13 @@ final class AdminUser implements UserInterface, PasswordAuthenticatedUserInterfa
      * A device trusted after one code stays trusted 30 days, unless the
      * password or the TOTP secret changes: the version follows both, so a new
      * create-secret.sh run forgets every device at once.
+     *
+     * Sixty bits of SHA-256 rather than CRC32 (Sablier flagged it, 2026-11-17):
+     * a checksum beside a secret is the wrong tool, and with 32 bits one change
+     * in four billion would have left every old device trusted.
      */
     public function getTrustedTokenVersion(): int
     {
-        return crc32($this->passwordHash.'|'.$this->totpSecret.'|'.$this->email);
+        return (int) hexdec(substr(hash('sha256', $this->passwordHash.'|'.$this->totpSecret.'|'.$this->email), 0, 15));
     }
 }

@@ -1,0 +1,50 @@
+{
+    "project": "Observatoire post-quantique",
+    "_regime": "A public site that publishes monthly measurements, with a newsletter and an administration. No framework of its own applies to its cryptography: the general regime.",
+    "regime": "general",
+    "jurisdiction": "FR",
+    "_probe": "What the site negotiates is decided by the server, not by these files: the site itself, and the service that reports a reader's own handshake.",
+    "probe": [
+        "observatoire.mesa.black",
+        "handshake.mesa.black"
+    ],
+    "default_lifetime_years": 3,
+    "_signing": "The key expected for this repository's reports and for the endorsement of this declaration. Its public halves live here, so changing it is a commit somebody reads; its private halves live in ~/.sablier and never enter the repository.",
+    "signing_public_key": "Ag/9d1zbK2IzxSWLEu80SLFuEhYy04wSUFGxaSwz6pI=",
+    "signing_public_key_pq": "-----BEGIN PUBLIC KEY-----\n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\nnRd14Kfs\n-----END PUBLIC KEY-----\n",
+    "domains": {
+        "acces techniques": {
+            "paths": [
+                "src/Releve/*"
+            ],
+            "lifetime_years": 0,
+            "note": "Les liens d'aperçu ne servent que jusqu'à la publication du relevé ; ensuite, tout est public.",
+            "declared_by": "Jérôme Nadaud",
+            "declared_on": "2026-11-17"
+        },
+        "abonnés à la lettre": {
+            "paths": [
+                "src/Newsletter/*",
+                "src/Entity/Subscriber.php",
+                "templates/newsletter/*",
+                "templates/email/*"
+            ],
+            "lifetime_years": 3,
+            "note": "Adresses e-mail des abonnés, et rien d'autre : ni nom, ni adresse IP, ni suivi d'ouverture. Conservées tant que la personne est abonnée ; effacées dès le désabonnement, par le lien de chaque lettre, le bouton du client mail ou un simple e-mail. Les inscriptions jamais confirmées sont purgées au bout de 7 jours. Trois ans, c'est la durée maximale que la CNIL retient pour des données de prospection à compter du dernier contact. Les sauvegardes nocturnes gardent jusqu'à six mois d'historique : une adresse effacée y reste jusqu'à leur rotation.",
+            "declared_by": "Jérôme Nadaud",
+            "declared_on": "2026-11-17"
+        },
+        "accès administrateur": {
+            "paths": [
+                "src/Security/*",
+                "config/packages/security.yaml",
+                "src/Entity/Passkey.php",
+                "src/Command/AdminTotpCommand.php"
+            ],
+            "lifetime_years": 1,
+            "note": "Mot de passe (Argon2), secret TOTP, passkeys et code envoyé par e-mail : de quoi entrer dans l'administration, pas des données à garder secrètes longtemps. Les secrets tournent avec create-secret.sh, et chaque rotation oublie les appareils de confiance ; les passkeys restent sur les appareils de leur titulaire.",
+            "declared_by": "Jérôme Nadaud",
+            "declared_on": "2026-11-17"
+        }
+    }
+}

@@ -20,7 +20,7 @@
     {# No link to the page one is on (the error page renders without a request). #}
     {% set here = app.request ? app.request.attributes.get('_route') : null %}
     {% set links = {course: 'Comprendre', privacy: 'Confidentialité'}|filter((label, route) => route != here) %}
-    <p>{% for route, label in links %}{% if not loop.first %} · {% endif %}<a href="{{ path(route) }}">{{ label }}</a>{% endfor %}</p>
+    <p>{% for route, label in links %}{% if not loop.first %} · {% endif %}<a href="{{ path(route) }}">{{ label }}</a>{% endfor %} · <a href="/audit/report.html">Inventaire cryptographique</a></p>
 </footer>
 </body>
 </html>
