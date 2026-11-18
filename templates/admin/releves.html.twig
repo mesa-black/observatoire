@@ -3,8 +3,12 @@
 {% block title %}Relevés{% endblock %}
 
 {# What Sablier said of one relevé's seal, the last time it was asked. #}
-{% macro sceau(r, s) %}
-    {% if not s.sealed %}
+{% macro sceau(r, s, now) %}
+    {% if not s.sealed and not r.isPublishedAt(now) %}
+        {# A draft or a relevé to come can still change: it is sealed as it was published. #}
+        <span class="badge draft">non scellé</span>
+        <p class="discret">À sceller une fois publié.</p>
+    {% elseif not s.sealed %}
         <span class="badge draft">non scellé</span>
         <p class="discret">Sur le poste qui détient la clé : <code>make seal N={{ r.number }}</code>, puis commit.</p>
     {% elseif s.last is null %}
@@ -50,15 +54,16 @@
             {% set s = sceaux[r.number] %}
             <tr id="releve-{{ r.number }}">
                 <td>{{ r.number }}</td>
-                <td>{{ r.title }}</td>
+                <td>{{ r.title }}{% if s.sealed %} <span class="scelle" title="Scellé par Sablier">{{ ui.ico('bouclier') }}</span>{% endif %}</td>
                 <td>{{ r.date }}</td>
                 <td>{{ r.publishedAt|date }}</td>
                 <td>{% if r.isPublishedAt(now) %}<span class="badge publie">publié</span>{% elseif r.draft %}<span class="badge draft">brouillon</span>{% else %}<span class="badge a-venir">à venir</span>{% endif %}</td>
-                <td class="sceau">{{ _self.sceau(r, s) }}</td>
+                <td class="sceau">{{ _self.sceau(r, s, now) }}</td>
                 <td class="fin">
                     <div class="actions">
                         {% if r.isPublishedAt(now) %}<a href="{{ path('releve', {number: r.number}) }}" class="bouton second">{{ ui.ico('site') }} Voir</a>{% else %}<a href="{{ path('admin_releve_preview', {number: r.number}) }}" class="bouton second">{{ ui.ico('oeil') }} Aperçu</a>{% endif %}
-                        {% if s.sealed %}
+                        {# Once checked, the weekly tick checks it again; resealed, it is unchecked again. #}
+                        {% if s.sealed and not s.checked %}
                             <form method="post" action="{{ path('admin_releve_verify', {number: r.number}) }}">
                                 <input type="hidden" name="_token" value="{{ csrf_token('verifier-sceau') }}">
                                 <button type="submit" class="second">{{ ui.ico('bouclier') }} Vérifier</button>
@@ -76,12 +81,15 @@
 
 <section class="carte">
     <h2>{{ ui.ico('bouclier') }} Sceaux</h2>
-    <p class="discret">Chaque relevé est scellé par Sablier sur le poste qui détient la clé (<code>make seal N=…</code>) : la liste de ses fichiers, signée en Ed25519 et ML-DSA-65, datée par des autorités d'horodatage et ancrée dans la chaîne Bitcoin. Ici, Sablier ne fait que vérifier, avec les clés publiques de <code>sablier.json</code> : le jour même pour un sceau nouveau, chaque semaine ensuite, et quand vous le demandez. Modifier un fichier d'un relevé, y compris son <code>meta.json</code>, demande de le resceller.</p>
-    {% if sceaux|filter(s => s.sealed)|length %}
+    <p class="discret">Chaque relevé est scellé par Sablier sur le poste qui détient la clé (<code>make seal N=…</code>) : la liste de ses fichiers, signée en Ed25519 et ML-DSA-65, datée par des autorités d'horodatage et ancrée dans la chaîne Bitcoin. Ici, Sablier ne fait que vérifier, avec les clés publiques de <code>sablier.json</code> : le jour même pour un sceau nouveau, chaque semaine ensuite, et ici pour ceux qui ne l'ont pas encore été. Modifier un fichier d'un relevé, y compris son <code>meta.json</code>, demande de le resceller.</p>
+    {% set unchecked = sceaux|filter(s => s.sealed and not s.checked)|length %}
+    {% if unchecked %}
         <form method="post" action="{{ path('admin_releve_verify') }}" class="actions">
             <input type="hidden" name="_token" value="{{ csrf_token('verifier-sceau') }}">
-            <button type="submit">{{ ui.ico('bouclier') }} Tout vérifier maintenant</button>
+            <button type="submit">{{ ui.ico('bouclier') }} Tout vérifier maintenant ({{ unchecked }})</button>
         </form>
+    {% elseif sceaux|filter(s => s.sealed)|length %}
+        <p class="discret">Tous les sceaux ont été vérifiés.</p>
     {% endif %}
 </section>
 

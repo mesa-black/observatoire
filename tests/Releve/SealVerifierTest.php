@@ -40,9 +40,11 @@ final class SealVerifierTest extends TestCase
         file_put_contents($this->dir.'/releve/seal.sig', '{"covers":"files"}');
         $verifier = $this->verifier('2026-10-16');
         $this->assertTrue($verifier->isDue($this->releve()));
+        $this->assertFalse($verifier->isChecked($this->releve()));
 
         $verifier->verify($this->releve());
         $this->assertFalse($verifier->isDue($this->releve()));
+        $this->assertTrue($verifier->isChecked($this->releve()));
         $this->assertTrue($verifier->last($this->releve())['valid'] ?? null);
     }
 
@@ -57,6 +59,8 @@ final class SealVerifierTest extends TestCase
 
         file_put_contents($this->dir.'/releve/seal.sig', '{"covers":"files","digest":"other"}');
         $this->assertTrue($this->verifier('2026-10-16 12:00')->isDue($this->releve()));
+        // Resealed: the last result is about the old seal, so this one is not checked.
+        $this->assertFalse($this->verifier('2026-10-16 12:00')->isChecked($this->releve()));
     }
 
     private function verifier(string $now): SealVerifier

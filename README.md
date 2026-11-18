@@ -100,13 +100,15 @@ that list with the key whose public halves are in `sablier.json` (Ed25519 +
 ML-DSA-65). The three authorities of the audit date it, and so does the
 OpenTimestamps anchoring. Any file edited afterwards, `meta.json` included,
 breaks the seal: run `make seal` again. An unchanged relevé keeps its seal and
-its first date.
+its first date. A relevé is sealed once published, not before: `make seal`
+refuses a draft, or a relevé whose publication time (Paris) has not come, since
+it can still change.
 
 The image carries Sablier at the release the Dockerfile pins, and only checks
 the seals, using the public keys. No private key reaches the cluster. The admin's relevés page
 shows, for each one, *Scellé le* (the signature, the attested date, the
 block) and *Vérifié le* (when Sablier last checked, and what it said), with a
-button to check again. The consumer checks a new seal the day it appears and
+button to check the seals not checked yet. The consumer checks a new seal the day it appears and
 every seal weekly (`VerifySeals`). Each check runs on a copy of the relevé in
 `/tmp`, so a proof the calendars completed since the commit is completed and
 checked there (the admin then says to `make anchor`). Sablier's own JSON

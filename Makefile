@@ -93,8 +93,16 @@ audit:
 # the anchoring of the audit: make seal N=4. The seal lists every file of
 # releves/N, meta.json included, so a relevé edited afterwards is sealed again;
 # an unchanged one keeps its seal and its first date. The admin only checks it.
+# A draft, or a relevé whose publication time (Paris) has not come, is refused:
+# it can still change, and its seal would only date a version nobody read.
 seal:
 	@test -n "$(N)" && test -f releves/$(N)/meta.json || { echo "usage: make seal N=4 (releves/N/meta.json must exist)"; exit 1; }
+	@! grep -Eq '"draft"[[:space:]]*:[[:space:]]*true' releves/$(N)/meta.json || { echo "✗ relevé $(N) is a draft: seal it once published"; exit 1; }
+	@published=$$(sed -n 's/.*"published"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' releves/$(N)/meta.json); \
+	 now=$$(TZ=Europe/Paris date '+%Y-%m-%d %H:%M'); \
+	 if [ -z "$$published" ] || expr "$$published" '>' "$$now" >/dev/null; then \
+		echo "✗ relevé $(N) is published on $${published:-?} (Paris), not yet: seal it then"; exit 1; \
+	 fi
 	@test -f "$(SABLIER_KEY)" || { echo "✗ signing key not found: $(SABLIER_KEY)"; exit 1; }
 	@$(SABLIER_RELEASED)
 	@$(SABLIER) seal releves/$(N) --sign=$(KEY_IN) --timestamp=$(TSA) --anchor=$(ANCHOR) --lang=fr

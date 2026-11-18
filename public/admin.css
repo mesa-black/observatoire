@@ -207,3 +207,4 @@ td.sceau { min-width: 16rem; }
 td.sceau p { margin: .2rem 0; }
 td.sceau ul { margin: .3rem 0 0; padding-left: 1.1rem; }
 td.sceau pre { white-space: pre-wrap; font-size: .75rem; max-width: 40rem; }
+.scelle { color: var(--vif); vertical-align: -.2rem; }
