@@ -38,6 +38,9 @@ final class SealAdminTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('tbody', 'make seal N=1');
         $this->assertSelectorTextContains('tbody', 'scellé, jamais vérifié');
+        // A draft is not asked for a seal yet: it can still change.
+        $this->assertSelectorTextContains('#releve-3 td.sceau', 'À sceller une fois publié');
+        $this->assertSelectorTextNotContains('#releve-3 td.sceau', 'make seal');
         // A button only where there is a seal to check: relevé 2 here.
         $this->assertCount(1, $client->getCrawler()->filter('form[action="/admin/releves/verifier/2"]'));
         $this->assertCount(0, $client->getCrawler()->filter('form[action="/admin/releves/verifier/1"]'));
