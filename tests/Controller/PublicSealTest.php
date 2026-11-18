@@ -52,6 +52,7 @@ final class PublicSealTest extends WebTestCase
         $this->assertSelectorTextContains('#sceau', 'au bloc 976246');
         $this->assertSelectorTextContains('#sceau pre', 'git clone --branch v0.14.0 https://github.com/mesa-black/sablier');
         $this->assertSelectorTextContains('#sceau pre', 'verify releves/2/seal.sig --declare=sablier.json');
+        $this->assertSelectorTextContains('#sceau', 'avec PHP 8.4 ou plus récent, ou à défaut Docker');
     }
 
     public function testAFailedSealIsNotShown(): void
