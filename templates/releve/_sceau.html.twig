@@ -1,0 +1,17 @@
+{# The seal of the relevé's files, as Sablier last found it on this server,
+   and how to check it without trusting this server. Included by
+   bin/sync-prototype in the method, before the table of every relevé. #}
+{% if sceau|default(null) %}
+{% set attested = (sceau.timestamps ?? [])|filter(t => t.state in ['valid', 'untrusted'])|map(t => t.authority ?: t.file) %}
+{% set anchored = (sceau.anchors ?? [])|filter(a => a.state == 'valid')|first %}
+<div class="sceau" id="sceau">
+    <h3><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg> Le sceau</h3>
+    <p>Les {{ sceau.files.count }} fichiers de ce relevé, mesures et description, ont été scellés par <a href="https://github.com/mesa-black/sablier" rel="noopener">Sablier</a> le {{ sceau.signed_at|date('d/m/Y à H:i') }} (heure de Paris) : leur liste, avec l'empreinte SHA-256 de chacun, est signée en Ed25519 et en {{ sceau.signature.hybrid_algorithm ?? 'ML-DSA-65' }}, une signature post-quantique{% if attested|length %}, datée par {{ attested|length > 1 ? attested|slice(0, -1)|join(', ') ~ ' et ' ~ attested|last : attested|first }}{% endif %}{% if anchored %}, et ancrée dans la chaîne Bitcoin au bloc {{ anchored.height }}{% else %} ; son ancrage dans la chaîne Bitcoin est en cours{% endif %}. Un octet changé depuis dans l'un de ces fichiers romprait le sceau.</p>
+    <p>Sablier l'a revérifié sur ce serveur le {{ sceau.checked_at|date('d/m/Y') }}. Pour le vérifier vous-même, sans faire confiance à ce serveur :</p>
+    <pre><code>git clone --branch v{{ sceau.sablier ?? '0.14.0' }} https://github.com/mesa-black/sablier
+git clone https://github.com/mesa-black/observatoire
+cd observatoire
+../sablier/sablier verify releves/{{ releve.number }}/seal.sig --declare=sablier.json</code></pre>
+    <p><a href="https://github.com/mesa-black/observatoire/tree/main/releves/{{ releve.number }}" rel="noopener">Les fichiers scellés sur GitHub →</a></p>
+</div>
+{% endif %}

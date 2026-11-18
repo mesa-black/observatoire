@@ -1,0 +1,6 @@
+{# One line under the headline when the relevé's files are sealed and Sablier
+   found the seal sound here. Included by bin/sync-prototype after the chapo;
+   the detail is in _sceau.html.twig, in the method. #}
+{% if sceau|default(null) %}
+<p class="sceau-tete"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg> Données scellées le {{ sceau.signed_at|date('d/m/Y') }} · <a href="#sceau">vérifier</a></p>
+{% endif %}
