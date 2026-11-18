@@ -6,6 +6,7 @@ use App\Releve\DataBuilder;
 use App\Releve\PreviewLinks;
 use App\Releve\Releve;
 use App\Releve\ReleveRepository;
+use App\Releve\SealVerifier;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -16,6 +17,7 @@ final class ReleveController extends AbstractController
     public function __construct(
         private readonly ReleveRepository $releves,
         private readonly DataBuilder $data,
+        private readonly SealVerifier $seals,
     ) {
     }
 
@@ -65,7 +67,12 @@ final class ReleveController extends AbstractController
             ['number' => $before->number, 'date' => $before->date, 'url' => $this->generateUrl('releve', ['number' => $before->number]), 'doors' => $this->data->doors($before)],
             \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_UNICODE | \JSON_UNESCAPED_SLASHES | \JSON_HEX_TAG | \JSON_HEX_AMP,
         );
-        $response = $this->render('releve/show.html.twig', ['releve' => $releve, 'donnees' => $this->data->json($releve), 'avant' => $avant, 'is_home' => $isHome, 'serie' => $this->releves->series($releve)]);
+        // The seal is told to the public only as Sablier last found it here:
+        // sound, and about the seal in the repository today. Anything else,
+        // the page says nothing, and the admin says why.
+        $last = $this->seals->isChecked($releve) ? $this->seals->last($releve) : null;
+        $sceau = true === ($last['valid'] ?? false) ? $last : null;
+        $response = $this->render('releve/show.html.twig', ['releve' => $releve, 'donnees' => $this->data->json($releve), 'avant' => $avant, 'is_home' => $isHome, 'serie' => $this->releves->series($releve), 'sceau' => $sceau]);
         // Short: the page that / shows changes when the next relevé's time comes.
         // Private: it carries a script nonce, which no shared cache may hand out.
         $response->setPrivate();

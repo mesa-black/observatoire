@@ -158,3 +158,13 @@ a.serie-plaque:hover { background: var(--p-scelle); color: var(--sur-scelle); }
     -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
 }
 .scan-son.son-fixe[aria-pressed="true"] { background: #ff3b30; color: #0b0606; }
+
+/* The seal of the relevé's files: a line under the headline, the detail in
+   the method. Shown only when Sablier found the seal sound on this server. */
+.sceau-tete { display: flex; align-items: center; gap: .4rem; margin: .7rem 0 0; font-size: .9rem; color: var(--doux); }
+.sceau-tete svg, .sceau h3 svg { width: 1.1em; height: 1.1em; flex: none; fill: none; stroke: var(--vif); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.sceau { margin-top: 2rem; padding: 1.2rem 1.4rem; max-width: 46rem; background: var(--papier); border: 1px solid var(--filet); border-radius: 10px; scroll-margin-top: 1.5rem; }
+.sceau h3 { display: flex; align-items: center; gap: .45rem; margin: 0 0 .5rem; font: 800 1rem/1.3 var(--sans); }
+.sceau p { margin: 0 0 .7rem; font-size: .9rem; color: var(--doux); }
+.sceau p:last-child { margin-bottom: 0; }
+.sceau pre { margin: 0 0 .8rem; padding: .8rem 1rem; border-radius: 8px; background: var(--creme); border: 1px solid var(--filet); font: 400 .8rem/1.5 var(--mono); overflow-x: auto; }
