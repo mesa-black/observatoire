@@ -54,7 +54,7 @@
             {% set s = sceaux[r.number] %}
             <tr id="releve-{{ r.number }}">
                 <td>{{ r.number }}</td>
-                <td>{{ r.title }}</td>
+                <td>{{ r.title }}{% if s.sealed %} <span class="scelle" title="Scellé par Sablier">{{ ui.ico('bouclier') }}</span>{% endif %}</td>
                 <td>{{ r.date }}</td>
                 <td>{{ r.publishedAt|date }}</td>
                 <td>{% if r.isPublishedAt(now) %}<span class="badge publie">publié</span>{% elseif r.draft %}<span class="badge draft">brouillon</span>{% else %}<span class="badge a-venir">à venir</span>{% endif %}</td>
@@ -62,7 +62,8 @@
                 <td class="fin">
                     <div class="actions">
                         {% if r.isPublishedAt(now) %}<a href="{{ path('releve', {number: r.number}) }}" class="bouton second">{{ ui.ico('site') }} Voir</a>{% else %}<a href="{{ path('admin_releve_preview', {number: r.number}) }}" class="bouton second">{{ ui.ico('oeil') }} Aperçu</a>{% endif %}
-                        {% if s.sealed %}
+                        {# Checked and found sound: the daily tick and "Tout vérifier" are enough. #}
+                        {% if s.sealed and not (s.last.valid ?? false) %}
                             <form method="post" action="{{ path('admin_releve_verify', {number: r.number}) }}">
                                 <input type="hidden" name="_token" value="{{ csrf_token('verifier-sceau') }}">
                                 <button type="submit" class="second">{{ ui.ico('bouclier') }} Vérifier</button>

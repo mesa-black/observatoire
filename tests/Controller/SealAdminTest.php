@@ -44,6 +44,9 @@ final class SealAdminTest extends WebTestCase
         // A button only where there is a seal to check: relevé 2 here.
         $this->assertCount(1, $client->getCrawler()->filter('form[action="/admin/releves/verifier/2"]'));
         $this->assertCount(0, $client->getCrawler()->filter('form[action="/admin/releves/verifier/1"]'));
+        // The shield beside the title of a sealed relevé, and only there.
+        $this->assertSelectorExists('#releve-2 .scelle');
+        $this->assertSelectorNotExists('#releve-1 .scelle');
     }
 
     public function testCheckingASealShowsWhenItWasSealedAndWhenChecked(): void
@@ -60,6 +63,9 @@ final class SealAdminTest extends WebTestCase
         $this->assertSelectorTextContains('#releve-2 td.sceau', 'par DigiCert');
         $this->assertSelectorTextContains('#releve-2 td.sceau', 'Ancré au bloc 976246');
         $this->assertSelectorTextContains('#releve-2 td.sceau', 'Vérifié le 16/10/2026 14:00 par Sablier 0.14.0');
+        // Found sound: no button of its own any more, the shield stays.
+        $this->assertCount(0, $client->getCrawler()->filter('form[action="/admin/releves/verifier/2"]'));
+        $this->assertSelectorExists('#releve-2 .scelle');
     }
 
     public function testAFailedCheckSaysWhatFailed(): void
@@ -73,6 +79,8 @@ final class SealAdminTest extends WebTestCase
         $this->assertSelectorTextContains('.erreur', '1 sceau en échec sur 1');
         $this->assertSelectorTextContains('#releve-2 td.sceau .badge', 'échec');
         $this->assertSelectorTextContains('#releve-2 td.sceau', 'broken modifié depuis le scellé');
+        // A failed seal keeps its button, to check again once mended.
+        $this->assertCount(1, $client->getCrawler()->filter('form[action="/admin/releves/verifier/2"]'));
     }
 
     public function testCheckingRequiresTheFormsToken(): void
