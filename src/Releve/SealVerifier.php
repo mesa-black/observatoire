@@ -54,16 +54,23 @@ final class SealVerifier
         return \is_array($result) ? $result : null;
     }
 
+    /** Sablier has a result for this very seal: one resealed since is not checked yet. */
+    public function isChecked(Releve $releve): bool
+    {
+        return $this->isSealed($releve)
+            && ($this->last($releve)['seal_sha256'] ?? null) === hash_file('sha256', $releve->dir.'/seal.sig');
+    }
+
     /** No check yet, a seal that changed since the last one, or a check too old. */
     public function isDue(Releve $releve): bool
     {
         if (!$this->isSealed($releve)) {
             return false;
         }
-        $last = $this->last($releve);
-        if (null === $last || ($last['seal_sha256'] ?? null) !== hash_file('sha256', $releve->dir.'/seal.sig')) {
+        if (!$this->isChecked($releve)) {
             return true;
         }
+        $last = $this->last($releve);
         $checkedAt = \DateTimeImmutable::createFromFormat(\DateTimeInterface::ATOM, (string) ($last['checked_at'] ?? ''));
 
         return false === $checkedAt || $checkedAt < $this->clock->now()->modify('-'.self::RECHECK_DAYS.' days');

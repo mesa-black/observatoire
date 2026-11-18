@@ -47,7 +47,7 @@ final class DashboardController extends AbstractController
         $all = array_reverse($releves->all(), true);
         $sceaux = [];
         foreach ($all as $number => $releve) {
-            $sceaux[$number] = ['sealed' => $seals->isSealed($releve), 'last' => $seals->last($releve)];
+            $sceaux[$number] = ['sealed' => $seals->isSealed($releve), 'checked' => $seals->isChecked($releve), 'last' => $seals->last($releve)];
         }
 
         return $this->render('admin/releves.html.twig', [
@@ -63,8 +63,9 @@ final class DashboardController extends AbstractController
 
     /**
      * Ask Sablier now, rather than waiting for the daily tick. One relevé, or
-     * every sealed one. Checking needs only the public keys: resealing is done
-     * on the owner's machine (make seal), never here.
+     * every seal not checked yet: one already checked is left to the weekly
+     * tick. Checking needs only the public keys: resealing is done on the
+     * owner's machine (make seal), never here.
      */
     #[Route('/admin/releves/verifier/{number}', name: 'admin_releve_verify', requirements: ['number' => '\d+'], defaults: ['number' => null], methods: ['POST'])]
     public function verify(Request $request, ?int $number, ReleveRepository $releves, SealVerifier $seals): Response
@@ -76,7 +77,7 @@ final class DashboardController extends AbstractController
             $one = $releves->find($number) ?? throw new NotFoundHttpException();
             $targets = [$one];
         } else {
-            $targets = array_values($releves->all());
+            $targets = array_values(array_filter($releves->all(), static fn ($r) => !$seals->isChecked($r)));
         }
         $held = $failed = 0;
         foreach ($targets as $releve) {
@@ -90,7 +91,7 @@ final class DashboardController extends AbstractController
             }
         }
         if (0 === $held + $failed) {
-            $this->addFlash('erreur', 'Aucun relevé scellé à vérifier : make seal N=… sur le poste qui détient la clé.');
+            $this->addFlash('ok', 'Aucun sceau en attente de vérification : chacun est revérifié chaque semaine.');
         } elseif (0 === $failed) {
             $this->addFlash('ok', 1 === $held ? 'Sceau vérifié par Sablier : conforme.' : $held.' sceaux vérifiés par Sablier : tous conformes.');
         } else {

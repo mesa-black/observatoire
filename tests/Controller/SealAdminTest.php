@@ -79,8 +79,27 @@ final class SealAdminTest extends WebTestCase
         $this->assertSelectorTextContains('.erreur', '1 sceau en échec sur 1');
         $this->assertSelectorTextContains('#releve-2 td.sceau .badge', 'échec');
         $this->assertSelectorTextContains('#releve-2 td.sceau', 'broken modifié depuis le scellé');
-        // A failed seal keeps its button, to check again once mended.
-        $this->assertCount(1, $client->getCrawler()->filter('form[action="/admin/releves/verifier/2"]'));
+        // Checked, even if it failed: the weekly tick checks it again, or a new seal does.
+        $this->assertCount(0, $client->getCrawler()->filter('form[action="/admin/releves/verifier/2"]'));
+    }
+
+    public function testCheckingAllLeavesTheSealsAlreadyChecked(): void
+    {
+        $client = $this->loggedIn();
+        $client->request('GET', '/admin/releves');
+        $this->assertSelectorTextContains('form[action="/admin/releves/verifier"] button', 'Tout vérifier maintenant (1)');
+        $token = $client->getCrawler()->filter('form[action="/admin/releves/verifier"] input[name="_token"]')->attr('value');
+        $client->submit($client->getCrawler()->filter('form[action="/admin/releves/verifier"]')->form());
+        $client->followRedirect();
+
+        $this->assertSelectorTextContains('.flash', 'conforme');
+        $this->assertCount(0, $client->getCrawler()->filter('form[action="/admin/releves/verifier"]'));
+        $this->assertSelectorTextContains('main', 'Tous les sceaux ont été vérifiés.');
+
+        // Asked anyway, with nothing left to check: Sablier is not run again.
+        $client->request('POST', '/admin/releves/verifier', ['_token' => $token]);
+        $client->followRedirect();
+        $this->assertSelectorTextContains('.flash', 'Aucun sceau en attente de vérification');
     }
 
     public function testCheckingRequiresTheFormsToken(): void

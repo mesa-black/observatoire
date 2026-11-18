@@ -62,8 +62,8 @@
                 <td class="fin">
                     <div class="actions">
                         {% if r.isPublishedAt(now) %}<a href="{{ path('releve', {number: r.number}) }}" class="bouton second">{{ ui.ico('site') }} Voir</a>{% else %}<a href="{{ path('admin_releve_preview', {number: r.number}) }}" class="bouton second">{{ ui.ico('oeil') }} Aperçu</a>{% endif %}
-                        {# Checked and found sound: the daily tick and "Tout vérifier" are enough. #}
-                        {% if s.sealed and not (s.last.valid ?? false) %}
+                        {# Once checked, the weekly tick checks it again; resealed, it is unchecked again. #}
+                        {% if s.sealed and not s.checked %}
                             <form method="post" action="{{ path('admin_releve_verify', {number: r.number}) }}">
                                 <input type="hidden" name="_token" value="{{ csrf_token('verifier-sceau') }}">
                                 <button type="submit" class="second">{{ ui.ico('bouclier') }} Vérifier</button>
@@ -81,12 +81,15 @@
 
 <section class="carte">
     <h2>{{ ui.ico('bouclier') }} Sceaux</h2>
-    <p class="discret">Chaque relevé est scellé par Sablier sur le poste qui détient la clé (<code>make seal N=…</code>) : la liste de ses fichiers, signée en Ed25519 et ML-DSA-65, datée par des autorités d'horodatage et ancrée dans la chaîne Bitcoin. Ici, Sablier ne fait que vérifier, avec les clés publiques de <code>sablier.json</code> : le jour même pour un sceau nouveau, chaque semaine ensuite, et quand vous le demandez. Modifier un fichier d'un relevé, y compris son <code>meta.json</code>, demande de le resceller.</p>
-    {% if sceaux|filter(s => s.sealed)|length %}
+    <p class="discret">Chaque relevé est scellé par Sablier sur le poste qui détient la clé (<code>make seal N=…</code>) : la liste de ses fichiers, signée en Ed25519 et ML-DSA-65, datée par des autorités d'horodatage et ancrée dans la chaîne Bitcoin. Ici, Sablier ne fait que vérifier, avec les clés publiques de <code>sablier.json</code> : le jour même pour un sceau nouveau, chaque semaine ensuite, et ici pour ceux qui ne l'ont pas encore été. Modifier un fichier d'un relevé, y compris son <code>meta.json</code>, demande de le resceller.</p>
+    {% set unchecked = sceaux|filter(s => s.sealed and not s.checked)|length %}
+    {% if unchecked %}
         <form method="post" action="{{ path('admin_releve_verify') }}" class="actions">
             <input type="hidden" name="_token" value="{{ csrf_token('verifier-sceau') }}">
-            <button type="submit">{{ ui.ico('bouclier') }} Tout vérifier maintenant</button>
+            <button type="submit">{{ ui.ico('bouclier') }} Tout vérifier maintenant ({{ unchecked }})</button>
         </form>
+    {% elseif sceaux|filter(s => s.sealed)|length %}
+        <p class="discret">Tous les sceaux ont été vérifiés.</p>
     {% endif %}
 </section>
 
