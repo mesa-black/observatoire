@@ -83,6 +83,23 @@ RUN set -eux; \
 	# Whatever the permissions on the workstation, the server (not root) reads it all.
 	chmod -R a+rX /app
 
+# ------------------------------------------------------------------ sablier
+# Sablier checks the relevés' seals (admin, and the consumer's weekly tick).
+# Its release archive, pinned by the digest its release notes publish: a
+# different file is refused at build time. Only what runs is kept; it needs
+# PHP with sodium and the openssl binary (3.5, for ML-DSA), both in the base.
+FROM --platform=$BUILDPLATFORM frankenphp_upstream AS sablier_release
+
+ARG SABLIER_VERSION=0.14.0
+ADD --checksum=sha256:465927a523849ed56e12001d95244f7dd09741aaf45fa11803ba9d7d4d568717 \
+	https://github.com/mesa-black/sablier/releases/download/v${SABLIER_VERSION}/sablier-${SABLIER_VERSION}.tar.gz /tmp/sablier.tar.gz
+RUN set -eux; \
+	mkdir /opt/sablier; \
+	tar -xzf /tmp/sablier.tar.gz -C /opt/sablier --strip-components=1 \
+		"sablier-${SABLIER_VERSION}/bin" "sablier-${SABLIER_VERSION}/src" \
+		"sablier-${SABLIER_VERSION}/translations" "sablier-${SABLIER_VERSION}/LICENSE"; \
+	chmod -R a+rX /opt/sablier
+
 # ------------------------------------------------------------------ prod
 FROM frankenphp_base AS frankenphp_prod
 
@@ -90,6 +107,7 @@ ENV APP_ENV=prod
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 COPY --link devops/frankenphp/conf.d/20-app.prod.ini $PHP_INI_DIR/app.conf.d/
 COPY --link --from=app_build /app /app
+COPY --link --from=sablier_release /opt/sablier /opt/sablier
 
 # Not root. The uid of the blog's image: no user database entry needed.
 USER 65532:65532

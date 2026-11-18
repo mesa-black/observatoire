@@ -19,6 +19,9 @@ final class Schedule implements ScheduleProviderInterface
     {
         return (new SymfonySchedule())
             ->add(RecurringMessage::every('1 minute', new SendDueNewsletters()))
-            ->add(RecurringMessage::every('1 day', new PurgePendingSubscribers()));
+            ->add(RecurringMessage::every('1 day', new PurgePendingSubscribers()))
+            // Daily, but each relevé only when it is due: never checked, its
+            // seal changed with a new image, or its last check is a week old.
+            ->add(RecurringMessage::every('1 day', new VerifySeals()));
     }
 }
