@@ -97,35 +97,35 @@ stream
 BT 0 g /F2 10.0 Tf 56.00 785.89 Td (RSA non déclaré confiance moyenne) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 768.09 Td (Signature : pas de récolte possible. À migrer avant 2030 pour la conformité, sans urgence de confidentialité.) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 754.98 Td (Jetons JWT. Dépendance déclarée : l'usage réel reste à confirmer.) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 736.87 Td (Accepter ce constat : sablier accept 32ceddb0 --reason="…" --until=2027-05-17) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 736.87 Td (Accepter ce constat : sablier accept 32ceddb0 --reason="…" --until=2027-05-20) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 718.76 Td (L'outil a tort ? Ouvrir un signalement pré-rempli) Tj ET
 BT 0 g /F2 10.0 Tf 56.00 689.65 Td (RSA non déclaré confiance moyenne) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 671.85 Td (Signature : pas de récolte possible. À migrer avant 2030 pour la conformité, sans urgence de confidentialité.) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 658.74 Td (JOSE. Dépendance déclarée : l'usage réel reste à confirmer.) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 640.63 Td (Accepter ce constat : sablier accept 14c1370d --reason="…" --until=2027-05-17) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 640.63 Td (Accepter ce constat : sablier accept 14c1370d --reason="…" --until=2027-05-20) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 622.52 Td (L'outil a tort ? Ouvrir un signalement pré-rempli) Tj ET
 BT 0 g /F2 10.0 Tf 56.00 593.41 Td (ECDSA non déclaré confiance moyenne) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 575.61 Td (Signature : pas de récolte possible. À migrer avant 2030 pour la conformité, sans urgence de confidentialité.) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 562.50 Td (Passkeys : signatures ECDSA/EdDSA côté authentificateur. Dépendance déclarée : l'usage réel reste à confirmer.) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 544.39 Td (Accepter ce constat : sablier accept 77b12984 --reason="…" --until=2027-05-17) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 544.39 Td (Accepter ce constat : sablier accept 77b12984 --reason="…" --until=2027-05-20) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 526.28 Td (L'outil a tort ? Ouvrir un signalement pré-rempli) Tj ET
 BT 0 g /F2 10.0 Tf 56.00 497.17 Td (SHA-1 non déclaré confiance moyenne) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 479.37 Td (Déclaré et non observé : SHA-1. Peut ne jamais être employé, être imposé par la spécification d'un protocole, ou) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 466.26 Td (être remplacé au déploiement — à confirmer avant toute action. TOTP : SHA-1 par spécification, sans enjeu) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 453.15 Td (quantique. Dépendance déclarée : l'usage réel reste à confirmer.) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 435.04 Td (Accepter ce constat : sablier accept 56aa6998 --reason="…" --until=2027-05-17) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 435.04 Td (Accepter ce constat : sablier accept 56aa6998 --reason="…" --until=2027-05-20) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 416.93 Td (L'outil a tort ? Ouvrir un signalement pré-rempli) Tj ET
 BT 0 g /F2 10.0 Tf 56.00 387.82 Td (ECDSA non déclaré) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 370.02 Td (Signature : pas de récolte possible. À migrer avant 2030 pour la conformité, sans urgence de confidentialité.) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 356.91 Td (Certificat serveur. Sa durée de vie est courte : le remplacer par une signature post-quantique se fera au) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 343.80 Td (renouvellement, sans migration de données.) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 325.69 Td (Accepter ce constat : sablier accept 4b5c069a --reason="…" --until=2027-05-17) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 325.69 Td (Accepter ce constat : sablier accept 4b5c069a --reason="…" --until=2027-05-20) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 307.58 Td (L'outil a tort ? Ouvrir un signalement pré-rempli) Tj ET
 BT 0 g /F2 10.0 Tf 56.00 278.47 Td (ECDSA non déclaré) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 260.67 Td (Signature : pas de récolte possible. À migrer avant 2030 pour la conformité, sans urgence de confidentialité.) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 247.56 Td (Certificat serveur. Sa durée de vie est courte : le remplacer par une signature post-quantique se fera au) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 234.45 Td (renouvellement, sans migration de données.) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 216.34 Td (Accepter ce constat : sablier accept 2aa69b43 --reason="…" --until=2027-05-17) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 216.34 Td (Accepter ce constat : sablier accept 2aa69b43 --reason="…" --until=2027-05-20) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 198.23 Td (L'outil a tort ? Ouvrir un signalement pré-rempli) Tj ET
 BT 0 g /F2 11.5 Tf 56.00 169.12 Td (CONFORME 9) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 149.25 Td (-) Tj ET
@@ -195,7 +195,7 @@ BT 0 g /F2 11.5 Tf 56.00 329.94 Td (Ce qu'il a cherché et n'a pas trouvé) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 310.07 Td (Chaque ligne est un résultat, pas un silence : un détecteur a ouvert ces fichiers et n'en a rien tiré. Le nombre est là) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 296.96 Td (pour que vous puissiez juger la portée de la phrase plutôt que la croire.) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 278.85 Td (-) Tj ET
-BT 0 g /F1 9.5 Tf 70.00 278.85 Td (282 fichier\(s\) lu\(s\) : aucune clé privée, aucun certificat, aucun magasin de clés dans l'arborescence versionnée.) Tj ET
+BT 0 g /F1 9.5 Tf 70.00 278.85 Td (300 fichier\(s\) lu\(s\) : aucune clé privée, aucun certificat, aucun magasin de clés dans l'arborescence versionnée.) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 262.74 Td (-) Tj ET
 BT 0 g /F1 9.5 Tf 70.00 262.74 Td (10 fichier\(s\) binaire\(s\) examiné\(s\) : aucun ne porte de bloc de clé, d'octets après la fin de l'image, ni) Tj ET
 BT 0 g /F1 9.5 Tf 70.00 249.63 Td (d'extension qui mente sur son contenu.) Tj ET
@@ -288,7 +288,7 @@ BT 0 g /F2 11.5 Tf 56.00 186.60 Td (Faux positif ?) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 166.73 Td (Deux choses s'appellent « faux positif », et elles ne vont pas au même endroit.) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 148.62 Td (1. L'outil a raison, mais ce constat est accepté ici. C'est une décision de projet : ajoutez ce bloc à votre déclaration,) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 135.51 Td (elle est versionnée, donc la relecture se fait en revue de code. La raison et la date d'expiration sont obligatoires.) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 117.40 Td (En ligne de commande : sablier accept <empreinte> --reason="…" --until=2027-05-17) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 117.40 Td (En ligne de commande : sablier accept <empreinte> --reason="…" --until=2027-05-20) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 99.29 Td (2. L'outil a tort. C'est une règle à corriger, et sa place est dans le dépôt de Sablier : github.com/mesa-black/sablier) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 81.18 Td (L'empreinte imprimée à côté de chaque constat le désigne, et c'est elle qu'on cite dans les deux cas. Elle est) Tj ET
 BT 0.45 g /F1 7.5 Tf 56.00 38.00 Td (Sablier — Observatoire post-quantique · 4/6) Tj ET
@@ -299,7 +299,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 15 0 R /F2 16 0 R /F3 17 0 R >> >> /Contents 12 0 R >>
 endobj
 12 0 obj
-<< /Length 6658 >>
+<< /Length 6622 >>
 stream
 BT 0 g /F1 9.5 Tf 56.00 785.89 Td (calculée sur la preuve, pas sur le numéro de ligne : elle survit à un déplacement du code, et change le jour où la) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 772.78 Td (ligne change vraiment.) Tj ET
@@ -353,10 +353,10 @@ BT 0 g /F1 9.5 Tf 56.00 176.73 Td (Le client officiel \(pip install opentimestam
 BT 0 g /F1 9.5 Tf 56.00 163.62 Td (verify le prend auprès de deux explorateurs publics qui doivent concorder, et vérifie lui-même la preuve de travail) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 150.51 Td (de l'en-tête plutôt que de les croire ; sur une machine sans réseau, l'en-tête se passe à la main avec) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 137.40 Td (--block-header.) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 119.29 Td (Ce que la signature garantit : la liste de ce qui a été trouvé — chaque algorithme, le fichier où il a été trouvé, le) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 106.18 Td (verdict qui lui a été donné. Elle ne dépend ni de la mise en page ni de la langue : la même analyse se vérifie en) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 93.07 Td (français, en anglais ou en espagnol. La page elle-même a sa propre signature, dans le fichier report.html.page.sig) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 79.96 Td (déposé à côté d'elle. Celle-là est calculée sur une empreinte du fichier — changez un seul caractère et l'empreinte) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 119.29 Td (Cette date est antérieure à celle du rapport \(20/11/2026 02:07 UTC\), et ce n'est pas une incohérence : les constats) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 106.18 Td (n'ont pas bougé depuis, donc la signature et le jeton d'origine sont tous deux conservés. Seul le rendu a changé.) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 93.07 Td (C'est l'attestation la plus ancienne qui a une valeur — en resignant et en réattestant à chaque passage, on détruirait) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 79.96 Td (l'antériorité qu'elle établit, pour n'y gagner aucune information nouvelle.) Tj ET
 BT 0.45 g /F1 7.5 Tf 56.00 38.00 Td (Sablier — Observatoire post-quantique · 5/6) Tj ET
 
 endstream
@@ -365,15 +365,19 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 15 0 R /F2 16 0 R /F3 17 0 R >> >> /Contents 14 0 R >>
 endobj
 14 0 obj
-<< /Length 1087 >>
+<< /Length 1718 >>
 stream
-BT 0 g /F1 9.5 Tf 56.00 785.89 Td (change complètement —, si bien que si un seul caractère de cette page est modifié, un verdict, une date, une) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 772.78 Td (virgule, la vérification échoue. Ce qu'aucune des deux ne peut empêcher : celui qui détient la clé de signature peut) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 759.67 Td (signer une autre page. Savoir quelle clé est la bonne, c'est l'objet du paragraphe suivant. Une seule commande) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 746.56 Td (vérifie les deux : sablier verify report.html.sig --declare=sablier.json) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 728.45 Td (Ce que les signatures établissent : la liste et la page ont été signées par la clé que la déclaration désigne. Ce qui) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 715.34 Td (rattache cette clé à quelqu'un n'est pas cette page — c'est l'historique du fichier qui la déclare, où tout changement) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 702.23 Td (de clé est un commit daté que n'importe qui peut relire.) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 785.89 Td (Ce que la signature garantit : la liste de ce qui a été trouvé — chaque algorithme, le fichier où il a été trouvé, le) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 772.78 Td (verdict qui lui a été donné. Elle ne dépend ni de la mise en page ni de la langue : la même analyse se vérifie en) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 759.67 Td (français, en anglais ou en espagnol. La page elle-même a sa propre signature, dans le fichier report.html.page.sig) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 746.56 Td (déposé à côté d'elle. Celle-là est calculée sur une empreinte du fichier — changez un seul caractère et l'empreinte) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 733.45 Td (change complètement —, si bien que si un seul caractère de cette page est modifié, un verdict, une date, une) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 720.34 Td (virgule, la vérification échoue. Ce qu'aucune des deux ne peut empêcher : celui qui détient la clé de signature peut) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 707.23 Td (signer une autre page. Savoir quelle clé est la bonne, c'est l'objet du paragraphe suivant. Une seule commande) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 694.12 Td (vérifie les deux : sablier verify report.html.sig --declare=sablier.json) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 676.01 Td (Ce que les signatures établissent : la liste et la page ont été signées par la clé que la déclaration désigne. Ce qui) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 662.90 Td (rattache cette clé à quelqu'un n'est pas cette page — c'est l'historique du fichier qui la déclare, où tout changement) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 649.79 Td (de clé est un commit daté que n'importe qui peut relire.) Tj ET
 BT 0.45 g /F1 7.5 Tf 56.00 38.00 Td (Sablier — Observatoire post-quantique · 6/6) Tj ET
 
 endstream
@@ -388,7 +392,7 @@ endobj
 << /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
 endobj
 18 0 obj
-<< /Title (Sablier — Observatoire post-quantique) /Producer (Sablier 0.13.2) /CreationDate (D:20261117125032) >>
+<< /Title (Sablier — Observatoire post-quantique) /Producer (Sablier 0.15.0) /CreationDate (D:20261120020722) >>
 endobj
 xref
 0 19
@@ -405,14 +409,14 @@ xref
 0000016561 00000 n 
 0000022528 00000 n 
 0000022685 00000 n 
-0000029395 00000 n 
-0000029552 00000 n 
-0000030691 00000 n 
-0000030789 00000 n 
-0000030892 00000 n 
-0000030988 00000 n 
+0000029359 00000 n 
+0000029516 00000 n 
+0000031286 00000 n 
+0000031384 00000 n 
+0000031487 00000 n 
+0000031583 00000 n 
 trailer
 << /Size 19 /Root 1 0 R /Info 18 0 R >>
 startxref
-31117
+31712
 %%EOF
