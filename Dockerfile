@@ -90,8 +90,8 @@ RUN set -eux; \
 # PHP with sodium and the openssl binary (3.5, for ML-DSA), both in the base.
 FROM --platform=$BUILDPLATFORM frankenphp_upstream AS sablier_release
 
-ARG SABLIER_VERSION=0.14.0
-ADD --checksum=sha256:465927a523849ed56e12001d95244f7dd09741aaf45fa11803ba9d7d4d568717 \
+ARG SABLIER_VERSION=0.16.0
+ADD --checksum=sha256:8436804c7917d7f279432221ae4a373cca65e8d86fd218c16a498ec0ecd7c40f \
 	https://github.com/mesa-black/sablier/releases/download/v${SABLIER_VERSION}/sablier-${SABLIER_VERSION}.tar.gz /tmp/sablier.tar.gz
 RUN set -eux; \
 	mkdir /opt/sablier; \
