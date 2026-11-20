@@ -353,7 +353,7 @@ BT 0 g /F1 9.5 Tf 56.00 176.73 Td (Le client officiel \(pip install opentimestam
 BT 0 g /F1 9.5 Tf 56.00 163.62 Td (verify le prend auprès de deux explorateurs publics qui doivent concorder, et vérifie lui-même la preuve de travail) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 150.51 Td (de l'en-tête plutôt que de les croire ; sur une machine sans réseau, l'en-tête se passe à la main avec) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 137.40 Td (--block-header.) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 119.29 Td (Cette date est antérieure à celle du rapport \(20/11/2026 02:07 UTC\), et ce n'est pas une incohérence : les constats) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 119.29 Td (Cette date est antérieure à celle du rapport \(20/11/2026 03:25 UTC\), et ce n'est pas une incohérence : les constats) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 106.18 Td (n'ont pas bougé depuis, donc la signature et le jeton d'origine sont tous deux conservés. Seul le rendu a changé.) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 93.07 Td (C'est l'attestation la plus ancienne qui a une valeur — en resignant et en réattestant à chaque passage, on détruirait) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 79.96 Td (l'antériorité qu'elle établit, pour n'y gagner aucune information nouvelle.) Tj ET
@@ -392,7 +392,7 @@ endobj
 << /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
 endobj
 18 0 obj
-<< /Title (Sablier — Observatoire post-quantique) /Producer (Sablier 0.15.0) /CreationDate (D:20261120020722) >>
+<< /Title (Sablier — Observatoire post-quantique) /Producer (Sablier 0.16.0) /CreationDate (D:20261120032515) >>
 endobj
 xref
 0 19
