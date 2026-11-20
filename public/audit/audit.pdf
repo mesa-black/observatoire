@@ -15,7 +15,7 @@ BT 0 g /F2 15.0 Tf 56.00 769.89 Td (Rapport d'audit — Observatoire post-quantiqu
 0.85 G 0.4 w 56.00 745.19 m 539.28 745.19 l S
 BT 0 g /F1 9.5 Tf 56.00 739.19 Td (Rapport d'audit) Tj ET
 BT 0 g /F2 11.5 Tf 56.00 710.08 Td (Observatoire post-quantique) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 690.21 Td (Exposition cryptographique et durées de confidentialité · 17/11/2026 12:50 UTC) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 690.21 Td (Exposition cryptographique et durées de confidentialité · 20/11/2026 02:07 UTC) Tj ET
 BT 0 g /F2 11.5 Tf 56.00 661.10 Td (Sommaire) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 641.23 Td (-) Tj ET
 BT 0 g /F1 9.5 Tf 70.00 641.23 Td (Objet et périmètre) Tj ET
@@ -51,11 +51,11 @@ BT 0 g /F1 9.5 Tf 206.00 388.82 Td ([à compléter]) Tj ET
 BT 0 g /F2 9.5 Tf 56.00 373.71 Td (Périmètre analysé) Tj ET
 BT 0 g /F1 9.5 Tf 206.00 373.71 Td (.) Tj ET
 BT 0 g /F2 9.5 Tf 56.00 358.60 Td (Date de l'analyse) Tj ET
-BT 0 g /F1 9.5 Tf 206.00 358.60 Td (17/11/2026 12:50 UTC) Tj ET
+BT 0 g /F1 9.5 Tf 206.00 358.60 Td (20/11/2026 02:07 UTC) Tj ET
 BT 0 g /F2 9.5 Tf 56.00 343.49 Td (Volume examiné) Tj ET
-BT 0 g /F1 9.5 Tf 206.00 343.49 Td (282 fichiers lus) Tj ET
+BT 0 g /F1 9.5 Tf 206.00 343.49 Td (300 fichiers lus) Tj ET
 BT 0 g /F2 9.5 Tf 56.00 328.38 Td (Outil) Tj ET
-BT 0 g /F1 9.5 Tf 206.00 328.38 Td (Sablier 0.13.2) Tj ET
+BT 0 g /F1 9.5 Tf 206.00 328.38 Td (Sablier 0.15.0) Tj ET
 BT 0 g /F2 9.5 Tf 56.00 313.27 Td (Commande exécutée) Tj ET
 BT 0 g /F1 9.5 Tf 206.00 313.27 Td (/sablier/bin/sablier scan . --out=public/audit/report.html) Tj ET
 BT 0 g /F1 9.5 Tf 206.00 300.16 Td (--audit=public/audit/audit.html --pdf=public/audit/report.pdf --lang=fr) Tj ET
@@ -73,7 +73,7 @@ BT 0 g /F1 9.5 Tf 56.00 122.19 Td (ce qui est réellement négocié, que le dépôt p
 BT 0 g /F1 9.5 Tf 56.00 104.08 Td (L'inventaire est ensuite croisé avec la durée pendant laquelle chaque catégorie de donnée doit rester) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 90.97 Td (confidentielle. Le raisonnement est celui de l'inégalité de Mosca \(2015\), simplifié :) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 72.86 Td (année de l'analyse + durée de confidentialité déclarée > péremption de l'algorithme  =>  la donnée déjà émise est) Tj ET
-BT 0.45 g /F1 7.5 Tf 56.00 38.00 Td (Rapport d'audit · Observatoire post-quantique · Sablier 0.13.2 · 1/8) Tj ET
+BT 0.45 g /F1 7.5 Tf 56.00 38.00 Td (Rapport d'audit · Observatoire post-quantique · Sablier 0.15.0 · 1/8) Tj ET
 
 endstream
 endobj
@@ -130,7 +130,7 @@ BT 0 g /F2 10.0 Tf 56.00 289.61 Td (Ce qu'il a cherché et n'a pas trouvé) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 271.81 Td (Chaque ligne est un résultat, pas un silence : un détecteur a ouvert ces fichiers et n'en a rien tiré. Le nombre est là) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 258.70 Td (pour que vous puissiez juger la portée de la phrase plutôt que la croire.) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 240.59 Td (-) Tj ET
-BT 0 g /F1 9.5 Tf 70.00 240.59 Td (282 fichier\(s\) lu\(s\) : aucune clé privée, aucun certificat, aucun magasin de clés dans l'arborescence versionnée.) Tj ET
+BT 0 g /F1 9.5 Tf 70.00 240.59 Td (300 fichier\(s\) lu\(s\) : aucune clé privée, aucun certificat, aucun magasin de clés dans l'arborescence versionnée.) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 224.48 Td (-) Tj ET
 BT 0 g /F1 9.5 Tf 70.00 224.48 Td (10 fichier\(s\) binaire\(s\) examiné\(s\) : aucun ne porte de bloc de clé, d'octets après la fin de l'image, ni) Tj ET
 BT 0 g /F1 9.5 Tf 70.00 211.37 Td (d'extension qui mente sur son contenu.) Tj ET
@@ -146,7 +146,7 @@ BT 0 g /F2 11.5 Tf 56.00 119.82 Td (4. Références normatives) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 99.95 Td (La date de péremption retenue est une échéance réglementaire, pas une prédiction de rupture cryptographique.) Tj ET
 BT 0 g /F2 8.5 Tf 56.00 75.84 Td (FIPS 203 / 204 / 205 \(2024\)) Tj ET
 BT 0 g /F2 8.5 Tf 297.64 75.84 Td (ML-KEM, ML-DSA et SLH-DSA normalisés \(août 2024\).) Tj ET
-BT 0.45 g /F1 7.5 Tf 56.00 38.00 Td (Rapport d'audit · Observatoire post-quantique · Sablier 0.13.2 · 2/8) Tj ET
+BT 0.45 g /F1 7.5 Tf 56.00 38.00 Td (Rapport d'audit · Observatoire post-quantique · Sablier 0.15.0 · 2/8) Tj ET
 
 endstream
 endobj
@@ -213,7 +213,7 @@ BT 0 g /F1 8.5 Tf 297.64 253.96 Td (déployé, et exigée pour les visas de sécurit
 BT 0 g /F1 8.5 Tf 297.64 242.23 Td (2030, l'ANSSI estime qu'il ne sera plus raisonnable d'acquérir) Tj ET
 BT 0 g /F1 8.5 Tf 297.64 230.50 Td (un produit sans post-quantique.) Tj ET
 0.85 G 0.4 w 56.00 215.77 m 539.28 215.77 l S
-BT 0.45 g /F1 7.5 Tf 56.00 38.00 Td (Rapport d'audit · Observatoire post-quantique · Sablier 0.13.2 · 3/8) Tj ET
+BT 0.45 g /F1 7.5 Tf 56.00 38.00 Td (Rapport d'audit · Observatoire post-quantique · Sablier 0.15.0 · 3/8) Tj ET
 
 endstream
 endobj
@@ -325,7 +325,7 @@ BT 0 g /F1 8.5 Tf 345.97 134.49 Td (256', 'apercu:'.$number,) Tj ET
 BT 0 g /F1 8.5 Tf 345.97 122.76 Td ($this->secret\), 0, 24\);) Tj ET
 BT 0 g /F1 8.5 Tf 442.62 157.95 Td (haute) Tj ET
 0.85 G 0.4 w 56.00 108.03 m 539.28 108.03 l S
-BT 0.45 g /F1 7.5 Tf 56.00 38.00 Td (Rapport d'audit · Observatoire post-quantique · Sablier 0.13.2 · 4/8) Tj ET
+BT 0.45 g /F1 7.5 Tf 56.00 38.00 Td (Rapport d'audit · Observatoire post-quantique · Sablier 0.15.0 · 4/8) Tj ET
 
 endstream
 endobj
@@ -439,7 +439,7 @@ BT 0 g /F1 8.5 Tf 345.97 111.95 Td (jusqu'à leur rotation.) Tj ET
 BT 0 g /F1 8.5 Tf 442.62 393.47 Td (Jérôme Nadaud ·) Tj ET
 BT 0 g /F1 8.5 Tf 442.62 381.74 Td (2026-11-17) Tj ET
 0.85 G 0.4 w 56.00 97.22 m 539.28 97.22 l S
-BT 0.45 g /F1 7.5 Tf 56.00 38.00 Td (Rapport d'audit · Observatoire post-quantique · Sablier 0.13.2 · 5/8) Tj ET
+BT 0.45 g /F1 7.5 Tf 56.00 38.00 Td (Rapport d'audit · Observatoire post-quantique · Sablier 0.15.0 · 5/8) Tj ET
 
 endstream
 endobj
@@ -521,7 +521,7 @@ BT 0 g /F2 10.0 Tf 56.00 134.91 Td (CONFORME) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 117.11 Td (Hachage de mot de passe : hors du périmètre post-quantique.) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 99.00 Td (Constatations concernées : n°5, n°6) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 80.89 Td (Résiste aux algorithmes quantiques connus.) Tj ET
-BT 0.45 g /F1 7.5 Tf 56.00 38.00 Td (Rapport d'audit · Observatoire post-quantique · Sablier 0.13.2 · 6/8) Tj ET
+BT 0.45 g /F1 7.5 Tf 56.00 38.00 Td (Rapport d'audit · Observatoire post-quantique · Sablier 0.15.0 · 6/8) Tj ET
 
 endstream
 endobj
@@ -591,7 +591,7 @@ BT 0 g /F2 9.5 Tf 56.00 102.88 Td (date attestée) Tj ET
 BT 0 g /F1 9.5 Tf 206.00 102.88 Td (17/11/2026 07:25 UTC · Asseco Data Systems S.A.) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 83.77 Td (Ce que l'horodatage établit : l'empreinte ci-dessus existait à cette date, selon un tiers qui n'a aucun intérêt dans) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 70.66 Td (ces conclusions. Aucune signature de ce rapport ne peut le prouver, puisque la date qu'elle porte sort de l'horloge) Tj ET
-BT 0.45 g /F1 7.5 Tf 56.00 38.00 Td (Rapport d'audit · Observatoire post-quantique · Sablier 0.13.2 · 7/8) Tj ET
+BT 0.45 g /F1 7.5 Tf 56.00 38.00 Td (Rapport d'audit · Observatoire post-quantique · Sablier 0.15.0 · 7/8) Tj ET
 
 endstream
 endobj
@@ -599,7 +599,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 19 0 R /F2 20 0 R /F3 21 0 R >> >> /Contents 18 0 R >>
 endobj
 18 0 obj
-<< /Length 3732 >>
+<< /Length 4327 >>
 stream
 BT 0 g /F1 9.5 Tf 56.00 785.89 Td (de la machine qui a signé. Sa limite : le jeton est signé en RSA-4096, que ce rapport classe lui-même comme) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 772.78 Td (vulnérable au quantique — c'est une preuve pour un litige dans les prochaines années, pas pour 2040.) Tj ET
@@ -618,18 +618,22 @@ BT 0 g /F1 9.5 Tf 56.00 607.57 Td (Le client officiel \(pip install opentimestam
 BT 0 g /F1 9.5 Tf 56.00 594.46 Td (verify le prend auprès de deux explorateurs publics qui doivent concorder, et vérifie lui-même la preuve de travail) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 581.35 Td (de l'en-tête plutôt que de les croire ; sur une machine sans réseau, l'en-tête se passe à la main avec) Tj ET
 BT 0 g /F1 9.5 Tf 56.00 568.24 Td (--block-header.) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 550.13 Td (Ce rapport porte deux signatures : Ed25519, vérifiable partout, et ML-DSA-65, qui résiste aux algorithmes) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 537.02 Td (quantiques connus. Aucune ne remplace l'autre — c'est l'hybridation que l'ANSSI demande, appliquée ici au) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 523.91 Td (document lui-même.) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 505.80 Td (Vérification par un tiers : sablier verify report.html.sig --declare=sablier.json) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 487.69 Td (Ce document a sa propre signature, dans le fichier audit.html.page.sig déposé à côté de lui. Elle est calculée sur) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 474.58 Td (une empreinte du fichier — changez un seul caractère et l'empreinte change complètement —, si bien que si un seul) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 461.47 Td (caractère de ce document est modifié, la vérification échoue. Le PDF, quand il y en a un, a la sienne à côté de lui,) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 448.36 Td (de la même façon. Pour la vérifier : sablier verify audit.html.page.sig --declare=sablier.json) Tj ET
-BT 0 g /F2 10.0 Tf 56.00 419.25 Td (Déclaration de l'auditeur) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 401.45 Td (Aucune déclaration de l'auditeur n'a été fournie. Elle doit être rédigée, datée et signée avant que ce document soit) Tj ET
-BT 0 g /F1 9.5 Tf 56.00 388.34 Td (produit devant un tiers.) Tj ET
-BT 0.45 g /F1 7.5 Tf 56.00 38.00 Td (Rapport d'audit · Observatoire post-quantique · Sablier 0.13.2 · 8/8) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 550.13 Td (Cette date est antérieure à celle du rapport \(20/11/2026 02:07 UTC\), et ce n'est pas une incohérence : les constats) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 537.02 Td (n'ont pas bougé depuis, donc la signature et le jeton d'origine sont tous deux conservés. Seul le rendu a changé.) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 523.91 Td (C'est l'attestation la plus ancienne qui a une valeur — en resignant et en réattestant à chaque passage, on détruirait) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 510.80 Td (l'antériorité qu'elle établit, pour n'y gagner aucune information nouvelle.) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 492.69 Td (Ce rapport porte deux signatures : Ed25519, vérifiable partout, et ML-DSA-65, qui résiste aux algorithmes) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 479.58 Td (quantiques connus. Aucune ne remplace l'autre — c'est l'hybridation que l'ANSSI demande, appliquée ici au) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 466.47 Td (document lui-même.) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 448.36 Td (Vérification par un tiers : sablier verify report.html.sig --declare=sablier.json) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 430.25 Td (Ce document a sa propre signature, dans le fichier audit.html.page.sig déposé à côté de lui. Elle est calculée sur) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 417.14 Td (une empreinte du fichier — changez un seul caractère et l'empreinte change complètement —, si bien que si un seul) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 404.03 Td (caractère de ce document est modifié, la vérification échoue. Le PDF, quand il y en a un, a la sienne à côté de lui,) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 390.92 Td (de la même façon. Pour la vérifier : sablier verify audit.html.page.sig --declare=sablier.json) Tj ET
+BT 0 g /F2 10.0 Tf 56.00 361.81 Td (Déclaration de l'auditeur) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 344.01 Td (Aucune déclaration de l'auditeur n'a été fournie. Elle doit être rédigée, datée et signée avant que ce document soit) Tj ET
+BT 0 g /F1 9.5 Tf 56.00 330.90 Td (produit devant un tiers.) Tj ET
+BT 0.45 g /F1 7.5 Tf 56.00 38.00 Td (Rapport d'audit · Observatoire post-quantique · Sablier 0.15.0 · 8/8) Tj ET
 
 endstream
 endobj
@@ -643,7 +647,7 @@ endobj
 << /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
 endobj
 22 0 obj
-<< /Title (Rapport d'audit — Observatoire post-quantique) /Producer (Sablier 0.13.2) /CreationDate (D:20261117125032) >>
+<< /Title (Rapport d'audit — Observatoire post-quantique) /Producer (Sablier 0.15.0) /CreationDate (D:20261120020723) >>
 endobj
 xref
 0 23
@@ -666,12 +670,12 @@ xref
 0000036183 00000 n 
 0000042110 00000 n 
 0000042267 00000 n 
-0000046051 00000 n 
-0000046149 00000 n 
-0000046252 00000 n 
-0000046348 00000 n 
+0000046646 00000 n 
+0000046744 00000 n 
+0000046847 00000 n 
+0000046943 00000 n 
 trailer
 << /Size 23 /Root 1 0 R /Info 22 0 R >>
 startxref
-46485
+47080
 %%EOF
